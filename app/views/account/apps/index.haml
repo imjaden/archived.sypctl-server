@@ -1,0 +1,32 @@
+%ol.breadcrumb
+  %li 应用管理
+  %li
+    %a{href: "#{url_for('/new')}?page=#{params[:page] || 1}"}
+      新建应用
+      %span.glyphicon.glyphicon-plus
+:css   
+  .table th:nth-child(1), .table td:nth-child(1) { width: 5%; }
+  .table th:nth-child(2), .table td:nth-child(2) { width: 20%; }
+  .table th:nth-child(3), .table td:nth-child(3) { text-align: center; width: 20%; }
+  .table th:nth-last-child(1), .table td:nth-last-child(1) { text-align: center; width: 10%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table
+  %thead
+    %th ID
+    %th 应用名称
+    %th 文件名称
+    %th 文件类型
+    %th 描述
+    %th 最新版本
+    %th 创建时间
+  %tbody
+    - @records.each do |record|
+      %tr{id: "dom_#{record.id}"}
+        %td= record.id
+        %td= record.name
+        %td= record.filename
+        %td= record.filetype
+        %td= record.description
+        %td
+        %td= (record.created_at || Time.now).strftime('%y/%m/%d %H:%M')
+
+= will_paginater @records

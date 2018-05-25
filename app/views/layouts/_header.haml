@@ -1,0 +1,12 @@
+-# coding: UTF-8
+%nav.navbar.navbar-default{style:"margin-bottom:0px;"}
+  .container
+    .col-sm-8.col-sm-offset-2
+      / Brand and toggle get grouped for better mobile display
+      .navbar-header
+        %button.navbar-toggle.collapsed{"data-target" => "#navbar-collapse", "data-toggle" => "collapse", :type => "button", "aria-expanded" => "false"}
+          %span.sr-only Toggle navigation
+          %span.icon-bar
+          %span.icon-bar
+          %span.icon-bar
+        = link_to Setting.website.title, "/", class: "navbar-brand"

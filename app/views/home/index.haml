@@ -1,0 +1,30 @@
+= stylesheet_link_tag 'user_login'
+
+.row
+  .bs-docs-masthead
+    %span.bs-docs-booticon.bs-docs-booticon-lg.bs-docs-booticon-outline= ENV["website.shortcut"]
+    %p.lead= ENV["website.slogan"]
+
+  .col-md-4.col-md-offset-4
+    - form_for @user, "/login", id: "loginForm", role: "form" do |f|
+      = text_field_tag :captcha, class: 'hidden'
+      .input-group
+        .input-group-addon
+          %span.glyphicon.glyphicon-user
+        = f.text_field :user_num, class: "form-control"
+      .input-group
+        .input-group-addon
+          %span.glyphicon.glyphicon-eye-close
+        = f.password_field :user_pass, class: "form-control"
+      .form-group
+        #popup-captcha{style:'text-align: center;'}
+      .form-group
+        = f.submit "登录", class: "btn btn-primary", disabled: 'disabled'
+
+.row.response.hidden{style: "margin-top:15%;"}
+  .col-md-offset-4.col-md-4.col-sm-8.col-sm-offset-2.col-xs-12
+    %p.result.text-primary{style: "text-align:center"}
+
+// http://static.geetest.com/static/tools/gt.js
+= javascript_include_tag 'init_geetest'
+= javascript_include_tag 'user_login'

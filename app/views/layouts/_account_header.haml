@@ -1,0 +1,60 @@
+-# coding: UTF-8
+%nav.navbar.navbar-default{role: 'navigation', style:'margin-bottom:0px;'}
+  .container
+    / Brand and toggle get grouped for better mobile display
+    .navbar-header
+      %button.navbar-toggle{'data-target' => '#navbar-collapse', 'data-toggle' => 'collapse', :type => 'button'}
+        %span.sr-only Toggle navigation
+        %span.icon-bar
+        %span.icon-bar
+        %span.icon-bar
+      = link_to '管理中心', '/account', class: 'navbar-brand'
+    / Collect the nav links, forms, and other content for toggling
+    .collapse.navbar-collapse{role: 'navigation', id:'navbar-collapse'}
+      %ul.nav.navbar-nav
+        %li
+          %a{href: "/account/apps"} 应用管理
+        %li
+          %a{href: "/account/devices"} 设备管理
+
+      %ul.nav.navbar-nav.navbar-right
+        %li.dropdown
+          %a{href: '#', class: 'dropdown-toggle', style: 'display:inline-block;padding-left:0px', 'data-toggle' => 'dropdown', role: 'button', 'aria-haspopup' => 'true', 'aria-expanded' => 'false'}
+            %span.glyphicon.glyphicon-user
+            = current_user.user_name
+            %span.caret
+          %ul.dropdown-menu
+            %li= link_to '基本资料', '#', 'data-toggle' => 'modal', 'data-target' => '#modalCurrentUserInfo'
+            %li.divider{role: 'seperator'}
+            %li= link_to '登出', '/logout'
+
+:css
+  .pagination { display: block; text-align: center;margin-bottom: 15px;}
+  #modalCurrentUserInfo td { text-align: left;O}
+:javascript
+  window.action_logger = {
+    operator: {
+      id: "#{current_user.user_num}",
+      name: "#{current_user.user_name}",
+      type: "operator"
+    }
+  };
+
+:css
+  .current-user-table td:nth-child(1) { width: 40%; }
+  .current-user-table td:nth-child(2) { width: 60%; }
+.modal.fade#modalCurrentUserInfo
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %button.close{'type' => 'button', 'data-dismiss' => 'modal', 'aria-label' => 'Close'}
+          %span{'aria-hidden' => 'true'} &times;
+        %h4.modal-title 基本资料
+      .modal-body
+        %table.table.table-bordered
+          %tr
+            %td 名称
+            %td= current_user.user_name
+          %tr
+            %td 登录名
+            %td= current_user.user_num

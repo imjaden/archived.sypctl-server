@@ -1,0 +1,31 @@
+%ol.breadcrumb
+  %li 设备管理
+  %li 设备列表
+
+:css   
+  .table th:nth-child(n+1), .table td:nth-child(n+1) { text-align: center; width: 10%; }
+  .table th:nth-child(2), .table td:nth-child(2) { width: 5%; }
+  .table th:nth-child(3), .table td:nth-child(3) { width: 5%; }
+  .table th:nth-last-child(1), .table td:nth-last-child(1) { width: 5%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table
+  %thead
+    %th 主机名称
+    %th 系统类型
+    %th 状态
+    %th UUID
+    %th 最近提交
+    %th 记录数量
+  %tbody
+    - @records.each do |record|
+      %tr{id: "dom_#{record.id}"}
+        %td= record.human_name || record.hostname
+        %td= "#{record.os_type}#{record.os_version}"
+        %td
+          - interval = (Time.now.to_i - record.updated_at.to_i) < 600
+          %span.label{class: "#{interval ? 'label-success' : 'label-danger'}"}
+            = interval ? '正常' : '异常'
+        %td= record.uuid
+        %td= record.updated_at.strftime('%y/%m/%d %H:%M')
+        %td= link_to record.record_count, url_for("/#{record.uuid}/records"), class: "badge"
+
+= will_paginater @records

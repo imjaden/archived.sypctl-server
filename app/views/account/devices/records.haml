@@ -1,0 +1,26 @@
+%ol.breadcrumb
+  %li= link_to '设备管理', url_for("/")
+  %li= @device.hostname
+  %li 提交记录
+
+:css   
+  .table th:nth-child(n+1), .table td:nth-child(n+1) { text-align: center; width: 20%; }
+  .table th:nth-child(3), .table td:nth-child(3) { width: 10%; }
+  .table th:nth-last-child(1), .table td:nth-last-child(1) { width: 10%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table
+  %thead
+    %th 版本
+    %th 内存使用
+    %th CPU 使用
+    %th 磁盘使用
+    %th 提交时间
+  %tbody
+    - @records.each do |record|
+      %tr{id: "dom_#{record.id}"}
+        %td= record.version
+        %td= record.memory_usage
+        %td= record.cpu_usage
+        %td= record.disk_usage
+        %td= record.created_at.strftime('%y/%m/%d %H:%M')
+
+= will_paginater @records
