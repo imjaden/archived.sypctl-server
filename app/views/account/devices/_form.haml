@@ -1,0 +1,46 @@
+- url = url_for(@record ? "/#{@record.id}?page=#{params[:page] || 1}" : "/")
+- form_for @record, url, method: "post", class: "form-horizontal", id: "recordForm" do |f|
+  - field_set_tag do
+    .form-group
+      = f.label '业务名称', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :human_name, class: "form-control", placeholder: "业务名称"
+    .form-group
+      = f.label 'SSH 服务器', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :ssh_ip, class: "form-control", placeholder: "SSH IP"
+    .form-group
+      = f.label 'SSH 端口', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :ssh_port, class: "form-control", placeholder: "SSH 端口"
+    .form-group
+      = f.label 'SSH 账号', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :ssh_username, class: "form-control", placeholder: "SSH 账号"
+    .form-group
+      = f.label 'SSH 密码', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :ssh_password, class: "form-control", placeholder: "SSH 密码"
+    .form-group
+      = f.label '主机描述', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_area :description, class: "form-control", placeholder: "主机描述"
+    .form-group
+      = f.label 'Host 名称', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :hostname, class: "form-control", disabled: "disabled"
+    .form-group
+      = f.label 'UUID', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :uuid, class: "form-control", disabled: "disabled"
+    .form-group
+      = f.label '系统类型', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :os_type, class: "form-control", disabled: "disabled"
+    .form-group
+      = f.label '系统版本', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :os_version, class: "form-control", disabled: "disabled"
+    .form-group
+      .col-sm-offset-2.col-sm-10
+        = f.submit "提交", class: "btn btn-primary"

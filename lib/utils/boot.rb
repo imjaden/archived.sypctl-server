@@ -1,8 +1,39 @@
 # encoding: utf-8
 # Boot Assitant Methods
 module Utils
-  # Boot Assitant Methods
   module Boot
+    def traverser_settings_yaml_to_env
+      root_path = ENV['APP_ROOT_PATH']
+      settings_path = File.join(root_path, 'config/setting.yaml')
+      settings_hash = YAML.load(IO.read(settings_path))
+      settings_mtime = File.mtime(settings_path).to_i
+      settings_json_path = File.join(root_path, "config/setting-#{ENV['RACK_ENV']}-#{settings_mtime}.json")
+      unless File.exists?(settings_json_path)
+        result_hash = {}
+        _traverser_settings_yaml_to_env(result_hash, settings_hash[ENV['RACK_ENV']])
+        File.open(settings_json_path, "w:utf-8") { |file| file.puts(result_hash.to_json) }
+      end
+      ENV['settings.json.path'] = settings_json_path
+      JSON.parse(IO.read(settings_json_path)).each_pair do |key, value|
+        ENV[key] = value
+      end
+    end
+
+    def _traverser_settings_yaml_to_env(result_hash = {}, hsh = {}, ancestors_hash = {}, parent_item = nil)
+      hsh.each_pair do |k, v|
+        uuid = SecureRandom.uuid
+        # puts "k: #{k}, parent: #{parent_item}, uuid: #{uuid}"
+        ancestors_hash[uuid] = parent_item ? Marshal.load(Marshal.dump(ancestors_hash[parent_item])) : []
+        ancestors_hash[uuid].push(k)
+        if v.is_a?(Hash)
+          _traverser_settings_yaml_to_env(result_hash, v, ancestors_hash, uuid)
+        else
+          result_hash[ancestors_hash[uuid].join(".")] = "#{v}"
+          # puts "#{ancestors_hash[uuid].join(".")}:#{v}"
+        end
+      end
+    end
+
     def recursion_require(dir_path, regexp, base_path = ENV['APP_ROOT_PATH'], sort_rules = [])
       dir_path_on_base = format('%s/%s', base_path, dir_path)
       partition = Dir.entries(dir_path_on_base)

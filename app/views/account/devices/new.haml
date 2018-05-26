@@ -1,0 +1,7 @@
+%ol.breadcrumb
+  %li
+    %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 主机管理
+  %li
+    新建主机
+
+= haml :_form

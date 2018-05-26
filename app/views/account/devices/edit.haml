@@ -1,0 +1,5 @@
+%ol.breadcrumb
+  %li= link_to "主机管理", url_for('/') + "?page=#{params[:page] || 1}"
+  %li= "编辑「#{@record.human_name || @record.hostname}」"
+
+= haml :_form

@@ -35,3 +35,6 @@ gem 'unicorn_metrics', '~> 0.3.1', github: 'superiorlu/unicorn_metrics'
 
 gem 'geetest3', '~> 0.1.0'
 gem 'httparty', '~> 0.13.7'
+
+gem 'net-ssh', '~>4.2.0'
+gem 'net-scp', '~>1.2.1'

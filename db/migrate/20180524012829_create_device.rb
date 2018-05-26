@@ -5,15 +5,16 @@ class CreateDevice < ActiveRecord::Migration[5.2]
     #   Set to +:cascade+ to drop dependent objects as well.
     #   Defaults to false.
     create_table :sys_devices, force: false, comment: '设备服务器表' do |t|
-      t.string   :uuid, null: false, comment: '设备 UUID'
+      t.string   :uuid, comment: '设备 UUID'
       t.string   :human_name, comment: '业务名称'
-      t.string   :hostname, null: false, comment: '主机名称'
+      t.string   :hostname, comment: '主机名称'
+      t.string   :ssh_ip, comment: 'SSH IP'
+      t.string   :ssh_port, comment: 'SSH 端口'
       t.string   :ssh_username, comment: 'SSH 登录用户'
       t.string   :ssh_password, comment: 'SSH 登录密码'
-      t.string   :ssh_port, comment: 'SSH 端口'
       t.boolean  :ssh_state, default: false, comment: 'SSH 连接状态'
-      t.string   :username, null: false, comment: '代理服务器用户名称'
-      t.string   :password, null: false, comment: '代理服务器登录密码'
+      t.string   :username, comment: '代理服务器用户名称'
+      t.string   :password, comment: '代理服务器登录密码'
       t.string   :os_type, comment: '系统类型'
       t.string   :os_version, comment: '系统版本'
       t.string   :api_token, comment: 'API Token'

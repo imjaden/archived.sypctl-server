@@ -1,0 +1,74 @@
+%ol.breadcrumb
+  %li
+    %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 主机管理
+  %li= "「#{@record.human_name || @record.hostname}」"
+
+:css   
+  .table th:nth-child(1), .table td:nth-child(1) { width: 10%; }
+  .table th:nth-child(2), .table td:nth-child(2) { width: 80%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered
+  %thead
+    %th 键值
+    %th 内容
+  %tbody
+    %tr
+      %td 业务名称
+      %td= @record.human_name
+    %tr
+      %td SSH 状态
+      %td
+        %span.label{class: "label-#{@record.ssh_state ? 'success' : 'warning'}"}
+          = @record.ssh_state ? '启用' : '关闭'
+    %tr
+      %td SSH 服务器
+      %td= @record.ssh_ip
+    %tr
+      %td SSH 端口
+      %td= @record.ssh_port
+    %tr
+      %td SSH 账号
+      %td= @record.ssh_username
+    %tr
+      %td SSH 密码
+      %td= @record.ssh_password
+    %tr
+      %td Host 名称
+      %td= @record.hostname
+    %tr
+      %td UUID
+      %td= @record.uuid
+    %tr
+      %td 系统类型
+      %td
+        %span.label.label-info= "#{@record.os_type}#{@record.os_version}"
+    %tr
+      %td LanIP
+      %td= @record.lan_ip
+    %tr
+      %td WanIP
+      %td= @record.wan_ip
+    %tr
+      %td 内存
+      %td= @record.memory
+    %tr
+      %td CPU
+      %td= @record.cpu
+    %tr
+      %td 磁盘
+      %td= @record.disk
+    %tr
+      %td 提交记录
+      %td
+        %span.badge= @record.record_count
+    %tr
+      %td 代理账号
+      %td= @record.username
+    %tr
+      %td 代理密码
+      %td= @record.password
+    %tr
+      %td 更新时间
+      %td= @record.updated_at.strftime('%y/%m/%d %H:%M:%S')
+    %tr
+      %td 创建时间
+      %td= @record.created_at.strftime('%y/%m/%d %H:%M:%S')
