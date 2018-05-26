@@ -20,12 +20,12 @@ class Device < ActiveRecord::Base
       ::Net::SSH.start(self.ssh_ip, self.ssh_username, port: self.ssh_port, password: self.ssh_password) do |ssh|
         update_columns({ssh_state: true})
 
-        ssh.exec!('blkid -s UUID') do |_, stream, data|
+        ssh.exec!('/sbin/blkid -s UUID') do |_, stream, data|
           device_uuid = ::Utils::Linux._device_uuid(data)
           update_columns({uuid: device_uuid})
         end if self.uuid.blank?
 
-        ssh.exec!("nohup curl -sS http://gitlab.ibi.ren/syp-apps/sypctl/raw/dev-0.0.1/env.sh | bash &") { |_, stream, data| puts data }
+        ssh.exec!("/usr/bin/nohup curl -sS http://gitlab.ibi.ren/syp-apps/sypctl/raw/dev-0.0.1/env.sh | bash &") { |_, stream, data| puts data }
       end
     end
   rescue => e

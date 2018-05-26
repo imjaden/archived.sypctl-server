@@ -19,3 +19,5 @@ I, [2018-05-26T21:48:30.505121 #90920]  INFO -- : listening on addr=/Users/junji
 I, [2018-05-26T21:48:30.505525 #90920]  INFO -- : listening on addr=0.0.0.0:4567 fd=11
 I, [2018-05-26T21:48:30.511197 #90920]  INFO -- : master process ready
 I, [2018-05-26T21:48:30.516990 #90924]  INFO -- : worker=0 ready
+I, [2018-05-26T22:29:27.308901 #90920]  INFO -- : reaped #<Process::Status: pid 90924 exit 0> worker=0
+I, [2018-05-26T22:29:27.309398 #90920]  INFO -- : master complete

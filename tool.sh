@@ -42,6 +42,10 @@ gem_command=$(rbenv which gem)
 
 cd "${app_root_path}" || exit 1
 case "$1" in
+    upgrade)
+        git_current_branch=$(git rev-parse --abbrev-ref HEAD)
+        git pull origin ${git_current_branch}
+    ;;
     start)
         test -d logs || mkdir -p logs
         fun_print_table_header "start process" "process" "status"

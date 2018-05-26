@@ -24,7 +24,7 @@ config/setting-*.json
 coverage
 
 # 项目本地文件夹
-log/
+logs/
 tmp/
 .sass-cache/
 

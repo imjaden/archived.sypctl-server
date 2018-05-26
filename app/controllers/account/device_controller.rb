@@ -5,7 +5,7 @@ module Account
     set :layout, :'../../layouts/layout'
 
     before do
-      @page_title = '设备管理'
+      @page_title = '主机管理'
     end
 
     get '/' do
