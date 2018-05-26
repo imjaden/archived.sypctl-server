@@ -25,11 +25,11 @@ class Device < ActiveRecord::Base
           update_columns({uuid: device_uuid})
         end if self.uuid.blank?
 
-        ssh.exec!("nohup curl -sS http://gitlab.ibi.ren/syp-apps/sypctl/raw/dev-0.0.1/env.sh | bash &")
+        ssh.exec!("nohup curl -sS http://gitlab.ibi.ren/syp-apps/sypctl/raw/dev-0.0.1/env.sh | bash &") { |_, stream, data| puts data }
       end
     end
   rescue => e
     puts "#{__FILE__}@#{__LINE__}: #{e.message}"
-    update_columns(:ssh_state, false)
+    update_columns({ssh_state: false})
   end
 end
