@@ -5,28 +5,29 @@
       新建应用
       %span.glyphicon.glyphicon-plus
 :css   
-  .table th:nth-child(1), .table td:nth-child(1) { width: 5%; }
-  .table th:nth-child(2), .table td:nth-child(2) { width: 20%; }
-  .table th:nth-child(3), .table td:nth-child(3) { text-align: center; width: 20%; }
-  .table th:nth-last-child(1), .table td:nth-last-child(1) { text-align: center; width: 10%; }
-%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table
+  .apps th:nth-child(n+1), .apps td:nth-child(n+1) { text-align: center; width: 5%; }
+  .apps th:nth-child(1), .apps td:nth-child(1) { text-align: left; width: 20%; }
+  .apps th:nth-child(2), .apps td:nth-child(2) { text-align: left; width: 15%; }
+  .apps th:nth-last-child(1), .apps td:nth-last-child(1) { text-align: center; width: 10%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.apps
   %thead
-    %th ID
     %th 应用名称
     %th 文件名称
     %th 文件类型
-    %th 描述
     %th 最新版本
-    %th 创建时间
+    %th 上传版本
+    %th 更新时间
   %tbody
     - @records.each do |record|
       %tr{id: "dom_#{record.id}"}
-        %td= record.id
-        %td= record.name
-        %td= record.filename
-        %td= record.filetype
-        %td= record.description
+        %td= link_to record.name, url_for("/#{record.id}")
+        %td= record.file_name
         %td
-        %td= (record.created_at || Time.now).strftime('%y/%m/%d %H:%M')
+          %span.label.label-info= record.file_type
+        %td= link_to record.latest_version, url_for("/#{record.id}/version/#{record.latest_version_id}")
+        %td
+          %a{href: url_for("/#{record.id}/version/new")}
+            %span.glyphicon.glyphicon-upload
+        %td= record.updated_at.strftime('%y/%m/%d %H:%M')
 
 = will_paginater @records

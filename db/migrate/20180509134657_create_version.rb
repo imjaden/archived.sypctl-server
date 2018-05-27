@@ -8,6 +8,7 @@ class CreateVersion < ActiveRecord::Migration[5.1]
       t.integer  :app_id, null: false, comment: '应用 ID'
       t.string   :version, null: false, comment: '版本号'
       t.integer  :build, null: false, comment: '版本 build 值'
+      t.string   :file_name, comment: '文件名称'
       t.string   :file_size, comment: '应用体积'
       t.string   :md5, comment: '文件 MD5 值'
       t.string   :cdn_link, comment: 'CDN 链接'

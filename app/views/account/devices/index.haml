@@ -11,19 +11,16 @@
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table
   %thead
     %th 主机名称
-    %th SSH 状态
     %th 系统类型
     %th 代理状态
     %th 最近提交
     %th 记录数量
+    %th SSH 状态
     %th 编辑
   %tbody
     - @records.each do |record|
       %tr{id: "dom_#{record.id}"}
         %td= link_to record.human_name || record.hostname, url_for("/#{record.id}")
-        %td
-          %span.label{class: "label-#{record.ssh_state ? 'success' : 'warning'}"}
-            = record.ssh_state ? '启用' : '关闭'
         %td= "#{record.os_type}#{record.os_version}"
         %td
           - interval = (Time.now.to_i - record.updated_at.to_i) < 600
@@ -31,6 +28,9 @@
             = interval ? '正常' : '异常'
         %td= record.updated_at.strftime('%y/%m/%d %H:%M')
         %td= link_to record.record_count, url_for("/#{record.id}/records"), class: "badge"
+        %td
+          %span.label{class: "label-#{record.ssh_state ? 'success' : 'warning'}"}
+            = record.ssh_state ? '启用' : '关闭'
         %td
           %a{href: url_for("/#{record.id}/edit"), class: 'btn btn-xs btn-link'}
             %span.glyphicon.glyphicon-edit

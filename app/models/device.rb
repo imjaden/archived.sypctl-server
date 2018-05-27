@@ -22,7 +22,7 @@ class Device < ActiveRecord::Base
 
         ssh.exec!('/sbin/blkid -s UUID') do |_, stream, data|
           device_uuid = ::Utils::Linux._device_uuid(data)
-          update_columns({uuid: device_uuid})
+          update_columns({uuid: device_uuid}) if device_uuid.length > 16
         end if self.uuid.blank?
 
         ssh.exec!("/usr/bin/nohup curl -sS http://gitlab.ibi.ren/syp-apps/sypctl/raw/dev-0.0.1/env.sh | bash &") { |_, stream, data| puts data }

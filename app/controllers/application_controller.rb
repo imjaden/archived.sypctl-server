@@ -156,6 +156,22 @@ class ApplicationController < Sinatra::Base
     redirect '/login', 302
   end
 
+  def app_root_join(path)
+    File.join(settings.root, path)
+  end
+
+  def app_tmp_join(path)
+    File.join(settings.root, 'tmp', path)
+  end
+
+  def md5(something)
+    Digest::MD5.hexdigest(something.to_s)
+  end
+
+  def digest_file_md5(filepath)
+    Digest::MD5.file(filepath).hexdigest
+  end
+
   private
 
   def set_login_cookie(cookie_name = 'authen', cookie_value = '')

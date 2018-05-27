@@ -1,0 +1,44 @@
+%ol.breadcrumb
+  %li= link_to '应用管理', url_for('/')
+  %li= link_to @app.name, url_for("/#{@app.id}")
+  %li= "#{@record.version}(#{@record.build})"
+
+
+:css   
+  .version th:nth-child(1), .version td:nth-child(1) { width: 15%; }
+  .version th:nth-child(2), .version td:nth-child(2) { width: 80%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.version
+  %thead
+    %th 键值
+    %th 内容
+  %tbody
+    %tr
+      %td 应用名称
+      %td= @app.name
+    %tr
+      %td 文件名称(业务)
+      %td= @app.filename
+    %tr
+      %td 版本号
+      %td= @record.version
+    %tr
+      %td build 值
+      %td= @record.build
+    %tr
+      %td 文件名称(版本)
+      %td= @record.file_name
+    %tr
+      %td 文件大小
+      %td= @record.file_size
+    %tr
+      %td 文件 MD5
+      %td= @record.md5
+    %tr
+      %td CDN 链接
+      %td= @record.cdn_link
+    %tr
+      %td 版本描述
+      %td= @record.description
+    %tr
+      %td 创建时间
+      %td= @record.created_at.strftime('%y/%m/%d %H:%M:%S')

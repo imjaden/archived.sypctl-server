@@ -8,8 +8,10 @@ class CreateApp < ActiveRecord::Migration[5.1]
       t.integer  :user_group_id, comment: '所属用户分组 ID'
       t.integer  :app_group_id, comment: '所属应用分组 ID'
       t.string   :name, null: false, comment: '应用名称'
-      t.string   :filename, null: false, comment: '文件名称'
-      t.string   :filetype, null: false, comment: '类型类型'
+      t.string   :file_name, null: false, comment: '文件名称'
+      t.string   :file_type, null: false, comment: '类型类型'
+      t.string   :latest_version, comment: '最新版本'
+      t.string   :latest_version_id, comment: '最新版本 ID'
       t.string   :category, comment: '应用类型'
       t.text     :description, comment: '应用描述'
 

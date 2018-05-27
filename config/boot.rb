@@ -36,5 +36,7 @@ require 'asset_handler'
 Time.zone = 'Beijing'
 
 traverser_settings_yaml_to_env
+
+recursion_require('lib/core_ext', /\.rb$/, ENV['APP_ROOT_PATH'])
 recursion_require('app/helpers', /_helper\.rb$/, ENV['APP_ROOT_PATH'])
 recursion_require('app/controllers', /_controller\.rb$/, ENV['APP_ROOT_PATH'], [/^application_/])
