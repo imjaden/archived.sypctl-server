@@ -12,6 +12,7 @@
     %th 内存使用
     %th CPU 使用
     %th 磁盘使用
+    %th 代理账号
     %th 代理版本
     %th 提交时间
   %tbody
@@ -20,6 +21,7 @@
         %td= record.memory_usage
         %td= record.cpu_usage
         %td= record.disk_usage
+        %td= record.whoami
         %td= record.version
         %td= record.created_at.strftime('%y/%m/%d %H:%M')
 
