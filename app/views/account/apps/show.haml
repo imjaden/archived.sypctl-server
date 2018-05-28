@@ -1,1 +1,37 @@
-show.haml
+%ol.breadcrumb
+  %li= link_to '应用管理', url_for('/')
+  %li= @record.name
+
+:css   
+  .app th:nth-child(1), .app td:nth-child(1) { width: 15%; }
+  .app th:nth-child(2), .app td:nth-child(2) { width: 80%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.app
+  %thead
+    %th 键值
+    %th 内容
+  %tbody
+    %tr
+      %td 应用名称
+      %td= @record.name
+    %tr
+      %td 文件名称
+      %td= @record.file_name
+    %tr
+      %td 文件名称
+      %td
+        %span.label.label-info= @record.file_type
+    %tr
+      %td 最新版本
+      %td= link_to "#{@record.latest_version}(#{@record.latest_build})", url_for("/#{@record.id}/version/#{@record.latest_version_id}")
+    %tr
+      %td 版本数量
+      %td= link_to @record.version_count, url_for("/#{@record.id}/version")
+    %tr
+      %td 应用描述
+      %td= @record.description
+    %tr
+      %td 创建时间
+      %td= @record.created_at.strftime('%y/%m/%d %H:%M:%S')
+    %tr
+      %td 更新时间
+      %td= @record.updated_at.strftime('%y/%m/%d %H:%M:%S')

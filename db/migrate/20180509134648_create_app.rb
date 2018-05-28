@@ -11,7 +11,9 @@ class CreateApp < ActiveRecord::Migration[5.1]
       t.string   :file_name, null: false, comment: '文件名称'
       t.string   :file_type, null: false, comment: '类型类型'
       t.string   :latest_version, comment: '最新版本'
+      t.integer  :latest_build, comment: '最新版本'
       t.string   :latest_version_id, comment: '最新版本 ID'
+      t.string   :version_count, default: 0, comment: '版本数量'
       t.string   :category, comment: '应用类型'
       t.text     :description, comment: '应用描述'
 

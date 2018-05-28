@@ -16,6 +16,7 @@
     %th 文件类型
     %th 最新版本
     %th 上传版本
+    %th 版本数量
     %th 更新时间
   %tbody
     - @records.each do |record|
@@ -24,10 +25,11 @@
         %td= record.file_name
         %td
           %span.label.label-info= record.file_type
-        %td= link_to record.latest_version, url_for("/#{record.id}/version/#{record.latest_version_id}")
+        %td= link_to "#{record.latest_version}(#{record.latest_build})", url_for("/#{record.id}/version/#{record.latest_version_id}") if record.latest_version_id
         %td
           %a{href: url_for("/#{record.id}/version/new")}
             %span.glyphicon.glyphicon-upload
+        %td= link_to record.version_count, url_for("/#{record.id}/version")
         %td= record.updated_at.strftime('%y/%m/%d %H:%M')
 
 = will_paginater @records

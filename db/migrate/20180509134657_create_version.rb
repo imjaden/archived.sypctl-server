@@ -11,6 +11,7 @@ class CreateVersion < ActiveRecord::Migration[5.1]
       t.string   :file_name, comment: '文件名称'
       t.string   :file_size, comment: '应用体积'
       t.string   :md5, comment: '文件 MD5 值'
+      t.string   :cdn_state, default: '无任务', comment: '上传 CDN 状态'
       t.string   :cdn_link, comment: 'CDN 链接'
       t.text     :description, comment: '版本描述'
 

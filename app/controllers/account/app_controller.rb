@@ -77,8 +77,12 @@ module Account
     end
 
     post '/:id/version' do
-      @app = App.find_by(id: params[:id])
+      unless params.dig(:version, :file)
+        flash[:danger] = "请选择版本文件"
+        redirect to("/#{params[:id]}/version/new")
+      end
 
+      @app = App.find_by(id: params[:id])
       md5, file_path = read_upload_file(params)
 
       params[:version].delete(:file)
@@ -87,9 +91,20 @@ module Account
       params[:version][:file_size] = File.size(file_path).number_to_human_size if File.exists?(file_path)
 
       version = Version.create(params[:version])
-      @app.update_attributes({latest_version: version.version, latest_version_id: version.id})
+      @app.update_attributes({
+        latest_version: version.version, 
+        latest_build: version.build,
+        latest_version_id: version.id, 
+        version_count: @app.versions.count})
 
       redirect to("/?id=#{params[:id]}")
+    end
+
+    get '/:id/version' do
+      @app = App.find_by(id: params[:id])
+      @records = @app.versions.paginate(page: params[:page], per_page: 15).order(id: :desc)
+
+      haml :'version/index', layout: settings.layout
     end
 
     get '/:id/version/:version_id' do
@@ -104,7 +119,7 @@ module Account
     def read_upload_file(params)
       version_file_md5 = nil
       version_file_md5_path = nil
-      version_path = File.join(Setting.path.version, params[:id])
+      version_path = Setting.path.version
       FileUtils.mkdir_p(version_path) unless File.exist?(version_path)
 
       form_data = params[:version][:file]
@@ -114,7 +129,7 @@ module Account
         begin
           File.open(version_file_path, "w:utf-8") { |file| file.puts(temp_file.read.force_encoding("UTF-8")) }
           version_file_md5 = digest_file_md5(version_file_path)
-          version_file_md5_path = File.join(version_path, "#{version_file_md5}.#{extname}")
+          version_file_md5_path = File.join(version_path, "#{params[:id]}-#{params[:version][:build]}-#{version_file_md5}#{extname}")
           FileUtils.mv(version_file_path, version_file_md5_path)
         rescue => e
           puts "#{__FILE__}:#{__LINE__} #{e.message}"

@@ -1,0 +1,7 @@
+%ol.breadcrumb
+  %li
+    %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 任务管理
+  %li
+    新建任务
+
+= haml :_form

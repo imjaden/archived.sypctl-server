@@ -1,0 +1,36 @@
+- url = url_for(@record ? "/#{@record.id}?page=#{params[:page] || 1}" : "/")
+- form_for @record, url, method: "post", class: "form-horizontal", id: "recordForm" do |f|
+  - field_set_tag do
+    .form-group
+      = f.label '任务标题', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :title, class: "form-control"
+    .form-group
+      = f.label '设备名称', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :device_name, class: "form-control"
+    .form-group
+      = f.label '应用名称', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :app_name, class: "form-control"
+    .form-group
+      = f.label '版本名称', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :version_name, class: "form-control"
+    .form-group
+      = f.label '部署脚本', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_area :command, class: "form-control", rows: 10
+    .form-group
+      = f.label '执行时间', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :executed_at, class: "form-control"
+    .form-group
+      = f.label '任务描述', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_area :description, class: "form-control", rows: 1
+    .form-group
+      .col-sm-offset-2.col-sm-10
+        = f.submit "提交", class: "btn btn-primary"
+
+

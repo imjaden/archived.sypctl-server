@@ -9,15 +9,15 @@
     .form-group
       = f.label '版本号', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.text_field :version, class: "form-control"
+        = f.text_field :version, class: "form-control", placeholder: '版本号，格式：0.0.1，必填项'
     .form-group
       = f.label 'build 值', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.text_field :build, class: "form-control"
+        = f.text_field :build, class: "form-control", placeholder: 'build 值，数字，必填项'
     .form-group
       = f.label '版本描述', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.text_area :description, class: "form-control"
+        = f.text_area :description, class: "form-control", placeholder: '版本更新说明'
     .form-group
       .col-sm-offset-2.col-sm-10
         = f.submit "提交", class: "btn btn-primary"
