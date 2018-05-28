@@ -25,7 +25,7 @@ class Device < ActiveRecord::Base
           update_columns({uuid: device_uuid}) if device_uuid.length > 16
         end if self.uuid.blank?
 
-        ssh.exec!("/usr/bin/nohup curl -sS http://gitlab.ibi.ren/syp-apps/sypctl/raw/dev-0.0.1/env.sh | bash &") { |_, stream, data| puts data }
+        # ssh.exec!("/usr/bin/nohup curl -sS http://gitlab.ibi.ren/syp-apps/sypctl/raw/dev-0.0.1/env.sh | bash &") { |_, stream, data| puts data }
       end
     end
   rescue => e
