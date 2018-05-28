@@ -16,6 +16,7 @@
     %th 最近提交
     %th 记录数量
     %th SSH 状态
+    %th 创建任务
     %th 编辑
   %tbody
     - @records.each do |record|
@@ -31,6 +32,9 @@
         %td
           %span.label{class: "label-#{record.ssh_state ? 'success' : 'warning'}"}
             = record.ssh_state ? '启用' : '关闭'
+        %td
+          %a{href: url_for("/#{record.id}/create_job")}
+            %span.glyphicon.glyphicon-refresh
         %td
           %a{href: url_for("/#{record.id}/edit"), class: 'btn btn-xs btn-link'}
             %span.glyphicon.glyphicon-edit

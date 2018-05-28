@@ -1,6 +1,6 @@
 %ol.breadcrumb
   %li= link_to '设备管理', url_for("/")
-  %li= @device.hostname
+  %li= link_to @device.human_name || @device.hostname, url_for("/#{params[:id]}")
   %li 提交记录
 
 :css   

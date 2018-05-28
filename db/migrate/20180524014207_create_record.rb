@@ -8,6 +8,7 @@ class CreateRecord < ActiveRecord::Migration[5.2]
       t.string   :uuid, comment: '设备 UUID'
       t.string   :api_token, comment: '应用 ID'
       t.string   :version, comment: '代理版本'
+      t.string   :whoami, comment: '代理运行账号'
       t.string   :memory_usage, comment: '内存使用情况'
       t.text     :memory_usage_description, comment: '内存使用情况JSON'
       t.string   :cpu_usage, comment: 'CPU  使用情况'

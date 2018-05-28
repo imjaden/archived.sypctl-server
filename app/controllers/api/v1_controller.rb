@@ -28,13 +28,22 @@ module API
     post '/receiver' do
       api_authen_params([:device])
 
+      jobs = []
       record = Record.create(params[:device])
-      puts params[:device][:uuid]
       if device = Device.find_by(uuid: params[:device][:uuid])
-        puts device.inspect
-        puts device.record_count
         device.update_attributes({record_count: device.record_count + 1})
-        puts device.record_count
+        jobs = Job.where(device_uuid: device.uuid, state: 'waiting').map(&:to_hash)
+      end
+
+      respond_with_json({id: record.id, jobs: jobs}, 201)
+    end
+
+    # post /api/v1/job
+    post '/job' do
+      api_authen_params([:job])
+
+      if record = Job.find_by(uuid: params[:job][:uuid])
+        record.update_attributes(params[:job])
       end
 
       respond_with_json({id: record.id}, 201)

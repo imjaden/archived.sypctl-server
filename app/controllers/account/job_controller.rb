@@ -36,7 +36,7 @@ module Account
     get '/:id' do
       unless @record = Job.find_by(id: params[:id])
         @record = Job.new
-        @record.name = '任务不存在'
+        @record.title = '任务不存在'
       end
 
       haml :show, layout: settings.layout
@@ -65,7 +65,7 @@ module Account
         record.destroy
       end
       
-      respond_with_json({message: "「#{record.name}」删除成功"}, 201)
+      respond_with_json({message: "「#{record.title}」删除成功"}, 201)
     end
   end
 end

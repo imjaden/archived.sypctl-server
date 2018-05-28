@@ -20,7 +20,7 @@
   %tbody
     - @records.each do |record|
       %tr{id: "dom_#{record.id}"}
-        %td= link_to record.name, url_for("/#{record.id}")
+        %td= link_to record.title, url_for("/#{record.id}")
         %td= record.device_name
         %td= record.app_name
         %td= record.version_name

@@ -24,6 +24,8 @@ class CreateDevice < ActiveRecord::Migration[5.2]
       t.text     :cpu_description, comment: 'CPU 描述JSON'
       t.string   :disk, comment: '磁盘大小'
       t.text     :disk_description, comment: '磁盘JSON'
+      t.string   :notify_mode, comment: '通知模式'
+      t.text     :notify_receivers, comment: '通知接收者'
       t.string   :lan_ip, comment: '内网 IP'
       t.string   :wan_ip, comment: '外网 IP'
       t.integer  :record_count, default: 0, comment: '记录数量'

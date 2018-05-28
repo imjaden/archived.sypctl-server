@@ -64,7 +64,22 @@ module Account
       @device = Device.find_by(id: params[:id])
       @records = @device.records.paginate(page: params[:page], per_page: 15).order(id: :desc)
 
-      haml :records, layout: settings.layout
+      haml :'records/index', layout: settings.layout
+    end
+
+    get '/:id/create_job' do
+      device = Device.find_by(id: params[:id])
+      Job.create(
+        uuid: SecureRandom.uuid,
+        title: "重新提交代理主机信息",
+        device_uuid: device.uuid,
+        device_name: device.human_name || device.hostname,
+        command: "rm -f /opt/scripts/sypctl/agent/db/agent.json\necho '删除代理端服务器配置档'\nsypctl bundle exec rake agent:submitor\necho '重新提交代理设备信息完成'",
+        state: "waiting"
+      )
+
+      flash[:success] = "15 分钟后刷新页面查看状态"
+      redirect to("/")
     end
   end
 end

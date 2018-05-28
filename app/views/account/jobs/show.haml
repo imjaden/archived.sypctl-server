@@ -1,0 +1,40 @@
+%ol.breadcrumb
+  %li= link_to '任务管理', url_for('/')
+  %li= @record.title
+
+:css   
+  .app th:nth-child(1), .app td:nth-child(1) { width: 15%; }
+  .app th:nth-child(2), .app td:nth-child(2) { width: 80%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.app
+  %thead
+    %th 键值
+    %th 内容
+  %tbody
+    %tr
+      %td 任务名称
+      %td= @record.title
+    %tr
+      %td 主机名称
+      %td= @record.device_name
+    %tr
+      %td 主机 UUID
+      %td= @record.device_uuid
+    %tr
+      %td 任务状态
+      %td
+        %span.label.label-info= @record.state
+    %tr
+      %td 部署脚本
+      %td
+        %pre= @record.command
+    - if @record.output
+      %tr
+        %td 脚本输出
+        %td
+          %pre= @record.output
+    %tr
+      %td 创建时间
+      %td= @record.created_at.strftime('%y/%m/%d %H:%M:%S')
+    %tr
+      %td 更新时间
+      %td= @record.updated_at.strftime('%y/%m/%d %H:%M:%S')

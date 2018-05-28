@@ -5,13 +5,14 @@ class CreateJob < ActiveRecord::Migration[5.2]
     #   Set to +:cascade+ to drop dependent objects as well.
     #   Defaults to false.
     create_table :sys_jobs, force: false, comment: '任务表' do |t|
+      t.string   :uuid, null: false, comment: '任务 UUID'
       t.string   :title, null: false, comment: '任务标题'
       t.text     :description, comment: '任务描述'
-      t.integer  :app_id, comment: '应用 ID'
+      t.string   :app_id, comment: '应用 ID'
       t.string   :app_name, comment: '应用名称'
-      t.integer  :version_id, comment: '版本 ID'
+      t.string   :version_id, comment: '版本 ID'
       t.string   :version_name, comment: '版本名称'
-      t.integer  :device_id, comment: '设备 ID'
+      t.string   :device_uuid, comment: '设备 UUID'
       t.string   :device_name, comment: '设备名称'
       t.text     :command, comment: '部署脚本'
       t.text     :output, comment: '脚本输出'

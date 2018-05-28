@@ -59,7 +59,8 @@
     %tr
       %td 提交记录
       %td
-        %span.badge= @record.record_count
+        %a{href: url_for("/#{params[:id]}/records")}
+          %span.badge= @record.record_count
     %tr
       %td 代理账号
       %td= @record.username
