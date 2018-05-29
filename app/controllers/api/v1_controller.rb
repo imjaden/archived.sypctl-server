@@ -77,6 +77,10 @@ module API
       respond_with_paginate(app.versions, records, params)
     end
 
+    get '/ifconfig.me' do
+      request.ip
+    end
+
     protected
 
     def authen_api_token(api_token)
