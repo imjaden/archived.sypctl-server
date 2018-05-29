@@ -2,21 +2,25 @@
 - form_for @record, url, method: "post", class: "form-horizontal", id: "recordForm" do |f|
   - field_set_tag do
     .form-group
+      = f.label '应用分组', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.select :app_group_id, options: AppGroup.all.map { |r| [r.name, r.id] }, class: "form-control"
+    .form-group
       = f.label '应用名称', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.text_field :name, class: "form-control"
+        = f.text_field :name, class: "form-control", placeholder: "应用名称, 必填项"
     .form-group
       = f.label '文件名称', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.text_field :file_name, class: "form-control"
+        = f.text_field :file_name, class: "form-control", placeholder: "文件名称, 必填项"
     .form-group
       = f.label '文件类型', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.text_field :file_type, class: "form-control"
+        = f.text_field :file_type, class: "form-control", placeholder: "文件类型, 必填项"
     .form-group
       = f.label '应用描述', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.text_area :description, class: "form-control"
+        = f.text_area :description, class: "form-control", placeholder: "版本更新日志"
     .form-group
       .col-sm-offset-2.col-sm-10
         = f.submit "提交", class: "btn btn-primary"

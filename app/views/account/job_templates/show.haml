@@ -1,6 +1,6 @@
 %ol.breadcrumb
   %li 部署中心
-  %li= link_to '任务管理', url_for('/')
+  %li= link_to '模板管理', url_for('/')
   %li= @record.title
 
 :css   
@@ -12,27 +12,18 @@
     %th 内容
   %tbody
     %tr
-      %td 任务名称
+      %td 模板名称
       %td= @record.title
     %tr
-      %td 主机名称
-      %td= @record.device_name
+      %td 功能描述
+      %td= @record.description
     %tr
-      %td 主机 UUID
-      %td= @record.device_uuid
-    %tr
-      %td 任务状态
-      %td
-        %span.label.label-info= @record.state
+      %td 模板 UUID
+      %td= @record.uuid
     %tr
       %td 部署脚本
       %td
-        %pre= @record.command
-    - if @record.output
-      %tr
-        %td 脚本输出
-        %td
-          %pre= @record.output
+        %pre= @record.content
     %tr
       %td 创建时间
       %td= @record.created_at.strftime('%y/%m/%d %H:%M:%S')

@@ -1,0 +1,16 @@
+- url = url_for(@record ? "/#{@record.id}?page=#{params[:page] || 1}" : "/")
+- form_for @record, url, method: "post", class: "form-horizontal", id: "recordForm" do |f|
+  - field_set_tag do
+    .form-group
+      = f.label '分组名称', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :name, class: "form-control"
+    .form-group
+      = f.label '分组描述', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_area :description, class: "form-control"
+    .form-group
+      .col-sm-offset-2.col-sm-10
+        = f.submit "提交", class: "btn btn-primary"
+
+

@@ -1,29 +1,28 @@
 # encoding: utf-8
 module Account
-  class JobController < Account::ApplicationController
-    set :views, File.join(ENV['VIEW_PATH'], 'account/jobs')
+  class JobTemplateController < Account::ApplicationController
+    set :views, File.join(ENV['VIEW_PATH'], 'account/job_templates')
     set :layout, :'../../layouts/layout'
 
     before do
-      @page_title = '任务管理'
+      @page_title = '模板管理'
     end
 
     get '/' do
-      @records = Job.paginate(page: params[:page], per_page: 15).order(id: :desc)
+      @records = JobTemplate.paginate(page: params[:page], per_page: 15).order(id: :desc)
 
       haml :index, layout: settings.layout
     end
 
     get '/new' do
-      @record = Job.new
+      @record = JobTemplate.new
       @record.uuid = SecureRandom.uuid
-      @record.executed_at = Time.now.strftime("%Y-%m-%d %H:%M:%S")
 
       haml :new, layout: settings.layout
     end
 
     post '/' do
-      record = Job.new(params[:job])
+      record = JobTemplate.new(params[:job_template])
 
       if record.save(validate: true)
         flash[:success] = '创建成功'
@@ -35,24 +34,24 @@ module Account
     end
 
     get '/:id' do
-      unless @record = Job.find_by(id: params[:id])
-        @record = Job.new
-        @record.title = '任务不存在'
+      unless @record = JobTemplate.find_by(id: params[:id])
+        @record = JobTemplate.new
+        @record.title = '任务模板不存在'
       end
 
       haml :show, layout: settings.layout
     end
 
     get '/:id/edit' do
-      @record = Job.find_by(id: params[:id])
+      @record = JobTemplate.find_by(id: params[:id])
 
       haml :edit, layout: settings.layout
     end
 
     post '/:id' do
-      record = Job.find_by(id: params[:id])
+      record = JobTemplate.find_by(id: params[:id])
         
-      if record.update_attributes(params[:job])
+      if record.update_attributes(params[:job_template])
         flash[:success] = '更新成功'
         redirect to("/?page=#{params[:page] || 1}&id=#{params[:id]}")
       else
@@ -62,7 +61,7 @@ module Account
     end
 
     delete '/:id' do
-      if record = Job.find_by(id: params[:id])
+      if record = JobTemplate.find_by(id: params[:id])
         record.destroy
       end
       

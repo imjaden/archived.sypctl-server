@@ -1,1 +1,6 @@
-edit.haml
+%ol.breadcrumb
+  %li 应用中心
+  %li= link_to "应用管理", url_for("/")
+  %li= @record.name
+
+= haml :_form

@@ -1,5 +1,6 @@
 %ol.breadcrumb
-  %li 应用管理
+  %li 部署中心
+  %li 任务管理
   %li
     %a{href: "#{url_for('/new')}?page=#{params[:page] || 1}"}
       新建任务
@@ -21,10 +22,11 @@
     - @records.each do |record|
       %tr{id: "dom_#{record.id}"}
         %td= link_to record.title, url_for("/#{record.id}")
-        %td= record.device_name
+        %td= link_to record.device_name, url_for("/../devices/uuid/#{record.device_uuid}")
         %td= record.app_name
         %td= record.version_name
-        %td= record.state
+        %td
+          %span.label{class: "label-#{record.state == 'waiting' ? 'primary' : 'default'}"}= record.state
         %td= record.updated_at.strftime('%y/%m/%d %H:%M')
 
 = will_paginater @records

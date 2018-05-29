@@ -21,7 +21,7 @@ module Account
     end
 
     post '/' do
-      record = AppGroup.new(params[:app])
+      record = AppGroup.new(params[:app_group])
 
       if record.save(validate: true)
         flash[:success] = '创建成功'
@@ -50,7 +50,7 @@ module Account
     post '/:id' do
       record = AppGroup.find_by(id: params[:id])
         
-      if record.update_attributes(params[:app])
+      if record.update_attributes(params[:app_group])
         flash[:success] = '更新成功'
         redirect to("/?page=#{params[:page] || 1}&id=#{params[:id]}")
       else
@@ -65,6 +65,27 @@ module Account
       end
       
       respond_with_json({message: "「#{record.name}」删除成功"}, 201)
+    end
+
+    get '/:id/apps' do
+      @record = AppGroup.find_by(id: params[:id])
+      @records = @record.apps.paginate(page: params[:page], per_page: 15).order(id: :desc)
+
+      haml :apps, layout: settings.layout
+    end
+
+    get '/:id/apps/add' do
+      @record = AppGroup.find_by(id: params[:id])
+      @records = App.paginate(page: params[:page], per_page: 15).order(id: :desc)
+
+      haml :apps_add, layout: settings.layout
+    end
+
+    post '/apps/state' do
+      record = App.find_by(id: params[:id])
+      record.update_attributes({app_group_id: params[:app_group_id]})
+
+      respond_with_json({data: "successfully"}, 201)
     end
   end
 end

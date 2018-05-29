@@ -77,9 +77,11 @@
       parts = pathname.split("/");
 
       $("li").removeClass("active");
-      $(".menu-" + parts[1]).addClass("active");
       $("a").filter(function(inx) {
-        if(pathname.indexOf($(this).attr("href")) >= 0) { $(this).closest("li").addClass("active"); }
+        if(pathname.indexOf($(this).attr("href")) >= 0) { 
+          $(this).closest("li").addClass("active");
+          $(this).closest(".dropdown").addClass("active")
+        }
       })
     },
     resizeWindow: function() {
@@ -183,7 +185,7 @@
     currentDate = new Date();
     copyInfo = "&copy; 2016-" + currentDate.getFullYear() + " " + window.location.host;
     $("#footer .footer").html(copyInfo);
-    $(".flash_area .alert").slideUp(15000);
+    // $(".flash_area .alert").slideUp(15000);
 
     $('.breadcrumb-search-input').on('keypress',function(event){ 
        if(event.keyCode == 13) {  

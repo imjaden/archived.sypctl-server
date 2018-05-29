@@ -8,7 +8,7 @@ class Device < ActiveRecord::Base
   self.table_name = 'sys_devices'
 
   has_many :records, primary_key: :uuid, foreign_key: :uuid
-
+  belongs_to :device_group
 
   after_create :validate_ssh_state
   after_update :validate_ssh_state

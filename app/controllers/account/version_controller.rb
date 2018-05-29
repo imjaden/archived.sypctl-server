@@ -21,7 +21,7 @@ module Account
     end
 
     post '/' do
-      record = Version.new(params[:app])
+      record = Version.new(params[:version])
 
       if record.save(validate: true)
         flash[:success] = '创建成功'
@@ -50,7 +50,7 @@ module Account
     post '/:id' do
       record = Version.find_by(id: params[:id])
         
-      if record.update_attributes(params[:app])
+      if record.update_attributes(params[:version])
         flash[:success] = '更新成功'
         redirect to("/?page=#{params[:page] || 1}&id=#{params[:id]}")
       else

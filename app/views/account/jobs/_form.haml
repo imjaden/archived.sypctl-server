@@ -1,36 +1,74 @@
-- url = url_for(@record ? "/#{@record.id}?page=#{params[:page] || 1}" : "/")
-- form_for @record, url, method: "post", class: "form-horizontal", id: "recordForm" do |f|
-  - field_set_tag do
-    .form-group
-      = f.label '任务标题', class: "col-sm-2 control-label"
-      .col-sm-7
-        = f.text_field :title, class: "form-control"
-    .form-group
-      = f.label '设备名称', class: "col-sm-2 control-label"
-      .col-sm-7
-        = f.text_field :device_name, class: "form-control"
-    .form-group
-      = f.label '应用名称', class: "col-sm-2 control-label"
-      .col-sm-7
-        = f.text_field :app_name, class: "form-control"
-    .form-group
-      = f.label '版本名称', class: "col-sm-2 control-label"
-      .col-sm-7
-        = f.text_field :version_name, class: "form-control"
-    .form-group
-      = f.label '部署脚本', class: "col-sm-2 control-label"
-      .col-sm-7
-        = f.text_area :command, class: "form-control", rows: 10
-    .form-group
-      = f.label '执行时间', class: "col-sm-2 control-label"
-      .col-sm-7
-        = f.text_field :executed_at, class: "form-control"
-    .form-group
-      = f.label '任务描述', class: "col-sm-2 control-label"
-      .col-sm-7
-        = f.text_area :description, class: "form-control", rows: 1
-    .form-group
-      .col-sm-offset-2.col-sm-10
-        = f.submit "提交", class: "btn btn-primary"
+.col-sm-9
+  - url = url_for(@record ? "/#{@record.id}?page=#{params[:page] || 1}" : "/")
+  - form_for @record, url, method: "post", class: "form-horizontal", id: "recordForm" do |f|
+    = f.hidden_field :uuid
+    - field_set_tag do
+      .form-group
+        = f.label '任务标题', class: "col-sm-2 control-label"
+        .col-sm-6
+          = f.text_field :title, class: "form-control", placeholder: "任务标题，必填项"
+        .col-sm-1{style: "padding-top:10px;"}
+          %a{onclick: "window.Job.listJobTemplates();"}
+            %span.glyphicon.glyphicon-check
+      .form-group
+        = f.label '设备名称', class: "col-sm-2 control-label"
+        .col-sm-6
+          = f.text_field :device_name, class: "form-control", placeholder: "要部署的设备，必填项"
+        .col-sm-1{style: "padding-top:10px;"}
+          %a{onclick: "window.Job.listDevices();"}
+            %span.glyphicon.glyphicon-check
+      .form-group
+        = f.label '应用名称', class: "col-sm-2 control-label"
+        .col-sm-6
+          = f.text_field :app_name, class: "form-control", placeholder: "要部署的应用"
+        .col-sm-1{style: "padding-top:10px;"}
+          %a{onclick: "window.Job.listApps();"}
+            %span.glyphicon.glyphicon-check
+      .form-group
+        = f.label '版本名称', class: "col-sm-2 control-label"
+        .col-sm-6
+          = f.text_field :version_name, class: "form-control", placeholder: "要部署的版本"
+        .col-sm-1{style: "padding-top:10px;"}
+          %a{onclick: "window.Job.listAppVersions();"}
+            %span.glyphicon.glyphicon-check
+      .form-group
+        = f.label '部署脚本', class: "col-sm-2 control-label"
+        .col-sm-7
+          = f.text_area :command, class: "form-control", rows: 8, placeholder: "部署脚本，必填项"
+      .form-group
+        = f.label '执行时间', class: "col-sm-2 control-label"
+        .col-sm-7
+          = f.text_field :executed_at, class: "form-control", placeholder: "执行时间，定时任务功能"
+      .form-group
+        = f.label '任务描述', class: "col-sm-2 control-label"
+        .col-sm-7
+          = f.text_area :description, class: "form-control", rows: 2, placeholder: "任务描述"
+      .form-group
+        .col-sm-offset-2.col-sm-10
+          = f.submit "提交", class: "btn btn-primary"
+.col-sm-3
+  .list-group
+    %button.disabled.list-group-item{type: "button"} 模板列表：
+    - JobTemplate.all.each do |template|
+      %button.list-group-item{type: "button", "data-content": template.content, "data-title": template.title, onclick: "window.Job.setJobTemplate(this);"}= template.title
 
 
+:javascript
+  window.Job = {
+    setJobTemplate: function(ctl) {
+      $("#job_title").val($(ctl).data("title"))
+      $("#job_command").val($(ctl).data("content"))
+    },
+    listJobTemplates: function() {
+
+    },
+    listDevices: function() {
+
+    },
+    listApps: function() {
+
+    },
+    listAppVersions: function() {
+    
+    }
+  }

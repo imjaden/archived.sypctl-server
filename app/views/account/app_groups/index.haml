@@ -1,1 +1,36 @@
-index.haml
+%ol.breadcrumb
+  %li 应用中心
+  %li= link_to "分组管理", url_for("/")
+  %li
+    %a{href: "#{url_for('/new')}?page=#{params[:page] || 1}"}
+      新建分组
+      %span.glyphicon.glyphicon-plus
+
+:css   
+  .app-groups th:nth-child(n+1), .app-groups td:nth-child(n+1) { text-align: center; width: 5%; }
+  .app-groups th:nth-child(2), .app-groups td:nth-child(2) { text-align: left; width: 15%; }
+  .app-groups th:nth-child(3), .app-groups td:nth-child(3) { text-align: left; width: 20%; }
+  .app-groups th:nth-last-child(1), .app-groups td:nth-last-child(1) { text-align: center; width: 10%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.app-groups
+  %thead
+    %th 分组ID
+    %th 分组名称
+    %th 分组描述
+    %th 应用列表
+    %th 编辑
+    %th 更新时间
+  %tbody
+    - @records.each do |record|
+      %tr{id: "dom_#{record.id}"}
+        %td= record.id
+        %td= record.name
+        %td= record.description
+        %td
+          %a.btn.btn-xs.btn-link{href: url_for("/#{record.id}/apps?page=#{params[:page] || 1}")}
+            .span.glyphicon.glyphicon-th
+        %td
+          %a{href: url_for("/#{record.id}/edit")}
+            %span.glyphicon.glyphicon-edit
+        %td= record.updated_at.strftime('%y/%m/%d %H:%M')
+
+= will_paginater @records

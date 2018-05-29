@@ -5,6 +5,8 @@ class CreateDevice < ActiveRecord::Migration[5.2]
     #   Set to +:cascade+ to drop dependent objects as well.
     #   Defaults to false.
     create_table :sys_devices, force: false, comment: '设备服务器表' do |t|
+      t.integer  :user_group_id, comment: '所属用户分组 ID'
+      t.integer  :device_group_id, comment: '所属设备分组 ID'
       t.string   :uuid, comment: '设备 UUID'
       t.string   :human_name, comment: '业务名称'
       t.string   :hostname, comment: '主机名称'

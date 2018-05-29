@@ -1,0 +1,8 @@
+%ol.breadcrumb
+  %li 部署中心
+  %li
+    %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 模板管理
+  %li
+    新建模板
+
+= haml :_form

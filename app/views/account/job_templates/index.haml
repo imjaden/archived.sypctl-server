@@ -1,0 +1,29 @@
+%ol.breadcrumb
+  %li 部署中心
+  %li 模板管理
+  %li
+    %a{href: "#{url_for('/new')}?page=#{params[:page] || 1}"}
+      新建模板
+      %span.glyphicon.glyphicon-plus
+:css   
+  .job-templates th:nth-child(n+1), .job-templates td:nth-child(n+1) { text-align: center; width: 5%; }
+  .job-templates th:nth-child(1), .job-templates td:nth-child(1) { text-align: left; width: 10%; }
+  .job-templates th:nth-child(2), .job-templates td:nth-child(2) { text-align: left; width: 15%; }
+  .job-templates th:nth-last-child(1), .job-templates td:nth-last-child(1) { text-align: center; width: 10%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.job-templates
+  %thead
+    %th 模板名称
+    %th 功能描述
+    %th 编辑
+    %th 更新时间
+  %tbody
+    - @records.each do |record|
+      %tr{id: "dom_#{record.id}"}
+        %td= link_to record.title, url_for("/#{record.id}")
+        %td= record.description
+        %td
+          %a{href: url_for("/#{record.id}/edit")}
+            %span.glyphicon.glyphicon-edit
+        %td= record.updated_at.strftime('%y/%m/%d %H:%M')
+
+= will_paginater @records

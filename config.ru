@@ -18,7 +18,9 @@ use Unicorn::WorkerKiller::Oom, (192*(1024**2)), (256*(1024**2))
   '/account/apps' => 'Account::AppController',
   '/account/versions' => 'Account::VersionController',
   '/account/devices' => 'Account::DeviceController',
+  '/account/device_groups' => 'Account::DeviceGroupController',
   '/account/jobs' => 'Account::JobController',
+  '/account/job_templates' => 'Account::JobTemplateController',
   '/api' => 'API::ApplicationController',
   '/api/v1' => 'API::V1Controller'
 }.each_pair do |path, mod|

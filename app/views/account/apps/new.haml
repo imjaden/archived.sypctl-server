@@ -1,7 +1,6 @@
 %ol.breadcrumb
-  %li
-    %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 应用管理
-  %li
-    新建应用
+  %li 应用中心
+  %li= link_to "应用管理", url_for("/")
+  %li 新建应用
 
 = haml :_form

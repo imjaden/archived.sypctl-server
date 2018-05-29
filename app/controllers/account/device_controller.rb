@@ -42,6 +42,15 @@ module Account
       haml :show, layout: settings.layout
     end
 
+    get '/uuid/:uuid' do
+      unless @record = Device.find_by(uuid: params[:uuid])
+        @record = Device.new
+        @record.name = '版本不存在'
+      end
+
+      haml :show, layout: settings.layout
+    end
+
     get '/:id/edit' do
       @record = Device.find_by(id: params[:id])
 

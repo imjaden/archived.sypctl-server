@@ -1,0 +1,99 @@
+.col-sm-9
+  %ol.breadcrumb
+    %li 应用中心
+    %li
+      %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 分组管理
+    %li
+      %a{href: "#{url_for('/')}#{params[:id]}/apps?obj_type=#{params[:obj_type] || 1}"}
+        ="「#{@record.name}」"
+    %li分组权限
+
+:css   
+  .apps th:nth-child(n+1), .apps td:nth-child(n+1) { text-align: center; width: 5%; }
+  .apps th:nth-child(3), .apps td:nth-child(3) { text-align: left; width: 20%; }
+  .apps th:nth-child(4), .apps td:nth-child(4) { text-align: left; width: 20%; }
+  .apps th:nth-last-child(1), .apps td:nth-last-child(1) { text-align: center; width: 10%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.records.smart-table.apps
+  %thead
+    %th ID
+    %th 应用名称
+    %th 文件名称
+    %th 更新时间
+  %tbody
+    - @records.each do |record|
+      %tr{id: "dom_#{record.id}", "data-id": record.id, "data-groupid": record.app_group_id}
+        %td.id= record.id
+        %td.name= record.name
+        %td.file_name= record.file_name
+        %td= (record.updated_at || Time.now).strftime('%y/%m/%d %H:%M')
+
+= will_paginater @records
+
+:javascript
+  window.AppGroup = {
+    initTableCheckbox: function() {
+      var $thr = $('table.records thead tr');
+      // <input type="checkbox" onclick="window.Group.checkAll(this);" id="checkAll" name="checkAll" />
+      var $checkAllTh = $('<th>选择</th>');
+      /*将全选/反选复选框添加到表头最前，即增加一列*/
+      $thr.prepend($checkAllTh);
+      /*“全选/反选”复选框*/
+      var $tbr = $('table.records tbody tr');
+      var $checkItemTd = $('<td><input class="item-checkbox" type="checkbox" name="checkItem" onclick="window.AppGroup.setState(this);" /></td>');
+      /*每一行都在最前面插入一个选中复选框的单元格*/
+      $tbr.prepend($checkItemTd);
+    },
+    checkAll: function(ctl) {
+      $(".item-checkbox").prop("checked", $(ctl).prop("checked"));
+    },
+    getState: function() {
+      $("table.records tbody tr").each(function() {
+        if(parseInt($(this).data("groupid")) === #{@record.id}) {
+          $("#dom_" + $(this).data("id") + " input").prop("checked", "checked");
+        }
+      })
+    },
+    setState: function(ctl) {
+      var id = parseInt($(ctl).closest("tr").find(".id").text()),
+          app_name = $(ctl).closest("tr").find(".name").text(),
+          check_state = $(ctl).prop("checked"),
+          options = {
+            type: 'post',
+            url: "#{url_for('/apps/state')}",
+            data: {
+              id: id,
+              app_group_id: #{params[:id]},
+              state: check_state
+            }
+          };
+      var state = confirm("确认" + ($(ctl).prop("checked") ? "" : "取消") + "关联分组「#{@record.name}」?");
+      if(!state) {
+        $("#dom_" + id + " .item-checkbox").prop("checked", !check_state);
+        return false;
+      }
+
+      window.Loading.show("操作中...");
+      $('.loading').removeClass('hidden');
+      $.ajax(options).done(function(res, status, xhr) {
+        if(res.code === 201) {
+          window.Loading.show("关联成功");
+
+          try {
+            var objects = {
+              role: { id: id, name: app_name, type: "app" },
+              menu: { id: "#{@record.id}", name: "#{@record.name}", type: "app_group"}
+            }
+            // window.OperationLogger.record("app_group.move_app_" + (check_state ? "into" : "out"), objects);
+          } catch(e) { console.log(e) }
+        } else {
+          window.Loading.show("关联失败");
+        }
+      }).fail(function(res, status, xhr) {
+        window.Loading.show("关联失败");
+      }).always(function(res, status, xhr) {
+        window.Loading.hide();
+      });
+    }
+  }
+  window.AppGroup.initTableCheckbox();
+  window.AppGroup.getState();

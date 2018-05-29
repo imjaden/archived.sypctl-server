@@ -1,0 +1,28 @@
+%ol.breadcrumb
+  %li 应用中心
+  %li= link_to '应用管理', url_for('/')
+  %li= @record.name
+
+:css   
+  .app-group th:nth-child(1), .app-group td:nth-child(1) { width: 15%; }
+  .app-group th:nth-child(2), .app-group td:nth-child(2) { width: 80%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.app-group
+  %thead
+    %th 键值
+    %th 内容
+  %tbody
+    %tr
+      %td 分组ID
+      %td= @record.id
+    %tr
+      %td 分组名称
+      %td= @record.name
+    %tr
+      %td 分组描述
+      %td= @record.description
+    %tr
+      %td 创建时间
+      %td= @record.created_at.strftime('%y/%m/%d %H:%M:%S')
+    %tr
+      %td 更新时间
+      %td= @record.updated_at.strftime('%y/%m/%d %H:%M:%S')
