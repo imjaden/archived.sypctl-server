@@ -8,28 +8,31 @@
         .col-sm-6
           = f.text_field :title, class: "form-control", placeholder: "任务标题，必填项"
         .col-sm-1{style: "padding-top:10px;"}
-          %a{onclick: "window.Job.listJobTemplates();"}
+          %a{onclick: "window.Job.listJobTemplates(0);"}
             %span.glyphicon.glyphicon-check
       .form-group
         = f.label '设备名称', class: "col-sm-2 control-label"
         .col-sm-6
+          = f.hidden_field :device_uuid
           = f.text_field :device_name, class: "form-control", placeholder: "要部署的设备，必填项"
         .col-sm-1{style: "padding-top:10px;"}
-          %a{onclick: "window.Job.listDevices();"}
+          %a{onclick: "window.Job.listDevices(0);"}
             %span.glyphicon.glyphicon-check
       .form-group
         = f.label '应用名称', class: "col-sm-2 control-label"
         .col-sm-6
+          = f.hidden_field :app_id
           = f.text_field :app_name, class: "form-control", placeholder: "要部署的应用"
         .col-sm-1{style: "padding-top:10px;"}
-          %a{onclick: "window.Job.listApps();"}
+          %a{onclick: "window.Job.listApps(0);"}
             %span.glyphicon.glyphicon-check
       .form-group
         = f.label '版本名称', class: "col-sm-2 control-label"
         .col-sm-6
+          = f.hidden_field :version_id
           = f.text_field :version_name, class: "form-control", placeholder: "要部署的版本"
         .col-sm-1{style: "padding-top:10px;"}
-          %a{onclick: "window.Job.listAppVersions();"}
+          %a{onclick: "window.Job.listAppVersions(0);"}
             %span.glyphicon.glyphicon-check
       .form-group
         = f.label '部署脚本', class: "col-sm-2 control-label"
@@ -48,10 +51,6 @@
           = f.submit "提交", class: "btn btn-primary"
 .col-sm-3
   .list-group
-    %button.disabled.list-group-item{type: "button"} 模板列表：
-    - JobTemplate.all.each do |template|
-      %button.list-group-item{type: "button", "data-content": template.content, "data-title": template.title, onclick: "window.Job.setJobTemplate(this);"}= template.title
-
 
 :javascript
   window.Job = {
@@ -59,16 +58,127 @@
       $("#job_title").val($(ctl).data("title"))
       $("#job_command").val($(ctl).data("content"))
     },
-    listJobTemplates: function() {
-
+    listJobTemplates: function(page) {
+      $.ajax({
+        method: 'get',
+        url: '/api/v1/job_templates',
+        contentType: 'application/json',
+        data: {page: page, page_size: 100}
+      }).done(function(res, status, xhr) {
+        $(".list-group").html("")
+        $(".list-group").append("<button class='list-group-item disabled' type='button' \>模板列表：</button>");
+        if(!res.data.length) {
+          $(".list-group").append("<button class='list-group-item disabled' type='button' \>无数据</button>");
+        }
+        res.data.forEach(function(el) {
+          $(".list-group").append(" \
+            <button class='list-group-item' \
+                    type='button' \
+                    onclick='window.Job.setJobTemplate(this);' \
+                    data-content='" + el.content + "' \
+                    data-title='" + el.title + "'> \
+            " + el.title + "</button> \
+          ")
+        })
+      }).fail(function(res, status, xhr) {
+      }).always(function(res, status, xhr) {
+      });
     },
-    listDevices: function() {
-
+    setDevice: function(ctl) {
+      $("#job_device_name").val($(ctl).data("name"));
+      $("#job_device_uuid").val($(ctl).data("uuid"));
     },
-    listApps: function() {
-
+    listDevices: function(page) {
+      $.ajax({
+        method: 'get',
+        url: '/api/v1/devices',
+        contentType: 'application/json',
+        data: {page: page, page_size: 100}
+      }).done(function(res, status, xhr) {
+        $(".list-group").html("")
+        $(".list-group").append("<button class='list-group-item disabled' type='button' \>设备列表：</button>");
+        if(!res.data.length) {
+          $(".list-group").append("<button class='list-group-item disabled' type='button' \>无数据</button>");
+        }
+        res.data.forEach(function(el) {
+          $(".list-group").append(" \
+            <button class='list-group-item' \
+                    type='button' \
+                    onclick='window.Job.setDevice(this);' \
+                    data-uuid='" + el.uuid + "' \
+                    data-name='" + el.human_name + "'> \
+            " + el.human_name + "</button> \
+          ")
+        })
+      }).fail(function(res, status, xhr) {
+      }).always(function(res, status, xhr) {
+      });
     },
-    listAppVersions: function() {
-    
+    setApp: function(ctl) {
+      $("#job_app_id").val($(ctl).data("id"));
+      $("#job_app_name").val($(ctl).data("name"));
+    },
+    listApps: function(page) {
+      $.ajax({
+        method: 'get',
+        url: '/api/v1/apps',
+        contentType: 'application/json',
+        data: {page: page, page_size: 100}
+      }).done(function(res, status, xhr) {
+        $(".list-group").html("")
+        $(".list-group").append("<button class='list-group-item disabled' type='button' \>应用列表：</button>");
+        if(!res.data.length) {
+          $(".list-group").append("<button class='list-group-item disabled' type='button' \>无数据</button>");
+        }
+        res.data.forEach(function(el) {
+          $(".list-group").append(" \
+            <button class='list-group-item' \
+                    type='button' \
+                    onclick='window.Job.setApp(this);' \
+                    data-id='" + el.id + "' \
+                    data-name='" + el.name + "'> \
+            " + el.name + "</button> \
+          ")
+        })
+      }).fail(function(res, status, xhr) {
+      }).always(function(res, status, xhr) {
+      });
+    },
+    setAppVersion: function(ctl) {
+      $("#job_version_id").val($(ctl).data("id"));
+      $("#job_verison_name").val($(ctl).data("name"));
+    },
+    listAppVersions: function(page) {
+      var app_id = parseInt($("#job_app_id").val());
+      if(isNaN(app_id) || app_id <= 0) {
+        window.Loading.popup("请选择应用")
+        return;
+      }
+      $.ajax({
+        method: 'get',
+        url: '/api/v1/' + app_id + '/versions',
+        contentType: 'application/json',
+        data: {page: page, page_size: 100}
+      }).done(function(res, status, xhr) {
+        $(".list-group").html("")
+        $(".list-group").append("<button class='list-group-item disabled' type='button' \>版本列表：</button>");
+        if(!res.data.length) {
+          $(".list-group").append("<button class='list-group-item disabled' type='button' \>无数据</button>");
+        }
+        res.data.forEach(function(el) {
+          $(".list-group").append(" \
+            <button class='list-group-item' \
+                    type='button' \
+                    onclick='window.Job.setApp(this);' \
+                    data-id='" + el.id + "' \
+                    data-name='" + el.version + "'> \
+            " + el.version + "</button> \
+          ")
+        })
+      }).fail(function(res, status, xhr) {
+      }).always(function(res, status, xhr) {
+      });
     }
   }
+
+  window.Job.listJobTemplates(0);

@@ -7,4 +7,10 @@ class App < ActiveRecord::Base
 
   has_many :versions, primary_key: :id, foreign_key: :app_id
   belongs_to :app_group
+
+  def to_hash
+    self.class.column_names.each_with_object({}) do |column_name, hsh|
+      hsh[column_name.to_sym] = send(column_name)
+    end
+  end
 end
