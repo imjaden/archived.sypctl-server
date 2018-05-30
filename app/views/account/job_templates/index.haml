@@ -15,15 +15,54 @@
     %th 模板名称
     %th 功能描述
     %th 编辑
+    %th 删除
     %th 更新时间
   %tbody
     - @records.each do |record|
       %tr{id: "dom_#{record.id}"}
-        %td= link_to record.title, url_for("/#{record.id}")
+        %td.name= link_to record.title, url_for("/#{record.id}")
         %td= record.description
         %td
           %a{href: url_for("/#{record.id}/edit")}
             %span.glyphicon.glyphicon-edit
+        %td
+          %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.JobTemplate.remove(#{record.id});"}
+            .span.glyphicon.glyphicon-trash
         %td= record.updated_at.strftime('%y/%m/%d %H:%M')
 
 = will_paginater @records
+
+:javascript
+  (function() {
+      window.JobTemplate = {
+        remove: function(id) {
+          var name = $("#dom_" + id + " .name").text();
+
+          if(!confirm('确定删除「' + name + '」?')) {
+            return false;
+          }
+
+          window.Loading.show("删除中...");
+          $.ajax({
+            type: 'delete',
+            url: "#{url_for('/')}" + id
+          }).done(function(res, status, xhr) {
+            if(res.code === 201) {
+              $("#dom_" + id).remove();
+              window.Loading.show("删除成功");
+
+              try {
+                var objects = {menu: { id: id, name: name, type: "device" }}
+                // window.OperationLogger.record("device.delete", objects);
+              } catch(e) { console.log(e) }
+            } else {
+              window.Loading.show("删除失败");
+            }
+          }).fail(function(xhr, status, error) {
+              window.Loading.show("删除失败");
+          }).always(function(res, status, xhr) {
+              window.Loading.hide();
+          });
+        }
+      }
+  }).call(this);

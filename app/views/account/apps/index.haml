@@ -6,31 +6,35 @@
       新建应用
       %span.glyphicon.glyphicon-plus
 :css   
-  .apps th:nth-child(n+1), .apps td:nth-child(n+1) { text-align: center; width: 5%; }
-  .apps th:nth-child(1), .apps td:nth-child(1) { text-align: left; width: 15%; }
-  .apps th:nth-child(2), .apps td:nth-child(2) { text-align: left; width: 10%; }
+  .apps th:nth-child(n+1), .apps td:nth-child(n+1) { text-align: center; width: 6%; }
+  .apps th:nth-child(1), .apps td:nth-child(1) { width: 12%; }
+  .apps th:nth-child(2), .apps td:nth-child(2) { text-align: left; width: 15%; }
+  .apps th:nth-child(3), .apps td:nth-child(3) { text-align: left; width: 15%; }
   .apps th:nth-child(4), .apps td:nth-child(4) { width: 10%; }
-  .apps th:nth-last-child(1), .apps td:nth-last-child(1) { text-align: center; width: 10%; }
+  .apps th:nth-child(8), .apps td:nth-child(8) { width: 5%; }
+  .apps th:nth-child(9), .apps td:nth-child(9) { width: 5%; }
+  .apps th:nth-last-child(1), .apps td:nth-last-child(1) { text-align: center; width: 8%; }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.apps
   %thead
+    %th 应用分组
     %th 应用名称
     %th 文件名称
     %th 文件类型
-    %th 应用分组
     %th 版本数量
     %th 最新版本
     %th 上传版本
     %th 编辑
+    %th 删除
     %th 更新时间
   %tbody
     - @records.each do |record|
       %tr{id: "dom_#{record.id}"}
-        %td= link_to record.name, url_for("/#{record.id}")
+        %td
+          %span.label.label-default= record.app_group.name if record.app_group
+        %td.name= link_to record.name, url_for("/#{record.id}")
         %td= record.file_name
         %td
           %span.label.label-success= record.file_type
-        %td
-          %span.label.label-default= record.app_group.name if record.app_group
         %td= link_to record.version_count, url_for("/#{record.id}/version"), class: "badge"
         %td= link_to "#{record.latest_version}(#{record.latest_build})", url_for("/#{record.id}/version/#{record.latest_version_id}") if record.latest_version_id
         %td
@@ -39,6 +43,44 @@
         %td
           %a{href: url_for("/#{record.id}/edit")}
             %span.glyphicon.glyphicon-edit
+        %td
+          %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.AppObject.remove(#{record.id});"}
+            .span.glyphicon.glyphicon-trash
         %td= record.updated_at.strftime('%y/%m/%d %H:%M')
 
 = will_paginater @records
+
+:javascript
+  (function() {
+      window.AppObject = {
+        remove: function(id) {
+          var name = $("#dom_" + id + " .name").text();
+
+          if(!confirm('确定删除「' + name + '」?')) {
+            return false;
+          }
+
+          window.Loading.show("删除中...");
+          $.ajax({
+            type: 'delete',
+            url: "#{url_for('/')}" + id
+          }).done(function(res, status, xhr) {
+            if(res.code === 201) {
+              $("#dom_" + id).remove();
+              window.Loading.show("删除成功");
+
+              try {
+                var objects = {menu: { id: id, name: name, type: "app" }}
+                // window.OperationLogger.record("app.delete", objects);
+              } catch(e) { console.log(e) }
+            } else {
+              window.Loading.show("删除失败");
+            }
+          }).fail(function(xhr, status, error) {
+              window.Loading.show("删除失败");
+          }).always(function(res, status, xhr) {
+              window.Loading.hide();
+          });
+        }
+      }
+  }).call(this);

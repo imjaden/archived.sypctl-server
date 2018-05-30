@@ -4,43 +4,39 @@
     %li
       %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 分组管理
     %li
-      %a{href: "#{url_for('/')}#{params[:id]}/apps?obj_type=#{params[:obj_type] || 1}"}
+      %a{href: "#{url_for('/')}#{params[:id]}/devices?obj_type=#{params[:obj_type] || 1}"}
         ="「#{@record.name}」"
     %li分组权限
 
 :css   
-  .apps th:nth-child(n+1), .apps td:nth-child(n+1) { text-align: center; width: 5%; }
-  .apps th:nth-child(3), .apps td:nth-child(3) { text-align: left; width: 20%; }
-  .apps th:nth-child(4), .apps td:nth-child(4) { text-align: left; width: 20%; }
-  .apps th:nth-last-child(1), .apps td:nth-last-child(1) { text-align: center; width: 10%; }
-%table.table.table-hover.table-condensed.table-strip.table-bordered.records.smart-table.apps
+  .devices th:nth-child(n+1), .devices td:nth-child(n+1) { text-align: center; width: 5%; }
+  .devices th:nth-child(3), .devices td:nth-child(3) { text-align: left; width: 20%; }
+  .devices th:nth-child(4), .devices td:nth-child(4) { text-align: left; width: 20%; }
+  .devices th:nth-last-child(1), .devices td:nth-last-child(1) { text-align: center; width: 10%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.records.smart-table.devices
   %thead
     %th ID
-    %th 应用名称
-    %th 文件名称
+    %th 主机名称
+    %th 主机UUID
     %th 更新时间
   %tbody
     - @records.each do |record|
-      %tr{id: "dom_#{record.id}", "data-id": record.id, "data-groupid": record.app_group_id}
+      %tr{id: "dom_#{record.id}", "data-id": record.id, "data-groupid": record.device_group_id}
         %td.id= record.id
-        %td.name= record.name
-        %td.file_name= record.file_name
+        %td.name= record.human_name || record.hostname
+        %td.uuid= record.uuid
         %td= (record.updated_at || Time.now).strftime('%y/%m/%d %H:%M')
 
 = will_paginater @records
 
 :javascript
-  window.AppGroup = {
+  window.DeviceGroup = {
     initTableCheckbox: function() {
       var $thr = $('table.records thead tr');
-      // <input type="checkbox" onclick="window.Group.checkAll(this);" id="checkAll" name="checkAll" />
       var $checkAllTh = $('<th>选择</th>');
-      /*将全选/反选复选框添加到表头最前，即增加一列*/
       $thr.prepend($checkAllTh);
-      /*“全选/反选”复选框*/
       var $tbr = $('table.records tbody tr');
-      var $checkItemTd = $('<td><input class="item-checkbox" type="checkbox" name="checkItem" onclick="window.AppGroup.setState(this);" /></td>');
-      /*每一行都在最前面插入一个选中复选框的单元格*/
+      var $checkItemTd = $('<td><input class="item-checkbox" type="checkbox" name="checkItem" onclick="window.DeviceGroup.setState(this);" /></td>');
       $tbr.prepend($checkItemTd);
     },
     checkAll: function(ctl) {
@@ -55,14 +51,14 @@
     },
     setState: function(ctl) {
       var id = parseInt($(ctl).closest("tr").find(".id").text()),
-          app_name = $(ctl).closest("tr").find(".name").text(),
+          device_name = $(ctl).closest("tr").find(".name").text(),
           check_state = $(ctl).prop("checked"),
           options = {
             type: 'post',
-            url: "#{url_for('/apps/state')}",
+            url: "#{url_for('/devices/state')}",
             data: {
               id: id,
-              app_group_id: #{params[:id]},
+              device_group_id: #{params[:id]},
               state: check_state
             }
           };
@@ -81,8 +77,8 @@
 
           try {
             var objects = {
-              role: { id: id, name: app_name, type: "app" },
-              menu: { id: "#{@record.id}", name: "#{@record.name}", type: "app_group"}
+              role: { id: id, name: device_name, type: "app" },
+              menu: { id: "#{@record.id}", name: "#{@record.name}", type: "device_group"}
             }
             // window.OperationLogger.record("app_group.move_app_" + (check_state ? "into" : "out"), objects);
           } catch(e) { console.log(e) }
@@ -96,5 +92,5 @@
       });
     }
   }
-  window.AppGroup.initTableCheckbox();
-  window.AppGroup.getState();
+  window.DeviceGroup.initTableCheckbox();
+  window.DeviceGroup.getState();

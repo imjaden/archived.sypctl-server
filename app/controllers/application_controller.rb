@@ -49,7 +49,8 @@ class ApplicationController < Sinatra::Base
   end
 
   get '/', '/login' do
-    @user = User.new
+    redirect to('/account') if request.cookies['authen'].present?
+    @user = User.new(user_num: request.cookies['authen'] || '')
 
     haml :index, layout: settings.layout
   end
@@ -93,6 +94,13 @@ class ApplicationController < Sinatra::Base
     end
 
     respond_with_json(hash)
+  end
+
+  # GET /logout
+  get '/logout' do
+    set_login_cookie
+
+    redirect to("/login")
   end
 
   def current_user
@@ -151,7 +159,7 @@ class ApplicationController < Sinatra::Base
   def authenticate!
     return if request.cookies['authen']
 
-    response.set_cookie 'path', value: request.url, path: '/', max_age: '600'
+    response.set_cookie 'path', value: request.url, path: '/', max_age: '6000'
     flash[:danger] = '继续操作前请登录.'
     redirect '/login', 302
   end
@@ -175,6 +183,6 @@ class ApplicationController < Sinatra::Base
   private
 
   def set_login_cookie(cookie_name = 'authen', cookie_value = '')
-    response.set_cookie cookie_name, value: cookie_value, path: '/', max_age: '28800'
+    response.set_cookie cookie_name, value: cookie_value, path: '/', max_age: '2880000'
   end
 end

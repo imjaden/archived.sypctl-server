@@ -2,6 +2,10 @@
 - form_for @record, url, method: "post", class: "form-horizontal", id: "recordForm" do |f|
   - field_set_tag do
     .form-group
+      = f.label '应用分组', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.select :device_group_id, options: DeviceGroup.all.map { |r| [r.name, r.id] }, class: "form-control"
+    .form-group
       = f.label '业务名称', class: "col-sm-2 control-label"
       .col-sm-7
         = f.text_field :human_name, class: "form-control", placeholder: "业务名称"
@@ -44,3 +48,4 @@
     .form-group
       .col-sm-offset-2.col-sm-10
         = f.submit "提交", class: "btn btn-primary"
+        = button_tag "取消", class: "btn btn-default", onclick: "window.history.go(-1);"

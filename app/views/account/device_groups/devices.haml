@@ -1,0 +1,31 @@
+.col-sm-9
+  %ol.breadcrumb
+    %li 设备中心
+    %li
+      %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 分组管理
+    %li= "「#{@record.name}」"
+    %li
+      %a{href: "#{url_for('/')}#{params[:id]}/devices/add?obj_type=#{params[:obj_type] || 1}"}
+        主机管理
+        %span.glyphicon.glyphicon-check
+
+:css   
+  .devices th:nth-child(n+1), .devices td:nth-child(n+1) { text-align: center; width: 5%; }
+  .devices th:nth-child(2), .devices td:nth-child(2) { text-align: left;width: 20%; }
+  .devices th:nth-child(3), .devices td:nth-child(3) { text-align: left;width: 20%; }
+  .devices th:nth-last-child(1), .devices td:nth-last-child(1) { text-align: center; width: 10%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.records.smart-table.devices
+  %thead
+    %th ID
+    %th 主机名称
+    %th 主机UUID
+    %th 更新时间
+  %tbody
+    - @records.each do |record|
+      %tr{id: "dom_#{record.id}"}
+        %td.id=record.id
+        %td.name= record.human_name || record.hostname
+        %td.file_name= record.uuid
+        %td= (record.updated_at || Time.now).strftime('%y/%m/%d %H:%M')
+
+= will_paginater @records

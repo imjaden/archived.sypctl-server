@@ -83,7 +83,7 @@ module Account
 
     post '/apps/state' do
       record = App.find_by(id: params[:id])
-      record.update_attributes({app_group_id: params[:app_group_id]})
+      record.update_attributes({app_group_id: (params[:state].to_s == 'true' ? params[:app_group_id] : nil)})
 
       respond_with_json({data: "successfully"}, 201)
     end

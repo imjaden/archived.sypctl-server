@@ -7,26 +7,68 @@
       %span.glyphicon.glyphicon-plus
 :css   
   .jobs th:nth-child(n+1), .jobs td:nth-child(n+1) { text-align: center; width: 5%; }
-  .jobs th:nth-child(1), .jobs td:nth-child(1) { text-align: left; width: 20%; }
+  .jobs th:nth-child(1), .jobs td:nth-child(1) { width: 8%; }
   .jobs th:nth-child(2), .jobs td:nth-child(2) { text-align: left; width: 15%; }
-  .jobs th:nth-last-child(1), .jobs td:nth-last-child(1) { text-align: center; width: 10%; }
+  .jobs th:nth-child(3), .jobs td:nth-child(3) { text-align: left; width: 20%; }
+  .jobs th:nth-last-child(1), .jobs td:nth-last-child(1) { text-align: center; width:8%; }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.jobs
   %thead
+    %th 创建时间
     %th 任务标题
     %th 目标设备
     %th 应用名称
     %th 版本信息
     %th 部署进度
+    %th 删除
     %th 更新时间
   %tbody
     - @records.each do |record|
       %tr{id: "dom_#{record.id}"}
-        %td= link_to record.title, url_for("/#{record.id}")
+        %td= record.created_at.strftime('%y/%m/%d %H:%M') if record.created_at
+        %td.name= link_to record.title, url_for("/#{record.id}")
         %td= link_to record.device_name, url_for("/../devices/uuid/#{record.device_uuid}")
         %td= record.app_name
         %td= record.version_name
         %td
           %span.label{class: "label-#{record.state == 'waiting' ? 'primary' : 'default'}"}= record.state
-        %td= record.updated_at.strftime('%y/%m/%d %H:%M')
+        %td
+          %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.Job.remove(#{record.id});"}
+            .span.glyphicon.glyphicon-trash
+        %td= record.updated_at.strftime('%y/%m/%d %H:%M') if record.updated_at
 
 = will_paginater @records
+
+:javascript
+  (function() {
+      window.Job = {
+        remove: function(id) {
+          var name = $("#dom_" + id + " .name").text();
+
+          if(!confirm('确定删除「' + name + '」?')) {
+            return false;
+          }
+
+          window.Loading.show("删除中...");
+          $.ajax({
+            type: 'delete',
+            url: "#{url_for('/')}" + id
+          }).done(function(res, status, xhr) {
+            if(res.code === 201) {
+              $("#dom_" + id).remove();
+              window.Loading.show("删除成功");
+
+              try {
+                var objects = {menu: { id: id, name: name, type: "device" }}
+                // window.OperationLogger.record("device.delete", objects);
+              } catch(e) { console.log(e) }
+            } else {
+              window.Loading.show("删除失败");
+            }
+          }).fail(function(xhr, status, error) {
+              window.Loading.show("删除失败");
+          }).always(function(res, status, xhr) {
+              window.Loading.hide();
+          });
+        }
+      }
+  }).call(this);

@@ -66,5 +66,26 @@ module Account
       
       respond_with_json({message: "「#{record.name}」删除成功"}, 201)
     end
+
+    get '/:id/devices' do
+      @record = DeviceGroup.find_by(id: params[:id])
+      @records = @record.devices.paginate(page: params[:page], per_page: 15).order(id: :desc)
+
+      haml :devices, layout: settings.layout
+    end
+
+    get '/:id/devices/add' do
+      @record = DeviceGroup.find_by(id: params[:id])
+      @records = Device.paginate(page: params[:page], per_page: 15).order(id: :desc)
+
+      haml :devices_add, layout: settings.layout
+    end
+
+    post '/devices/state' do
+      record = Device.find_by(id: params[:id])
+      record.update_attributes({device_group_id: (params[:state].to_s == 'true' ? params[:device_group_id] : nil)})
+
+      respond_with_json({data: "successfully"}, 201)
+    end
   end
 end

@@ -21,3 +21,4 @@
     .form-group
       .col-sm-offset-2.col-sm-10
         = f.submit "提交", class: "btn btn-primary"
+        = button_tag "取消", class: "btn btn-default", onclick: "window.history.go(-1);"

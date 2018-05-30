@@ -69,6 +69,14 @@ module Account
       end
     end
 
+    delete '/:id' do
+      if record = Device.find_by(id: params[:id])
+        record.destroy
+      end
+      
+      respond_with_json({message: "删除成功"}, 201)
+    end
+
     get '/:id/records' do
       @device = Device.find_by(id: params[:id])
       @records = @device.records.paginate(page: params[:page], per_page: 15).order(id: :desc)
