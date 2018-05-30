@@ -16,6 +16,7 @@ module Account
 
     get '/new' do
       @record = App.new
+      @record.file_path = "/usr/local/src/"
 
       haml :new, layout: settings.layout
     end
@@ -97,7 +98,7 @@ module Account
         latest_version_id: version.id, 
         version_count: @app.versions.count})
 
-      redirect to("/?id=#{params[:id]}")
+      redirect to("/#{params[:id]}/version")
     end
 
     get '/:id/version' do

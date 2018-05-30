@@ -47,5 +47,6 @@
         = f.text_field :os_version, class: "form-control", disabled: "disabled"
     .form-group
       .col-sm-offset-2.col-sm-10
-        = f.submit "提交", class: "btn btn-primary"
+        = f.submit "提交", class: "btn btn-primary hidden"
+        = link_to "提交", "javascript:void(0);", class: "btn btn-primary", onclick: "window.Device.onsubmit();"
         = button_tag "取消", class: "btn btn-default", onclick: "window.history.go(-1);"

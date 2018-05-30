@@ -48,7 +48,8 @@
           = f.text_area :description, class: "form-control", rows: 2, placeholder: "任务描述"
       .form-group
         .col-sm-offset-2.col-sm-10
-          = f.submit "提交", class: "btn btn-primary"
+          = f.submit "提交", class: "btn btn-primary hidden"
+          = link_to "提交", "javascript:void(0);", class: "btn btn-primary", onclick: "window.Job.onsubmit();"
           = button_tag "取消", class: "btn btn-default", onclick: "window.history.go(-1);"
 
 .col-sm-3
@@ -180,6 +181,17 @@
       }).fail(function(res, status, xhr) {
       }).always(function(res, status, xhr) {
       });
+    },
+    onsubmit: function() {
+      try {
+        var objects = {
+          job: { id: "-1", name: $("#job_title").val() }, 
+          device: { id: $("#job_device_uuid").val(), name: $("#job_device_name").val() }
+        }
+        window.OperationLogger.record("job.new", objects);
+      } catch(e) { console.log(e) }
+
+      $("#recordForm").submit();
     }
   }
 

@@ -1,0 +1,43 @@
+%ol.breadcrumb
+  %li 日志中心
+  %li
+    操作日志
+    %a{"data-toggle" => "modal", "data-target" => "#templateModal"}
+      %span.glyphicon.glyphicon-info-sign
+
+= stylesheet_link_tag "materialdesignicons.min.css"
+:css
+  .operation-logs th:nth-child(1), .operation-logs td:nth-child(1) { width: 100%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.operation-logs
+  %tbody
+    - @records.each do |record|
+      %tr{id: "dom_#{record.id}"}
+        %td
+          %span{style: "color: darkgray;"}
+            = record.created_at.strftime("%y-%m-%d %H:%M:%S")
+            &nbsp;-&nbsp;
+          %span{class: "mdi #{operation_log_type(record.tags)}"}
+          = record.description
+
+= will_paginater @records
+
+#templateModal.modal.fade{"aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+          %span{"aria-hidden" => "true"} ×
+        %h4.modal-title 日志模板
+      %pre.modal-body{style: "max-height:450px;overflow:scroll;"}
+        loading...
+
+
+:javascript
+  $(function() {
+    $(".operation-logs td a").each(function() {
+      $(this).attr("target", "_blank");
+      $(this).attr("href", "javascript:void(0);");
+    })
+
+    $("#templateModal .modal-body").html(JSON.stringify(window.OperationLogger.templates, null, 2))
+  })

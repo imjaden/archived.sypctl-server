@@ -1,5 +1,6 @@
 %ol.breadcrumb
-  %li 应用管理
+  %li 应用中心
+  %li= link_to "应用管理", url_for("/")
   %li= link_to @app.name, url_for("/#{@app.id}")
   %li 
     版本列表
@@ -9,8 +10,8 @@
       %span.glyphicon.glyphicon-upload
 :css   
   .apps th:nth-child(n+1), .apps td:nth-child(n+1) { text-align: center; width: 5%; }
-  .apps th:nth-child(1), .apps td:nth-child(1) { text-align: left; width: 20%; }
-  .apps th:nth-child(2), .apps td:nth-child(2) { text-align: left; width: 15%; }
+  .apps th:nth-child(1), .apps td:nth-child(1) { width: 20%; }
+  .apps th:nth-child(2), .apps td:nth-child(2) { width: 15%; }
   .apps th:nth-last-child(1), .apps td:nth-last-child(1) { text-align: center; width: 10%; }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.apps
   %thead
@@ -22,7 +23,7 @@
   %tbody
     - @records.each do |record|
       %tr{id: "dom_#{record.id}"}
-        %td= record.version
+        %td= link_to record.version, url_for("/#{@app.id}/version/#{record.id}")
         %td= record.build
         %td= record.file_size
         %td= record.cdn_state

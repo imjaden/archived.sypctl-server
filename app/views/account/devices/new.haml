@@ -6,3 +6,15 @@
     新建主机
 
 = haml :_form
+
+:javascript
+  window.Device = {
+    onsubmit: function() {
+      try {
+        var objects = {device: { id: "-1", name: $("#device_human_name").val() }}
+        window.OperationLogger.record("device.new", objects);
+      } catch(e) { console.log(e) }
+
+      $("#recordForm").submit();
+    }
+  }

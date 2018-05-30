@@ -21,9 +21,9 @@ class User < ActiveRecord::Base
       else
         user = create({user_num: res_hash['user_num'], user_name: res_hash['user_name'], user_pass: res_hash['user_pass']})
       end
-      [true, user]
+      [user, "登录成功"]
     else
-      [false, response.body]
+      [nil, response.body]
     end
   end
   

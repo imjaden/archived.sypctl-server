@@ -4,3 +4,15 @@
   %li= @record.name
 
 = haml :_form
+
+:javascript
+  window.AppObject = {
+    onsubmit: function() {
+      try {
+        var objects = {app: { id: "#{@record.id}", name: $("#app_name").val() }}
+        window.OperationLogger.record("app.edit", objects);
+      } catch(e) { console.log(e) }
+
+      $("#recordForm").submit();
+    }
+  }

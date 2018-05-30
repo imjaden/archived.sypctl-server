@@ -4,3 +4,15 @@
   %li 新建分组
 
 = haml :_form
+
+:javascript
+  window.AppGroup = {
+    onsubmit: function() {
+      try {
+        var objects = {app_group: { id: "-1", name: $("#app_group_name").val() }}
+        window.OperationLogger.record("app_group.new", objects);
+      } catch(e) { console.log(e) }
+
+      $("#recordForm").submit();
+    }
+  }

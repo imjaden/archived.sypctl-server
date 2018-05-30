@@ -52,8 +52,8 @@
               window.Loading.show("删除成功");
 
               try {
-                var objects = {menu: { id: id, name: name, type: "device" }}
-                // window.OperationLogger.record("device.delete", objects);
+                var objects = {job_template: { id: id, name: name}}
+                window.OperationLogger.record("job_template.delete", objects);
               } catch(e) { console.log(e) }
             } else {
               window.Loading.show("删除失败");

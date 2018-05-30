@@ -1,5 +1,5 @@
 - url = url_for("/#{@app.id}/version?page=#{params[:page] || 1}")
-- form_for @record, url, method: "post", class: "form-horizontal", enctype: "multipart/form-data" do |f|
+- form_for @record, url, method: "post", class: "form-horizontal", enctype: "multipart/form-data", id: "recordForm" do |f|
   = f.hidden_field :app_id, class: "form-control"
   - field_set_tag do
     .form-group
@@ -20,5 +20,6 @@
         = f.text_area :description, class: "form-control", placeholder: '版本更新说明'
     .form-group
       .col-sm-offset-2.col-sm-10
-        = f.submit "提交", class: "btn btn-primary"
+        = f.submit "提交", class: "btn btn-primary hidden"
+        = link_to "提交", "javascript:void(0);", class: "btn btn-primary", onclick: "window.AppVersion.onsubmit();"
         = button_tag "取消", class: "btn btn-default", onclick: "window.history.go(-1);"

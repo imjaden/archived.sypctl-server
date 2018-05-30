@@ -62,4 +62,18 @@ module ApplicationHelper
   def render_page_header
     haml :'../layouts/_header'
   end
+
+
+  def operation_log_type(mode)
+    case mode.to_s.split('.')[0]
+    when 'user' then 'mdi-account-edit'
+    when 'job' then 'mdi-account-network'
+    when 'job_group' then 'mdi-account-group'
+    when 'device' then 'mdi-flag'
+    when 'device_group' then 'mdi-car'
+    when 'app' then 'mdi-beach'
+    when 'app_group' then 'mdi-leaf'
+    else 'mdi-react'
+    end
+  end
 end

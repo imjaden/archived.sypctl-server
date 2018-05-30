@@ -5,3 +5,15 @@
   %li= @record.title
 
 = haml :_form
+
+:javascript
+  window.JobTemplate = {
+    onsubmit: function() {
+      try {
+        var objects = {job_template: { id: "#{@record.id}", name: $("#job_template_title").val() }}
+        window.OperationLogger.record("job_template.edit", objects);
+      } catch(e) { console.log(e) }
+
+      $("#recordForm").submit();
+    }
+  }

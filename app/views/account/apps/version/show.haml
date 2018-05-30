@@ -1,5 +1,6 @@
 %ol.breadcrumb
-  %li= link_to '应用管理', url_for('/')
+  %li 应用中心
+  %li= link_to "应用管理", url_for("/")
   %li= link_to @app.name, url_for("/#{@app.id}")
   %li= "#{@record.version}(#{@record.build})"
 
@@ -17,7 +18,7 @@
       %td= link_to @app.name, url_for("/#{@app.id}")
     %tr
       %td 文件名称(业务)
-      %td= @app.filename
+      %td= @app.file_name
     %tr
       %td 版本号
       %td= @record.version

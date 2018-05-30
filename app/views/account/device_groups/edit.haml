@@ -5,3 +5,15 @@
   %li 编辑分组
 
 = haml :_form
+
+:javascript
+  window.DeviceGroup = {
+    onsubmit: function() {
+      try {
+        var objects = {device_group: { id: "#{@record.id}", name: $("#device_group_name").val() }}
+        window.OperationLogger.record("device_group.edit", objects);
+      } catch(e) { console.log(e) }
+
+      $("#recordForm").submit();
+    }
+  }

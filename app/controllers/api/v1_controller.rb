@@ -52,6 +52,14 @@ module API
       respond_with_json({id: record.id}, 201)
     end
 
+    post '/operation/logger' do
+      params[:operation_log][:ip] = request.ip
+      params[:operation_log][:browser] = request.user_agent
+      OperationLog.create(params[:operation_log])
+
+      respond_with_formt_json({message: '接收成功'}, 201)
+    end
+
     get '/job_templates' do
       records = JobTemplate.order(id: :desc).offset(params[:page]*params[:page_size]).limit(params[:page_size]).map(&:to_hash)
 

@@ -1,6 +1,22 @@
 %ol.breadcrumb
-  %li= link_to '应用管理', url_for('/')
+  %li 应用中心
+  %li= link_to "应用管理", url_for("/")
   %li= link_to @app.name, url_for("/#{@app.id}")
   %li 上传版本
 
 = haml :'version/_form'
+
+:javascript
+  window.AppVersion = {
+    onsubmit: function() {
+      try {
+        var objects = {
+          app: { id: "#{@app.id}", name: "#{@app.name}" },
+          version: { id: $("#version_build").val(), name: $("#version_version").val() }
+        }
+        window.OperationLogger.record("app.upload_version", objects);
+      } catch(e) { console.log(e) }
+
+      $("#recordForm").submit();
+    }
+  }

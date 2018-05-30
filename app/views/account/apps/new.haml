@@ -4,3 +4,15 @@
   %li 新建应用
 
 = haml :_form
+
+:javascript
+  window.AppObject = {
+    onsubmit: function() {
+      try {
+        var objects = {app: { id: "-1", name: $("#app_name").val() }}
+        window.OperationLogger.record("app.new", objects);
+      } catch(e) { console.log(e) }
+
+      $("#recordForm").submit();
+    }
+  }

@@ -70,8 +70,8 @@
               window.Loading.show("删除成功");
 
               try {
-                var objects = {menu: { id: id, name: name, type: "app" }}
-                // window.OperationLogger.record("app.delete", objects);
+                var objects = {app: { id: id, name: name }}
+                window.OperationLogger.record("app.delete", objects);
               } catch(e) { console.log(e) }
             } else {
               window.Loading.show("删除失败");

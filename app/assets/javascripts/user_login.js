@@ -7,7 +7,7 @@ $(function() {
             x = w.innerWidth || e.clientWidth || g.clientWidth,
             y = w.innerHeight|| e.clientHeight || g.clientHeight,
             alertHeight = $(".alert").height() || 0,
-            restHeight = (y - 52 - 402 - alertHeight)/4;
+            restHeight = (y - 52 - 402 - alertHeight)/4 - 52;
         if(restHeight >= 0) {
           $(".bs-docs-masthead .bs-docs-booticon").css({opacity: 0, display: 'block'});
           $(".bs-docs-masthead .bs-docs-booticon").animate({'margin-top': restHeight + 'px', opacity: 1}, 'slow');

@@ -56,16 +56,16 @@ class ApplicationController < Sinatra::Base
   end
 
   post '/login' do
-    status, response = User.authen_with_api(params[:user])
+    user, message = User.authen_with_api(params[:user])
 
-    if status
-      flash[:success] = '登录成功'
+    if user
+      flash[:success] = message
       set_login_cookie('authen', params[:user][:user_num])
 
-      redirect to("/account")
+      redirect to("/account/devices?#{append_params_when_login(user)}")
     else
-      flash[:danger] = response
-      redirect to('/')
+      flash[:waning] = message
+      redirect to('/login')
     end
   end
 
@@ -100,7 +100,7 @@ class ApplicationController < Sinatra::Base
   get '/logout' do
     set_login_cookie
 
-    redirect to("/login")
+    redirect to("/login?#{append_params_when_logout}")
   end
 
   def current_user
@@ -184,5 +184,13 @@ class ApplicationController < Sinatra::Base
 
   def set_login_cookie(cookie_name = 'authen', cookie_value = '')
     response.set_cookie cookie_name, value: cookie_value, path: '/', max_age: '2880000'
+  end
+
+  def append_params_when_login(user)
+    "user_num=#{user.user_num}&user_name=#{URI.encode(user.user_name)}&login_authen_to_redirect=true"
+  end
+
+  def append_params_when_logout
+    "user_num=#{current_user.user_num}&user_name=#{URI.encode(current_user.user_name)}&logout_authen_to_redirect=true"
   end
 end

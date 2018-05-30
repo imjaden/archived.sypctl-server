@@ -5,3 +5,15 @@
   %li 编辑分组
 
 = haml :_form
+
+:javascript
+  window.AppGroup = {
+    onsubmit: function() {
+      try {
+        var objects = {app_group: { id: "#{@record.id}", name: $("#app_group_name").val() }}
+        window.OperationLogger.record("app_group.edit", objects);
+      } catch(e) { console.log(e) }
+
+      $("#recordForm").submit();
+    }
+  }

@@ -18,12 +18,17 @@
       .col-sm-7
         = f.text_field :file_type, class: "form-control", placeholder: "文件类型, 必填项"
     .form-group
+      = f.label '部署路径', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :file_path, class: "form-control", placeholder: "Tomcat 部署路径, 必填项"
+    .form-group
       = f.label '应用描述', class: "col-sm-2 control-label"
       .col-sm-7
         = f.text_area :description, class: "form-control", placeholder: "版本更新日志"
     .form-group
       .col-sm-offset-2.col-sm-10
-        = f.submit "提交", class: "btn btn-primary"
+        = f.submit "提交", class: "btn btn-primary hidden"
+        = link_to "提交", "javascript:void(0);", class: "btn btn-primary", onclick: "window.AppObject.onsubmit();"
         = button_tag "取消", class: "btn btn-default", onclick: "window.history.go(-1);"
 
 

@@ -5,3 +5,15 @@
   %li 编辑
 
 = haml :_form
+
+:javascript
+  window.Device = {
+    onsubmit: function() {
+      try {
+        var objects = {device: { id: "#{@record.id}", name: $("#device_human_name").val() }}
+        window.OperationLogger.record("device.edit", objects);
+      } catch(e) { console.log(e) }
+
+      $("#recordForm").submit();
+    }
+  }

@@ -6,3 +6,15 @@
     新建模板
 
 = haml :_form
+
+:javascript
+  window.JobTemplate = {
+    onsubmit: function() {
+      try {
+        var objects = {job_template: { id: "-1", name: $("#job_template_title").val() }}
+        window.OperationLogger.record("job_template.new", objects);
+      } catch(e) { console.log(e) }
+
+      $("#recordForm").submit();
+    }
+  }
