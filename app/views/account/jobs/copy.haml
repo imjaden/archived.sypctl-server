@@ -2,21 +2,21 @@
   %li 部署中心
   %li
     %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 任务管理
-  %li
-    新建任务
+  %li= link_to @job.title, url_for("/#{@job.id}")
+  %li 拷贝任务
 
 = haml :_form
-
 
 :javascript
   window.JobObject = {
     onsubmit: function() {
       try {
         var objects = {
+          from_job: {id: "#{@job.id}", name: "#{@job.title}" },
           job: { id: "-1", name: $("#job_title").val() }, 
           device: { id: $("#job_device_uuid").val(), name: $("#job_device_name").val() }
         }
-        window.OperationLogger.record("job.new", objects);
+        window.OperationLogger.record("job.copy", objects);
       } catch(e) { console.log(e) }
 
       $("#recordForm").submit();

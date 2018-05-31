@@ -50,8 +50,8 @@ module Account
     end
 
     get '/:id/copy' do
-      record = Job.find_by(id: params[:id])
-      options = record.to_hash
+      @job = Job.find_by(id: params[:id])
+      options = @job.to_hash
       options.delete(:id)
       options.delete(:state)
 
@@ -59,7 +59,7 @@ module Account
       @record.uuid = SecureRandom.uuid
       @record.executed_at = Time.now.strftime("%Y-%m-%d %H:%M:%S")
 
-      haml :new, layout: settings.layout
+      haml :copy, layout: settings.layout
     end
 
     post '/:id' do
