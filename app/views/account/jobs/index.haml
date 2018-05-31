@@ -19,6 +19,7 @@
     %th 应用名称
     %th 版本信息
     %th 部署进度
+    %th 拷贝
     %th 删除
     %th 更新时间
   %tbody
@@ -31,6 +32,9 @@
         %td= record.version_name
         %td
           %span.label{class: "label-#{record.state == 'waiting' ? 'primary' : 'default'}"}= record.state
+        %td
+          %a.btn.btn-xs.btn-link{style: "color: black;", href: url_for("/#{record.id}/copy")}
+            .span.glyphicon.glyphicon-retweet
         %td
           %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.Job.remove(#{record.id});"}
             .span.glyphicon.glyphicon-trash

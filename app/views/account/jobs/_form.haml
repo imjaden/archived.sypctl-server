@@ -192,7 +192,17 @@
       } catch(e) { console.log(e) }
 
       $("#recordForm").submit();
+    },
+    cleanCommand: function() {
+      var command = $("#job_command").val();
+      if(command.length) {
+        command = command.split("\n").map(function(el) {
+          return $.trim(el);
+        }).join("\n");
+        $("#job_command").val(command);
+      }
     }
   }
 
   window.Job.listJobTemplates(0);
+  window.Job.cleanCommand();

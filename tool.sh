@@ -44,6 +44,7 @@ cd "${app_root_path}" || exit 1
 case "$1" in
     upgrade)
         git_current_branch=$(git rev-parse --abbrev-ref HEAD)
+        echo "$ git pull origin ${git_current_branch}"
         git pull origin ${git_current_branch}
     ;;
     start)

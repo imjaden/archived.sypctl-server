@@ -49,6 +49,19 @@ module Account
       haml :edit, layout: settings.layout
     end
 
+    get '/:id/copy' do
+      record = Job.find_by(id: params[:id])
+      options = record.to_hash
+      options.delete(:id)
+      options.delete(:state)
+
+      @record = Job.new(options)
+      @record.uuid = SecureRandom.uuid
+      @record.executed_at = Time.now.strftime("%Y-%m-%d %H:%M:%S")
+
+      haml :new, layout: settings.layout
+    end
+
     post '/:id' do
       record = Job.find_by(id: params[:id])
         
