@@ -62,8 +62,8 @@
               window.Loading.show("删除成功");
 
               try {
-                var objects = {device: { id: id, name: name }}
-                window.OperationLogger.record("device.delete", objects);
+                var objects = {job: { id: id, name: name }}
+                window.OperationLogger.record("job.delete", objects);
               } catch(e) { console.log(e) }
             } else {
               window.Loading.show("删除失败");
