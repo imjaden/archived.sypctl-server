@@ -13,11 +13,38 @@ module API
       end
     end
 
+
+    #
+    # 注册接口有两种方式：
+    # 1. 在代理服务器端主动注册(直接创建)，执行命令 sypctl bundle exec agent:submitor
+    #    参数格式为: { device: { field: field_value }}
+    # 2. 管理平台创建主机，然后在代理服务器声明随机分配的 uuid, 代理提交时作为查询主键
+    #    参数格式为: { uuid: 服务器随机 UUID, device: { field: field_value }}
+    #
+    # 主机的 uuid 命令规范：
+    # `/sbin/blkid -s UUID` 列表，sda*/xvda* 优先，匹配出第一个设备 UUID 作为该主机 UUID
+    # 比如：
+    #
+    # $ /sbin/blkid -s UUID
+    # /dev/sda1: UUID="db30250c-d0aa-4883-9667-223f85d7c6be"
+    # /dev/sda2: UUID="gBMj47-0jzt-BDHc-GZ9Q-8glh-x0LJ-jVJIaw"
+    # /dev/sdb1: UUID="SwoEDH-AqKe-Bg4u-BOgV-q7Mo-eWlC-4GbSgf"
+    #
+    # 避免主机 UUID 作为参数与 URL 规范冲突，`/` 替换为 `_`，示例主机的 UUID 为:
+    # _dev_sda1-db30250c-d0aa-4883-9667-223f85d7c6be
+    #
     # post /api/v1/register
     post '/register' do
       api_authen_params([:device])
 
-      if device = Device.find_by(uuid: params[:device][:uuid])
+      if params[:uuid]
+        device = Device.find_by(uuid: params[:uuid])
+        device = Device.find_by(uuid: params[:device][:uuid]) unless device
+      else
+        device = Device.find_by(uuid: params[:device][:uuid])
+      end
+
+      if device
         device.update_attributes(params[:device])
       else
         device = Device.create(params[:device])

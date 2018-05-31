@@ -14,6 +14,8 @@ class Device < ActiveRecord::Base
   after_update :validate_ssh_state
 
   def validate_ssh_state
+    update_columns({human_name: self.hostname}) if self.human_name.blank
+
     return if self.ssh_ip.blank? || self.ssh_port.blank? || self.ssh_username.blank? || self.ssh_password.blank?
 
     ::Timeout::timeout(5) do 

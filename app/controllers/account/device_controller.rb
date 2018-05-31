@@ -17,6 +17,7 @@ module Account
     get '/new' do
       @record = Device.new
       @record.ssh_port = 22
+      @record.uuid = "random-#{SecureRandom.uuid}"
 
       haml :new, layout: settings.layout
     end
