@@ -16,6 +16,9 @@
       %td 业务名称
       %td= @record.human_name
     %tr
+      %td API Token
+      %td= @record.api_token
+    %tr
       %td SSH 状态
       %td
         %span.label{class: "label-#{@record.ssh_state ? 'success' : 'warning'}"}
