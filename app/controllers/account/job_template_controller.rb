@@ -53,10 +53,10 @@ module Account
         
       if record.update_attributes(params[:job_template])
         flash[:success] = '更新成功'
-        redirect to("/?page=#{params[:page] || 1}&id=#{params[:id]}")
+        redirect to("/#{record.id}")
       else
         flash[:danger] = record.errors.messages.to_s
-        redirect to("/?page=#{params[:page] || 1}&id=#{params[:id]}")
+        redirect to("/#{record.id}/edit")
       end
     end
 
