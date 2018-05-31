@@ -27,7 +27,7 @@ module Account
 
       if record.save(validate: true)
         flash[:success] = '创建成功'
-        redirect to('/')
+        redirect to("/#{record.id}")
       else
         flash[:danger] = record.errors.messages.to_s
         redirect to('/new')
@@ -54,6 +54,7 @@ module Account
 
     get '/:id/edit' do
       @record = Device.find_by(id: params[:id])
+      @record.uuid = "random-#{SecureRandom.uuid}" unless @record.uuid
 
       haml :edit, layout: settings.layout
     end
