@@ -36,15 +36,15 @@
     .form-group
       = f.label 'UUID', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.text_field :uuid, class: "form-control", disabled: "disabled"
+        = f.text_field :uuid, class: "form-control"
     .form-group
       = f.label '系统类型', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.text_field :os_type, class: "form-control", disabled: "disabled"
+        = f.text_field :os_type, class: "form-control"
     .form-group
       = f.label '系统版本', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.text_field :os_version, class: "form-control", disabled: "disabled"
+        = f.text_field :os_version, class: "form-control"
     .form-group
       .col-sm-offset-2.col-sm-10
         = f.submit "提交", class: "btn btn-primary hidden"
