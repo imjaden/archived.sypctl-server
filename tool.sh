@@ -34,6 +34,10 @@ done < .env-files
 source lib/utils/toolsh_common_functions.sh
 cd ${app_root_path}
 
+fun_configuration_guides ".app-port" "运行端口号"  "4567"
+app_default_port=$(cat .app-port)
+app_port=${2:-${app_default_port}}
+
 unicorn_config_file=config/unicorn.rb
 unicorn_pid_file=tmp/pids/unicorn.pid
 
@@ -51,7 +55,7 @@ case "$1" in
         test -d logs || mkdir -p logs
         fun_print_table_header "start process" "process" "status"
 
-        command_text="$bundle_command exec unicorn -c ${unicorn_config_file} -p 4567 -E production -D"
+        command_text="$bundle_command exec unicorn -c ${unicorn_config_file} -p ${app_port} -E production -D"
         process_start "${unicorn_pid_file}" "unicorn" "${command_text}"
 
         fun_print_table_footer
