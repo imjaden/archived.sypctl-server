@@ -39,6 +39,18 @@ function check_redis_process_running() {
     fi
 }
 
+function fun_print_command_text() {
+    command_text="$1"
+    printf "| %-55s |\n" "\$ ${command_text:0:50}"
+    command_text="${command_text:50}"
+    while [[ ${#command_text} -gt 50 ]]; do
+        printf "| %-55s |\n" "\$\\ ${command_text:0:50}"
+        command_text="${command_text:50}"
+    done
+    test -n "${command_text}" && printf "| %-55s |\n" "\$\\ ${command_text:0:50}"
+
+}
+
 function process_start() {
     local pid_file="$1"
     local process_name="$2"
@@ -64,11 +76,12 @@ function process_start() {
         [[ $? -eq 0 ]] && return 0
     fi
 
-    run_result=$($command_text) #> /dev/null 2>&1
-    run_result_text="$([[ $? -eq 0 ]] && echo 'successfully' || echo 'failed')(${run_result})"
+    ${command_text}
+    run_result_text="$([[ $? -eq 0 ]] && echo 'successfully' || echo 'failed')"
+
+    fun_print_command_text "${command_text}"
 
     printf "$two_cols_table_format" "${process_name}" "run ${run_result_text}"
-    # echo -e "$ run \`${command_text}\`"
 }
 
 function process_stop() {
@@ -77,16 +90,22 @@ function process_stop() {
     local exec_status='failed'
 
     if [[ ! -f ${pid_file} ]]; then
-        echo -e "${process_name} never started"
+
+        printf "| %-55s |\n" "\$ test -f ${pid_file}"
+        printf "$two_cols_table_format" "${process_name}" "never started"
         return 1
     fi
 
-    cat "${pid_file}" | xargs -I pid kill -QUIT pid
+    command_text="cat ${pid_file} | xargs -I pid kill -QUIT pid"
+    cat ${pid_file} | xargs -I pid kill -QUIT pid
     if [[ $? -eq 0  ]]; then
         rm -f ${pid_file} &> /dev/null
         exec_status='successfully'
     fi
-    echo -e "${process_name} stop ${exec_status}"
+
+    fun_print_command_text "${command_text}"
+
+    printf "$two_cols_table_format" "${process_name}" "stop ${exec_status}"
 }
 
 function process_checker() {
