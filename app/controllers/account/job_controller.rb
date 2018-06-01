@@ -25,8 +25,10 @@ module Account
     post '/' do
       device_list = JSON.parse(params[:job].delete(:device_list))
       device_list.each do |hsh|
+        params[:job][:uuid] = SecureRandom.uuid
         params[:job][:device_name] = hsh['name']
         params[:job][:device_uuid] = hsh['uuid']
+
         Job.create(params[:job])
       end
 

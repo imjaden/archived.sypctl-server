@@ -13,7 +13,7 @@
   %tbody
     %tr
       %td 任务名称
-      %td= @record.title
+      %td.name= @record.title
     %tr
       %td 任务 UUID
       %td= @record.uuid
@@ -42,3 +42,45 @@
     %tr
       %td 更新时间
       %td= @record.updated_at.strftime('%y/%m/%d %H:%M:%S')
+    %tr
+      %td 删除
+      %td
+        %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.Job.remove(#{@record.id});"}
+          .span.glyphicon.glyphicon-trash
+
+:javascript
+  (function() {
+      window.Job = {
+        remove: function(id) {
+          var name = $(".name").text();
+
+          if(!confirm('确定删除「' + name + '」?')) {
+            return false;
+          }
+
+          window.Loading.show("删除中...");
+          $.ajax({
+            type: 'delete',
+            url: "#{url_for('/')}" + id
+          }).done(function(res, status, xhr) {
+            if(res.code === 201) {
+              $("#dom_" + id).remove();
+              window.Loading.show("删除成功");
+
+              try {
+                var objects = {job: { id: id, name: name }}
+                window.OperationLogger.record("job.delete", objects);
+              } catch(e) { console.log(e) }
+              
+              window.location.href = "#{url_for('/')}";
+            } else {
+              window.Loading.show("删除失败");
+            }
+          }).fail(function(xhr, status, error) {
+              window.Loading.show("删除失败");
+          }).always(function(res, status, xhr) {
+              window.Loading.hide();
+          });
+        }
+      }
+  }).call(this);

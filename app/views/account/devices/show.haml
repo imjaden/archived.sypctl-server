@@ -14,7 +14,7 @@
   %tbody
     %tr
       %td 业务名称
-      %td= @record.human_name
+      %td.name= @record.human_name
     %tr
       %td API Token
       %td= @record.api_token
@@ -77,3 +77,50 @@
     %tr
       %td 创建时间
       %td= @record.created_at.strftime('%y/%m/%d %H:%M:%S')
+    %tr
+      %td 编辑
+      %td
+        %a{href: url_for("/#{@record.id}/edit"), class: 'btn btn-xs btn-link'}
+          %span.glyphicon.glyphicon-edit
+    %tr
+      %td 删除
+      %td
+        %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.Device.remove(#{@record.id});"}
+          .span.glyphicon.glyphicon-trash
+
+:javascript
+  (function() {
+      window.Device = {
+        remove: function(id) {
+          var name = $(".name").text();
+
+          if(!confirm('确定删除「' + name + '」?')) {
+            return false;
+          }
+
+          window.Loading.show("删除中...");
+          $.ajax({
+            type: 'delete',
+            url: "#{url_for('/')}" + id
+          }).done(function(res, status, xhr) {
+            if(res.code === 201) {
+              $("#dom_" + id).remove();
+              window.Loading.show("删除成功");
+
+              try {
+                var objects = {device: { id: id, name: name }}
+                window.OperationLogger.record("device.delete", objects);
+              } catch(e) { console.log(e) }
+              
+              window.location.href = "#{url_for('/')}";
+            } else {
+              window.Loading.show("删除失败");
+            }
+          }).fail(function(xhr, status, error) {
+              window.Loading.show("删除失败");
+          }).always(function(res, status, xhr) {
+              window.Loading.hide();
+          });
+        }
+      }
+  }).call(this);
