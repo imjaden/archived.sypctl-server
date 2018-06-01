@@ -116,6 +116,10 @@ module API
       request.ip
     end
 
+    get '/linux.date' do
+      `date +'%z %m/%d/%y %H:%M:%S'`.strip
+    end
+
     protected
 
     def authen_api_token(api_token)

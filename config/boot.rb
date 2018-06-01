@@ -42,4 +42,4 @@ recursion_require('lib/core_ext', /\.rb$/, ENV['APP_ROOT_PATH'])
 recursion_require('app/helpers', /_helper\.rb$/, ENV['APP_ROOT_PATH'])
 recursion_require('app/controllers', /_controller\.rb$/, ENV['APP_ROOT_PATH'], [/^application_/])
 
-`echo "#{ENV['APP_VERSION']} > .app-version"
+`echo "#{ENV['APP_VERSION']}" > .app-version`
