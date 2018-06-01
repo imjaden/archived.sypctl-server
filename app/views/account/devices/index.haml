@@ -30,7 +30,7 @@
     - @records.each do |record|
       %tr{id: "dom_#{record.id}"}
         %td
-          %span.label.label-default= record.device_group.name if record.device_group
+          %span.label.label-default= link_to record.device_group.name, "/dashboard/#{record.device_group.uuid}", style: "color:white;" if record.device_group
         %td.name= link_to record.human_name || record.hostname, url_for("/#{record.id}")
         %td= "#{record.os_type}#{record.os_version}"
         %td

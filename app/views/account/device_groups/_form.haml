@@ -1,5 +1,6 @@
 - url = url_for(@record ? "/#{@record.id}?page=#{params[:page] || 1}" : "/")
 - form_for @record, url, method: "post", class: "form-horizontal", id: "recordForm" do |f|
+  = f.hidden_field :uuid, class: "form-control"
   - field_set_tag do
     .form-group
       = f.label '分组名称', class: "col-sm-2 control-label"

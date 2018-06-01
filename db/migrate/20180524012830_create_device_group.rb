@@ -6,6 +6,7 @@ class CreateDeviceGroup < ActiveRecord::Migration[5.1]
     #   Defaults to false.
     create_table :sys_device_groups, force: false, comment: '设备分组表' do |t|
       t.integer  :user_group_id, comment: '所属用户分组 ID'
+      t.string   :uuid, null: false, comment: 'uuid'
       t.string   :name, null: false, comment: '分组名称'
       t.integer  :device_count, default: 0, comment: '关联的设备数量'
       t.text     :description

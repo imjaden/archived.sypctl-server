@@ -16,6 +16,7 @@ module Account
 
     get '/new' do
       @record = DeviceGroup.new
+      @record.uuid = SecureRandom.uuid
 
       haml :new, layout: settings.layout
     end
@@ -43,6 +44,7 @@ module Account
 
     get '/:id/edit' do
       @record = DeviceGroup.find_by(id: params[:id])
+      @record.uuid = SecureRandom.uuid unless @record.uuid
 
       haml :edit, layout: settings.layout
     end

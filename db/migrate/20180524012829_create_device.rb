@@ -32,6 +32,7 @@ class CreateDevice < ActiveRecord::Migration[5.2]
       t.string   :wan_ip, comment: '外网 IP'
       t.integer  :record_count, default: 0, comment: '记录数量'
       t.text     :description, comment: '设备服务器描述'
+      t.integer  :order_index, default: 0, comment: '排序序号'
 
       t.timestamps null: false
     end

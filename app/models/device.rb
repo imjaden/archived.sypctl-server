@@ -34,6 +34,14 @@ class Device < ActiveRecord::Base
     puts "#{__FILE__}@#{__LINE__}: #{e.message}"
     update_columns({ssh_state: false})
   end
+
+  def latest_record
+    if record = self.records.order(id: :desc).first
+      record.to_hash
+    else
+      ::Record.default_hash
+    end
+  end
   
   def to_hash
     result = self.class.column_names.each_with_object({}) do |column_name, hsh|

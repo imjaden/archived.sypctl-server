@@ -96,6 +96,13 @@ class ApplicationController < Sinatra::Base
     respond_with_json(hash)
   end
 
+  get '/dashboard/:uuid' do
+    @device_group = DeviceGroup.find_by(uuid: params[:uuid])
+    @records = @device_group.devices.order(order_index: :asc)
+    
+    haml :dashboard, layout: settings.layout
+  end
+
   # GET /logout
   get '/logout' do
     set_login_cookie

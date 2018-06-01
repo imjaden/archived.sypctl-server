@@ -1,0 +1,127 @@
+%ol.breadcrumb
+  %li 设备中心
+  %li= link_to "主机管理", url_for('/') + "?page=#{params[:page] || 1}"
+  %li= @device_group.name
+
+:css   
+  .devices th:nth-child(n+1), .devices td:nth-child(n+1) { text-align: center; width: 5%; }
+  .devices th:nth-child(1), .devices td:nth-child(1) { width: 3%; }
+  .devices th:nth-child(2), .devices td:nth-child(2) { width: 12%; }
+  .devices th:nth-child(5), .devices td:nth-child(5) { width: 8%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.devices
+  %thead
+    %th -
+    %th 主机名称
+    %th 系统类型
+    %th 代理状态
+    %th 最近提交
+    %th 提交数量
+    %th 代理账号
+    %th 代理版本
+    %th 内存情况
+    %th 明细
+    %th CPU 情况
+    %th 明细
+    %th 磁盘情况
+    %th 明细
+  %tbody
+    - @records.each_with_index do |record, index|
+      - record_hash = record.latest_record
+      %tr{id: "dom_#{record.id}"}
+        %td= index+1
+        %td.name= link_to record.human_name || record.hostname, url_for("/#{record.id}")
+        %td= "#{record.os_type}#{record.os_version}"
+        %td
+          - interval = (Time.now.to_i - record.updated_at.to_i) < 600
+          %span.label{class: "#{interval ? 'label-success' : 'label-danger'}"}
+            = interval ? '正常' : '异常'
+        %td= record_hash[:created_at].strftime('%y/%m/%d %H:%M')
+        %td= link_to record.record_count, url_for("/#{record.id}/records"), class: "badge"
+        %td= record_hash[:whoami]
+        %td= record_hash[:version]
+        %td= record_hash[:memory_usage] + "%"
+        %td
+          %a{onclick: "window.Device.showMemoryModal(this);", "data-title" => "内存明细", "data-content" => record_hash[:memory_usage_description]}
+            %span.glyphicon.glyphicon-info-sign
+        %td= record_hash[:cpu_usage]
+        %td
+          %a{onclick: "window.Device.showCPUModal(this);", "data-title" => "CPU明细", "data-content" => record_hash[:cpu_usage_description]}
+            %span.glyphicon.glyphicon-info-sign
+        %td= record_hash[:disk_usage]
+        %td
+          %a{onclick: "window.Device.showDiskModal(this);", "data-title" => "磁盘明细", "data-content" => record_hash[:disk_usage_description]}
+            %span.glyphicon.glyphicon-info-sign
+
+#deviceModal.modal.fade{"aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+          %span{"aria-hidden" => "true"} ×
+        %h4.modal-title 日志模板
+      .modal-body{style: "max-height:490px;overflow:scroll;padding:15px;"}
+        loading...
+
+:javascript
+  window.Device = {
+    humanSize: function(num) {
+      var humanText = num;
+
+      try {
+        num = parseInt(num);
+
+        if(num > 1024) {
+          humanText = (num/1024).toFixed(0) + "G " + (num % 1024) + "M"
+        } else {
+          humanText = num + "M"
+        }
+      } catch(e) {
+        console.log(e);
+      }
+      return humanText;
+    },
+    showMemoryModal: function(ctl) {
+      $("#deviceModal").modal('show');
+      $("#deviceModal .modal-title").html($(ctl).data("title"));
+      
+      try {
+        $("#deviceModal .modal-body").html("<table class='table table-bordered table-condensed'></table>");
+        var hash = $(ctl).data("content"), key;
+        for(key in hash) {
+          $("#deviceModal .modal-body table").append("<tr><td>" + key + "</td><td>" + window.Device.humanSize(hash[key]) + "</td><tr>")
+        }
+      } catch(e) {
+        $("#deviceModal .modal-body").html(JSON.stringify($(ctl).data("content")));
+      }
+    },
+    showCPUModal: function(ctl) {
+      $("#deviceModal").modal('show');
+      $("#deviceModal .modal-title").html($(ctl).data("title"));
+      
+      $("#deviceModal .modal-body").html(JSON.stringify($(ctl).data("content")));
+    },
+    showDiskModal: function(ctl) {
+      $("#deviceModal").modal('show');
+      $("#deviceModal .modal-title").html($(ctl).data("title"));
+      
+      // try {
+        $("#deviceModal .modal-body").html("<table class='table table-bordered table-condensed'></table>");
+        var array = $(ctl).data("content"), hash, key, pairs, headers = [];
+        for(var i = 0, len = array.length; i < len; i ++) {
+          hash = array[i];
+          pairs = [];
+          for(key in hash) {
+            pairs.push("<td>" + hash[key] + "</td>")
+            headers.push("<td style='font-weight: bold;'>" + key + "</td>")
+          }
+          if(i == 0) {
+            $("#deviceModal .modal-body table").append("<tr>" + headers.join("") + "<tr>")
+          }
+          $("#deviceModal .modal-body table").append("<tr>" + pairs.join("") + "<tr>")
+        }
+      // } catch(e) {
+      //  console.log(e);
+      //  $("#deviceModal .modal-body").html(JSON.stringify($(ctl).data("content")));
+      //}
+    }
+  }
