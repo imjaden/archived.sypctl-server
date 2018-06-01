@@ -19,3 +19,17 @@
         = f.submit "提交", class: "btn btn-primary hidden"
         = link_to "提交", "javascript:void(0);", class: "btn btn-primary", onclick: "window.JobTemplate.onsubmit();"
         = button_tag "取消", class: "btn btn-default", onclick: "window.history.go(-1);"
+
+:javascript
+  window.JobTemplateForm = {
+    cleanCommand: function() {
+      var command = $("#job_template_content").val();
+      if(command.length) {
+        command = command.split("\n").map(function(el) {
+          return $.trim(el);
+        }).join("\n");
+        $("#job_template_content").val(command);
+      }
+    }
+  }
+  window.JobTemplateForm.cleanCommand();

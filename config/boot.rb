@@ -1,7 +1,7 @@
 # encoding: utf-8
 require 'rubygems'
 
-ENV['APP_DEV_ENV']   = '0.0.34'
+ENV['APP_VERSION']   = '0.0.35'
 ENV['APP_ROOT_PATH'] = File.dirname(File.dirname(__FILE__))
 ENV['RACK_ENV']    ||= 'development'
 ENV['VIEW_PATH']     = File.join(ENV['APP_ROOT_PATH'], 'app/views')
@@ -41,3 +41,5 @@ traverser_settings_yaml_to_env
 recursion_require('lib/core_ext', /\.rb$/, ENV['APP_ROOT_PATH'])
 recursion_require('app/helpers', /_helper\.rb$/, ENV['APP_ROOT_PATH'])
 recursion_require('app/controllers', /_controller\.rb$/, ENV['APP_ROOT_PATH'], [/^application_/])
+
+`echo "#{ENV['APP_VERSION']} > .app-version"

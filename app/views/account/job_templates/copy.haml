@@ -1,0 +1,23 @@
+%ol.breadcrumb
+  %li 部署中心
+  %li
+    %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 任务管理
+  %li= link_to @job_template.title, url_for("/#{@job_template.id}")
+  %li 拷贝任务模板
+
+= haml :_form
+
+:javascript
+  window.JobTemplate = {
+    onsubmit: function() {
+      try {
+        var objects = {
+          from_job_template: {id: "#{@job_template.id}", name: "#{@job_template.title}" },
+          job_template: { id: "-1", name: $("#job_template_title").val() }
+        }
+        window.OperationLogger.record("job_template.copy", objects);
+      } catch(e) { console.log(e) }
+
+      $("#recordForm").submit();
+    }
+  }

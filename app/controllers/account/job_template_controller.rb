@@ -48,6 +48,17 @@ module Account
       haml :edit, layout: settings.layout
     end
 
+    get '/:id/copy' do
+      @job_template = JobTemplate.find_by(id: params[:id])
+      options = @job_template.to_hash
+      options.delete(:id)
+
+      @record = JobTemplate.new(options)
+      @record.uuid = SecureRandom.uuid
+
+      haml :copy, layout: settings.layout
+    end
+
     post '/:id' do
       record = JobTemplate.find_by(id: params[:id])
         

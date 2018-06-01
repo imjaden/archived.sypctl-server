@@ -37,6 +37,7 @@ window.OperationLoggerTemplates = {
   job_template: {
     new: "{{ operator.at }} 创建了任务模板 {{ job_template.at.text }}",
     edit: "{{ operator.at }} 编辑了任务模板 {{ job_template.at }}",
-    delete: "{{ operator.at }} 删除了任务模板 {{ job_template.at.text.strike }}"
+    delete: "{{ operator.at }} 删除了任务模板 {{ job_template.at.text.strike }}",
+    copy: "{{ operator.at }} 拷贝任务模板  {{ from_job_template.at }} 创建了任务模板  {{ job_template.at }}"
   }
 };
