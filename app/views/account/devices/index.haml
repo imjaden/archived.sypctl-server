@@ -8,13 +8,18 @@
 
 :css   
   .devices th:nth-child(n+1), .devices td:nth-child(n+1) { text-align: center; width: 5%; }
-  .devices th:nth-child(1), .devices td:nth-child(1) { width: 12%; }
-  .devices th:nth-child(2), .devices td:nth-child(2) { text-align: left; width: 15%; }
-  .devices th:nth-child(5), .devices td:nth-child(5) { width: 8%; }
-  .devices th:nth-child(7), .devices td:nth-child(7) { width: 7%; }
-  .devices th:nth-last-child(1), .devices td:nth-last-child(1) { text-align: center; width: 8%; }
+  .devices th:nth-child(1), .devices td:nth-child(1) { width: 3%; }
+  .devices th:nth-child(2), .devices td:nth-child(2) { text-align: left; width: 12%; }
+  .devices th:nth-child(3), .devices td:nth-child(3) { text-align: left; width: 15%; }
+  .devices th:nth-child(6), .devices td:nth-child(6) { width: 8%; }
+  .devices th:nth-child(8), .devices td:nth-child(8) { width: 7%; }
+  .devices th:nth-last-child(2), .devices td:nth-last-child(2) { width: 3%; }
+  .devices th:nth-last-child(3), .devices td:nth-last-child(3) { width: 3%; }
+  .devices th:nth-last-child(4), .devices td:nth-last-child(4) { width: 3%; }
+  .devices th:nth-last-child(1), .devices td:nth-last-child(1) { width: 8%; }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.devices
   %thead
+    %th -
     %th 分组名称
     %th 主机名称
     %th 系统类型
@@ -22,13 +27,14 @@
     %th 最近提交
     %th 记录数量
     %th SSH 状态
-    %th 创建任务
+    %th 刷新
     %th 编辑
     %th 删除
     %th 创建时间
   %tbody
-    - @records.each do |record|
+    - @records.each_with_index do |record, index|
       %tr{id: "dom_#{record.id}"}
+        %td= index+1
         %td
           %span.label.label-default= link_to record.device_group.name, "/dashboard/#{record.device_group.uuid}", style: "color:white;" if record.device_group
         %td.name= link_to record.human_name || record.hostname, url_for("/#{record.id}")

@@ -10,19 +10,19 @@ module Utils
       end
 
       def device_uuid
-        "random-#{SecureRandom.uuid}"
+        "random-#{SecureRandom.uuid}@#{hostname}"
       end
 
       def memory
-        'darwin'
+        -1
       end
 
       def cpu
-        'darwin'
+        -1
       end
 
       def disk
-        'darwin'
+        -1
       end
 
       def hostname
@@ -43,6 +43,14 @@ module Utils
 
       def df_h
         [{"Filesystem":"/dev/mapper/centos_java1-root","Size":"50G","Used":"567M","Avail":"50G","Use%":"2%","MountedOn":"/"},{"Filesystem":"devtmpfs","Size":"16G","Used":"0","Avail":"16G","Use%":"0%","MountedOn":"/dev"},{"Filesystem":"tmpfs","Size":"16G","Used":"0","Avail":"16G","Use%":"0%","MountedOn":"/dev/shm"},{"Filesystem":"tmpfs","Size":"16G","Used":"25M","Avail":"16G","Use%":"1%","MountedOn":"/run"},{"Filesystem":"tmpfs","Size":"16G","Used":"0","Avail":"16G","Use%":"0%","MountedOn":"/sys/fs/cgroup"},{"Filesystem":"/dev/mapper/centos_java1-usr","Size":"100G","Used":"3.1G","Avail":"97G","Use%":"4%","MountedOn":"/usr"},{"Filesystem":"/dev/sda1","Size":"1014M","Used":"167M","Avail":"848M","Use%":"17%","MountedOn":"/boot"},{"Filesystem":"/dev/mapper/centos_java1-tmp","Size":"10G","Used":"33M","Avail":"10G","Use%":"1%","MountedOn":"/tmp"},{"Filesystem":"/dev/mapper/centos_java1-opt","Size":"10G","Used":"67M","Avail":"10G","Use%":"1%","MountedOn":"/opt"},{"Filesystem":"/dev/mapper/centos_java1-home","Size":"100G","Used":"33M","Avail":"100G","Use%":"1%","MountedOn":"/home"},{"Filesystem":"/dev/mapper/centos_java1-data","Size":"600G","Used":"35M","Avail":"600G","Use%":"1%","MountedOn":"/data"},{"Filesystem":"/dev/mapper/centos_java1-var","Size":"100G","Used":"1.4G","Avail":"99G","Use%":"2%","MountedOn":"/var"},{"Filesystem":"tmpfs","Size":"3.2G","Used":"0","Avail":"3.2G","Use%":"0%","MountedOn":"/run/user/0"}]
+      end
+
+      def lan_ip
+        '0.0.0.0'
+      end
+
+      def wan_ip
+        '0.0.0.0'
       end
     end
   end
@@ -65,7 +73,7 @@ module Utils
       # /dev/mapper/centos_java1-opt: UUID="8f7236ea-97ef-4aa9-886f-9e1a50a030a1"
       # /dev/mapper/centos_java1-home: UUID="bae67bdc-1ff5-477f-ba08-11f02d2a00d2"
       def device_uuid
-        _device_uuid(`blkid -s UUID`)
+        "#{_device_uuid(`blkid -s UUID`)}@#{hostname}"
       end
 
       def _device_uuid(blkid_lines)
@@ -91,11 +99,27 @@ module Utils
       end
 
       def cpu
-        'todo'
+        `cat /proc/cpuinfo| grep "processor"| wc -l`
       end
 
+      # $ df
+      # Filesystem               1K-blocks      Used  Available Use% Mounted on
+      # /dev/mapper/centos-root   52403200    436280   51966920   1% /
+      # devtmpfs                  16377812         0   16377812   0% /dev
+      # tmpfs                     16389648        20   16389628   1% /dev/shm
+      # tmpfs                     16389648     50252   16339396   1% /run
+      # tmpfs                     16389648         0   16389648   0% /sys/fs/cgroup
+      # /dev/mapper/centos-usr   104806400   8346252   96460148   8% /usr
+      # /dev/mapper/centos-tmp    10475520    361836   10113684   4% /tmp
+      # /dev/mapper/centos-home  104806400     33496  104772904   1% /home
+      # /dev/mapper/centos-data 2146435072 145504524 2000930548   7% /data
+      # /dev/mapper/centos-opt    10475520    979456    9496064  10% /opt
+      # /dev/sda1                  1038336    213300     825036  21% /boot
+      # /dev/mapper/centos-var   104806400   8522604   96283796   9% /var
+      # tmpfs                      3277932         0    3277932   0% /run/user/0
       def disk
-        'todo'
+        blocks = `df`.split(/\n/).reject(&:empty?).map { |line| line.scan(/\b\d+\b/).flatten[0].to_f }.inject(:+)
+        blocks * 1024
       end
 
       def hostname
@@ -147,6 +171,14 @@ module Utils
           end
         end
       end
+
+      def lan_ip
+        `ifconfig`.scan(/\d+\.\d+\.\d+\.\d+/).flatten.first
+      end
+
+      def wan_ip
+        `curl http://sypctl-api.ibi.ren/api/v1/ifconfig.me`.strip
+      end
     end
   end
 
@@ -165,7 +197,7 @@ module Utils
       end
 
       def uuid
-        uuid_tmp_path = File.join(ENV["RAKE_ROOT_PATH"] || Dir.pwd, ".device-uuid")
+        uuid_tmp_path = File.join(ENV["RAKE_ROOT_PATH"] || Dir.pwd, "device-uuid")
         unless File.exists?(uuid_tmp_path)
           File.open(uuid_tmp_path, "w:utf-8") { |file| file.puts(klass.device_uuid) }
         end
@@ -185,7 +217,7 @@ module Utils
       end
 
       def disk
-        klass.disk
+        klass.disk.number_to_human_size(true)
       rescue => e
         e.message
       end
@@ -243,6 +275,18 @@ module Utils
 
       def disk_usage_description
         klass.df_h
+      rescue => e
+        e.message
+      end
+
+      def lan_ip
+        klass.lan_ip
+      rescue => e
+        e.message
+      end
+
+      def wan_ip
+        klass.wan_ip
       rescue => e
         e.message
       end

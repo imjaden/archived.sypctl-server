@@ -23,15 +23,15 @@ module Account
     end
 
     post '/' do
-      record = Job.new(params[:job])
-
-      if record.save(validate: true)
-        flash[:success] = '创建成功'
-        redirect to("/#{record.id}")
-      else
-        flash[:danger] = record.errors.messages.to_s
-        redirect to('/new')
+      device_list = JSON.parse(params[:job].delete(:device_list))
+      device_list.each do |hsh|
+        params[:job][:device_name] = hsh['name']
+        params[:job][:device_uuid] = hsh['uuid']
+        Job.create(params[:job])
       end
+
+      flash[:success] = "创建 #{device_list.length} 个任务成功"
+      redirect to("/")
     end
 
     get '/:id' do

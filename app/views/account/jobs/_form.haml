@@ -13,8 +13,8 @@
       .form-group
         = f.label '设备名称', class: "col-sm-2 control-label"
         .col-sm-6
-          = f.hidden_field :device_uuid
-          = f.text_field :device_name, class: "form-control", placeholder: "要部署的设备，必填项"
+          = f.hidden_field :device_list
+          = f.text_area :device_name, class: "form-control", rows: 1, placeholder: "要部署的设备，必填项"
         .col-sm-1{style: "padding-top:10px;"}
           %a{onclick: "window.Job.listDevices(0);"}
             %span.glyphicon.glyphicon-check
@@ -88,8 +88,17 @@
       });
     },
     setDevice: function(ctl) {
-      $("#job_device_name").val($(ctl).data("name"));
-      $("#job_device_uuid").val($(ctl).data("uuid"));
+      var device_list = [], device_names = [], $li;
+      $(".list-group input[type=checkbox]:checked").each(function() {
+          $li = $(this).closest("li");
+          device_list.push({
+            name: $li.data("name"),
+            uuid: $li.data("uuid")
+          });
+          device_names.push("<" + $li.data("name") + ">");
+      });
+      $("#job_device_name").val(device_names.join(","));
+      $("#job_device_list").val(JSON.stringify(device_list));
     },
     listDevices: function(page) {
       $.ajax({
@@ -105,12 +114,11 @@
         }
         res.data.forEach(function(el) {
           $(".list-group").append(" \
-            <button class='list-group-item' \
+            <li class='list-group-item' \
                     type='button' \
-                    onclick='window.Job.setDevice(this);' \
                     data-uuid='" + el.uuid + "' \
                     data-name='" + el.human_name + "'> \
-            " + el.human_name + "</button> \
+            <input type='checkbox' onclick='window.Job.setDevice(this);' \>&nbsp;" + el.human_name + "</li> \
           ")
         })
       }).fail(function(res, status, xhr) {

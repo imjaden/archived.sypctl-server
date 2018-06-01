@@ -49,7 +49,7 @@ class ApplicationController < Sinatra::Base
   end
 
   get '/', '/login' do
-    redirect to('/account') if request.cookies['authen'].present?
+    redirect to('/account/devices') if request.cookies['authen'].present?
     @user = User.new(user_num: request.cookies['authen'] || '')
 
     haml :index, layout: settings.layout
