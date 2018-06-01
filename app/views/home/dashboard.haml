@@ -29,14 +29,15 @@
       - record_hash = record.latest_record
       %tr{id: "dom_#{record.id}"}
         %td= index+1
-        %td.name= link_to record.human_name || record.hostname, url_for("/#{record.id}")
+        %td.name= record.human_name || record.hostname
         %td= "#{record.os_type}#{record.os_version}"
         %td
           - interval = (Time.now.to_i - record.updated_at.to_i) < 600
           %span.label{class: "#{interval ? 'label-success' : 'label-danger'}"}
             = interval ? '正常' : '异常'
         %td= record_hash[:created_at].strftime('%y/%m/%d %H:%M')
-        %td= link_to record.record_count, url_for("/#{record.id}/records"), class: "badge"
+        %td 
+          .badge= record.record_count
         %td= record_hash[:whoami]
         %td= record_hash[:version]
         %td= record_hash[:memory_usage] + "%"
