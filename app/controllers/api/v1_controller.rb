@@ -49,7 +49,7 @@ module API
       else
         device = Device.create(params[:device])
       end
-      device.update_attribute(:api_token, Digest::MD5.hexdigest(SecureRandom.uuid))
+      device.update_attributes({api_token: Digest::MD5.hexdigest(SecureRandom.uuid), request_ip: request.ip})
    
       respond_with_json(device.to_hash, 201)
     end
@@ -59,6 +59,7 @@ module API
       api_authen_params([:device])
 
       jobs = []
+      params[:device][:request_ip] = request.ip
       record = Record.create(params[:device])
       if device = Device.find_by(uuid: params[:device][:uuid])
         device.update_attributes({record_count: device.record_count + 1})

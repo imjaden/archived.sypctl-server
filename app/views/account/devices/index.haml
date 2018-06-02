@@ -11,8 +11,10 @@
   .devices th:nth-child(1), .devices td:nth-child(1) { width: 3%; }
   .devices th:nth-child(2), .devices td:nth-child(2) { text-align: left; width: 12%; }
   .devices th:nth-child(3), .devices td:nth-child(3) { text-align: left; width: 15%; }
+  .devices th:nth-child(4), .devices td:nth-child(4) { width: 7%; }
   .devices th:nth-child(6), .devices td:nth-child(6) { width: 8%; }
-  .devices th:nth-child(8), .devices td:nth-child(8) { width: 7%; }
+  .devices th:nth-child(7), .devices td:nth-child(7) { width: 8%; }
+  .devices th:nth-child(8), .devices td:nth-child(8) { width: 5%; }
   .devices th:nth-last-child(2), .devices td:nth-last-child(2) { width: 3%; }
   .devices th:nth-last-child(3), .devices td:nth-last-child(3) { width: 3%; }
   .devices th:nth-last-child(4), .devices td:nth-last-child(4) { width: 3%; }
@@ -25,6 +27,7 @@
     %th 系统类型
     %th 代理状态
     %th 最近提交
+    %th 代理 IP
     %th 记录数量
     %th SSH 状态
     %th 刷新
@@ -44,6 +47,7 @@
           %span.label{class: "#{interval ? 'label-success' : 'label-danger'}"}
             = interval ? '正常' : '异常'
         %td= record.updated_at.strftime('%y/%m/%d %H:%M')
+        %td= record.request_ip
         %td= link_to record.record_count, url_for("/#{record.id}/records"), class: "badge"
         %td
           %span.label{class: "label-#{record.ssh_state ? 'success' : 'warning'}"}
