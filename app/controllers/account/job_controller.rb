@@ -56,6 +56,8 @@ module Account
       options = @job.to_hash
       options.delete(:id)
       options.delete(:state)
+      options.delete(:device_name)
+      options.delete(:device_uuid)
 
       @record = Job.new(options)
       @record.uuid = SecureRandom.uuid

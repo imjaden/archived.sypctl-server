@@ -1,7 +1,7 @@
 # encoding: utf-8
 require 'rubygems'
 
-ENV['APP_VERSION']   = '0.0.40'
+ENV['APP_VERSION']   = '0.0.41'
 ENV['APP_ROOT_PATH'] = File.dirname(File.dirname(__FILE__))
 ENV['RACK_ENV']    ||= 'development'
 ENV['VIEW_PATH']     = File.join(ENV['APP_ROOT_PATH'], 'app/views')
