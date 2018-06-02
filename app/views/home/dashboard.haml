@@ -38,7 +38,7 @@
           - interval = (Time.now.to_i - record.updated_at.to_i) < 600
           %span.label{class: "#{interval ? 'label-success' : 'label-danger'}"}
             = interval ? '正常' : '异常'
-        %td= record_hash[:created_at].strftime('%y/%m/%d %H:%M')
+        %td= record_hash[:created_at].first(14)
         %td 
           .badge= record.record_count
         %td= record_hash[:whoami]

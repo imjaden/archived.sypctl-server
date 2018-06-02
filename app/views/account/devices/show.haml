@@ -23,16 +23,20 @@
       %td
         %span.label{class: "label-#{@record.ssh_state ? 'success' : 'warning'}"}
           = @record.ssh_state ? '启用' : '关闭'
-    %tr
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        %a{onclick: "window.Device.toggleShowSSHInfo(this);"}
+          %span.glyphicon.glyphicon-eye-open
+            
+    %tr.ssh-info.hidden
       %td SSH 服务器
       %td= @record.ssh_ip
-    %tr
+    %tr.ssh-info.hidden
       %td SSH 端口
       %td= @record.ssh_port
-    %tr
+    %tr.ssh-info.hidden
       %td SSH 账号
       %td= @record.ssh_username
-    %tr
+    %tr.ssh-info.hidden
       %td SSH 密码
       %td= @record.ssh_password
     %tr
@@ -111,7 +115,7 @@
                 var objects = {device: { id: id, name: name }}
                 window.OperationLogger.record("device.delete", objects);
               } catch(e) { console.log(e) }
-              
+
               window.location.href = "#{url_for('/')}";
             } else {
               window.Loading.show("删除失败");
@@ -121,6 +125,18 @@
           }).always(function(res, status, xhr) {
               window.Loading.hide();
           });
+        },
+        toggleShowSSHInfo: function(ctl) {
+          var $span = $(ctl).children("span").first();
+          if($span.hasClass("glyphicon-eye-open")) {
+            $span.removeClass("glyphicon-eye-open");
+            $span.addClass("glyphicon-eye-close");
+            $(".ssh-info").removeClass("hidden");
+          } else {
+            $span.addClass("glyphicon-eye-open");
+            $span.removeClass("glyphicon-eye-close");
+            $(".ssh-info").addClass("hidden");
+          }
         }
       }
   }).call(this);

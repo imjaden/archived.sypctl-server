@@ -51,7 +51,7 @@ module API
       end
       device.update_attribute(:api_token, Digest::MD5.hexdigest(SecureRandom.uuid))
    
-      respond_with_json({api_token: device.api_token}, 201)
+      respond_with_json(device.to_hash, 201)
     end
 
     # post /api/v1/receiver
