@@ -18,9 +18,6 @@
     %th 系统类型
     %th 代理状态
     %th 最近提交
-    %th 提交数量
-    %th 代理账号
-    %th 代理版本
     %th 内存情况
     %th 明细
     %th CPU 情况
@@ -39,10 +36,6 @@
           %span.label{class: "#{interval ? 'label-success' : 'label-danger'}"}
             = interval ? '正常' : '异常'
         %td= record_hash[:created_at].first(14)
-        %td 
-          .badge= record.record_count
-        %td= record_hash[:whoami]
-        %td= record_hash[:version]
         %td= record_hash[:memory_usage] + "%"
         %td
           %a{onclick: "window.Device.showMemoryModal(this);", "data-title" => "内存明细", "data-content" => record_hash[:memory_usage_description]}

@@ -40,21 +40,18 @@
       %td SSH 密码
       %td= @record.ssh_password
     %tr
-      %td Host 名称
-      %td= @record.hostname
-    %tr
-      %td UUID
-      %td= @record.uuid
-    %tr
       %td 系统类型
       %td
         %span.label.label-info= "#{@record.os_type}#{@record.os_version}"
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        %a{onclick: "window.Device.toggleShowDeviceInfo(this);"}
+          %span.glyphicon.glyphicon-eye-open
+    %tr.device-info.hidden
+      %td UUID
+      %td= @record.uuid
     %tr
-      %td LanIP
-      %td= @record.lan_ip
-    %tr
-      %td WanIP
-      %td= @record.wan_ip
+      %td Host 名称
+      %td= @record.hostname
     %tr
       %td 内存
       %td= @record.memory
@@ -64,17 +61,29 @@
     %tr
       %td 磁盘
       %td= @record.disk
-    %tr
+    %tr.device-info.hidden
+      %td LanIP
+      %td= @record.lan_ip
+    %tr.device-info.hidden
+      %td WanIP
+      %td= @record.wan_ip
+    %tr.device-info.hidden
+      %td 代理账号
+      %td= @record.username
+    %tr.device-info.hidden
+      %td 代理密码
+      %td= @record.password
+    %tr.device-info.hidden
+      %td 代理 IP
+      %td= @record.request_ip
+    %tr.device-info.hidden
+      %td 代理版本
+      %td= @record.request_agent
+    %tr.device-info.hidden
       %td 提交记录
       %td
         %a{href: url_for("/#{params[:id]}/records")}
           %span.badge= @record.record_count
-    %tr
-      %td 代理账号
-      %td= @record.username
-    %tr
-      %td 代理密码
-      %td= @record.password
     %tr
       %td 更新时间
       %td= @record.updated_at.strftime('%y/%m/%d %H:%M:%S')
@@ -136,6 +145,18 @@
             $span.addClass("glyphicon-eye-open");
             $span.removeClass("glyphicon-eye-close");
             $(".ssh-info").addClass("hidden");
+          }
+        },
+        toggleShowDeviceInfo: function(ctl) {
+          var $span = $(ctl).children("span").first();
+          if($span.hasClass("glyphicon-eye-open")) {
+            $span.removeClass("glyphicon-eye-open");
+            $span.addClass("glyphicon-eye-close");
+            $(".device-info").removeClass("hidden");
+          } else {
+            $span.addClass("glyphicon-eye-open");
+            $span.removeClass("glyphicon-eye-close");
+            $(".device-info").addClass("hidden");
           }
         }
       }

@@ -1,0 +1,8 @@
+[
+  {
+    "title": "服务名称",
+    "monitor_type": "command/pid",
+    "monitor_object": "command/pidpath",
+    "command": "启动服务命令"
+  }
+]
