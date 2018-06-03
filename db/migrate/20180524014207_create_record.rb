@@ -16,6 +16,7 @@ class CreateRecord < ActiveRecord::Migration[5.2]
       t.string   :disk_usage, comment: '磁盘使用情况'
       t.text     :disk_usage_description, comment: '磁盘使用情况JSON'
       t.string   :request_ip, comment: '代理 IP'
+      t.string   :request_agent, comment: '代理版本信息'
       t.text     :description, comment: '请求描述'
 
       t.timestamps null: false

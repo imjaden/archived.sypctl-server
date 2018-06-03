@@ -37,6 +37,10 @@ module API
     post '/register' do
       api_authen_params([:device])
 
+      params[:device][:api_token] = Digest::MD5.hexdigest(SecureRandom.uuid)
+      params[:device][:request_ip] = request.ip
+      params[:device][:request_agent] = request.user_agent
+      
       if params[:uuid]
         device = Device.find_by(uuid: params[:uuid])
         device = Device.find_by(uuid: params[:device][:uuid]) unless device
@@ -49,7 +53,6 @@ module API
       else
         device = Device.create(params[:device])
       end
-      device.update_attributes({api_token: Digest::MD5.hexdigest(SecureRandom.uuid), request_ip: request.ip})
    
       respond_with_json(device.to_hash, 201)
     end
@@ -58,8 +61,10 @@ module API
     post '/receiver' do
       api_authen_params([:device])
 
-      jobs = []
       params[:device][:request_ip] = request.ip
+      params[:device][:request_agent] = request.user_agent
+
+      jobs = []
       record = Record.create(params[:device])
       if device = Device.find_by(uuid: params[:device][:uuid])
         device.update_attributes({record_count: device.record_count + 1})
