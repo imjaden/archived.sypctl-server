@@ -123,7 +123,7 @@ module API
     end
 
     get '/linux.date' do
-      `date +'%z %m/%d/%y %H:%M:%S'`.strip
+      `date +'%s'`.strip
     end
 
     protected
