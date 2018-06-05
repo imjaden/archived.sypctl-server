@@ -91,14 +91,24 @@
       var device_list = [], device_names = [], $li;
       $(".list-group input[type=checkbox]:checked").each(function() {
           $li = $(this).closest("li");
-          device_list.push({
-            name: $li.data("name"),
-            uuid: $li.data("uuid")
-          });
-          device_names.push("<" + $li.data("name") + ">");
+          if($li.data("name")) {
+            device_list.push({
+              name: $li.data("name"),
+              uuid: $li.data("uuid")
+            });
+            device_names.push("<" + $li.data("name") + ">");
+          }
       });
       $("#job_device_name").val(device_names.join(","));
       $("#job_device_list").val(JSON.stringify(device_list));
+    },
+    selectAllDevice: function() {
+      var device_list = [], device_names = [], $li;
+      $(".list-group input[type=checkbox]").each(function() {
+          if($(this).hasClass('device')) {
+            $(this).click();
+          }
+      });
     },
     listDevices: function(page) {
       $.ajax({
@@ -108,7 +118,7 @@
         data: {page: page, page_size: 100}
       }).done(function(res, status, xhr) {
         $(".list-group").html("")
-        $(".list-group").append("<button class='list-group-item disabled' type='button' \>设备列表：</button>");
+        $(".list-group").append("<span class='list-group-item' style='background:#eee;'>设备列表：<input class='no' type='checkbox' onclick='window.Job.selectAllDevice();' \>&nbsp;全选</span>");
         if(!res.data.length) {
           $(".list-group").append("<button class='list-group-item disabled' type='button' \>无数据</button>");
         }
@@ -118,7 +128,7 @@
                     type='button' \
                     data-uuid='" + el.uuid + "' \
                     data-name='" + el.human_name + "'> \
-            <input type='checkbox' onclick='window.Job.setDevice(this);' \>&nbsp;" + el.human_name + "</li> \
+            <input class='device' type='checkbox' onclick='window.Job.setDevice(this);' \>&nbsp;" + el.human_name + "</li> \
           ")
         })
       }).fail(function(res, status, xhr) {
