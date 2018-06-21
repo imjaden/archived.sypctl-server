@@ -1,7 +1,9 @@
 %ol.breadcrumb
   %li 设备中心
   %li 主机管理
-  %li= @device_group.name
+  %li
+    = @device_group.name
+    %span.text-warning= Time.now.strftime("%y-%m-%d %H:%M:%S")
 
 :css   
   .devices th:nth-child(n+1), .devices td:nth-child(n+1) { text-align: center; width: 5%; }
@@ -61,6 +63,8 @@
 
 :javascript
   $(".navbar").addClass("hidden");
+  setInterval(function() { window.location.reload(); }, 60000);
+
   window.Device = {
     humanSize: function(num) {
       var humanText = num;
@@ -102,7 +106,7 @@
       $("#deviceModal").modal('show');
       $("#deviceModal .modal-title").html($(ctl).data("title"));
       
-      // try {
+      try {
         $("#deviceModal .modal-body").html("<table class='table table-bordered table-condensed'></table>");
         var array = $(ctl).data("content"), hash, key, pairs, headers = [];
         for(var i = 0, len = array.length; i < len; i ++) {
@@ -117,9 +121,9 @@
           }
           $("#deviceModal .modal-body table").append("<tr>" + pairs.join("") + "<tr>")
         }
-      // } catch(e) {
-      //  console.log(e);
-      //  $("#deviceModal .modal-body").html(JSON.stringify($(ctl).data("content")));
-      //}
+      } catch(e) {
+        console.log(e);
+        $("#deviceModal .modal-body").html(JSON.stringify($(ctl).data("content")));
+      }
     }
   }
