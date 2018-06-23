@@ -13,7 +13,6 @@ module API
       end
     end
 
-
     #
     # 注册接口有两种方式：
     # 1. 在代理服务器端主动注册(直接创建)，执行命令 sypctl bundle exec agent:submitor

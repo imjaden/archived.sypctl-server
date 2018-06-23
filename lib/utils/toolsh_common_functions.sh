@@ -5,6 +5,8 @@
 # updated@170523: optimized `check_redis_process_running` with `grep -v $0`
 #
 
+function title() { printf "\n%s\n\n" "$1"; }
+
 function fun_configuration_guides() {
     local filename="$1"
     local keyname="$2"

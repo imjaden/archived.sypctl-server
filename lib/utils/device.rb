@@ -1,4 +1,5 @@
 # encoding: utf-8
+# version: 0.0.8
 require 'json'
 require 'securerandom'
 
@@ -73,7 +74,7 @@ module Utils
       # /dev/mapper/centos_java1-opt: UUID="8f7236ea-97ef-4aa9-886f-9e1a50a030a1"
       # /dev/mapper/centos_java1-home: UUID="bae67bdc-1ff5-477f-ba08-11f02d2a00d2"
       def device_uuid
-        "#{_device_uuid(`blkid -s UUID`)}@#{hostname}"
+        "#{_device_uuid(`sudo blkid -s UUID`)}@#{hostname}"
       end
 
       def _device_uuid(blkid_lines)
@@ -90,12 +91,13 @@ module Utils
         device_hsh = device_list.first unless device_hsh
 
         "#{device_hsh[:device]}-#{device_hsh[:uuid]}".gsub("/", "_")
-      rescue
-        "random-#{SecureRandom.uuid}"
+      rescue => e
+        puts e.message
+        "exception-#{SecureRandom.uuid}"
       end
 
       def memory
-        free_m['total']
+        free_m['total'].to_i * 1024 * 1024
       end
 
       def cpu
@@ -198,14 +200,26 @@ module Utils
 
       def uuid
         uuid_tmp_path = File.join(ENV["RAKE_ROOT_PATH"] || Dir.pwd, "device-uuid")
-        unless File.exists?(uuid_tmp_path)
-          File.open(uuid_tmp_path, "w:utf-8") { |file| file.puts(klass.device_uuid) }
+
+        if File.exists?(uuid_tmp_path)
+          device_uuid = File.read(uuid_tmp_path).strip
+          
+          if device_uuid.empty?
+            File.remove(uuid_tmp_path)
+          else
+            return device_uuid
+          end
         end
-        File.read(uuid_tmp_path).strip
+
+        device_uuid = klass.device_uuid
+        device_uuid = "empty-#{SecureRandom.uuid}" if device_uuid.empty?
+        File.open(uuid_tmp_path, "w:utf-8") { |file| file.puts(device_uuid) }
+
+        return device_uuid
       end
 
       def memory
-        klass.memory
+        klass.memory.number_to_human_size(true)
       rescue => e
         e.message
       end
