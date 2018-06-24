@@ -1,0 +1,27 @@
+
+当前时间: <%= Time.now.strftime("%Y-%m-%m %H:%M:%S") %>
+<table border="1" cellspacing="0" cellpadding="3" style="text-align: center;">
+  <thead>
+    <tr>
+      <th>归属群组</th>
+      <th>主机名称</th>
+      <th>系统类型</th>
+      <th>代理状态</th>
+      <th>最近提交</th>
+      <th>超时</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @devices.each do |device| %>
+    <tr>
+      <td><%= device.device_group.name if device.device_group %></td>
+      <td><%= device.human_name || device.hostname %></td>
+      <td><%= "#{device.os_type}#{device.os_version}" %></td>
+      <td><%= (Time.now.to_i - device.updated_at.to_i) < 600 ? '正常' : '异常' %></td>
+      <td><%= device.updated_at.strftime('%y/%m/%d %H:%M') %></td>
+      <td><%= (Time.now.to_i - device.updated_at.to_i)/60 - 5 %>分钟</td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+<small>请勿回复该邮件，技术问题请联系 jay_li@intfocus.com</small>

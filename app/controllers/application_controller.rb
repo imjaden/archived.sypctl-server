@@ -103,6 +103,12 @@ class ApplicationController < Sinatra::Base
     haml :dashboard, layout: settings.layout
   end
 
+  get '/monitor' do
+    @records = Device.where(monitor_state: true)
+    
+    haml :monitor, layout: settings.layout
+  end
+
   # GET /logout
   get '/logout' do
     set_login_cookie

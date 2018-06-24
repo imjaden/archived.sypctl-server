@@ -11,10 +11,12 @@
   .devices th:nth-child(1), .devices td:nth-child(1) { width: 3%; }
   .devices th:nth-child(2), .devices td:nth-child(2) { text-align: left; width: 12%; }
   .devices th:nth-child(3), .devices td:nth-child(3) { text-align: left; width: 15%; }
-  .devices th:nth-child(4), .devices td:nth-child(4) { width: 7%; }
-  .devices th:nth-child(6), .devices td:nth-child(6) { width: 8%; }
+  .devices th:nth-child(4), .devices td:nth-child(4) { width: 5%; }
+  .devices th:nth-child(4), .devices td:nth-child(5) { width: 5%; }
+  .devices th:nth-child(6), .devices td:nth-child(6) { width: 5%; }
   .devices th:nth-child(7), .devices td:nth-child(7) { text-align:left; width: 8%; }
   .devices th:nth-child(8), .devices td:nth-child(8) { width: 5%; }
+  .devices th:nth-child(8), .devices td:nth-child(9) { width: 5%; }
   .devices th:nth-last-child(2), .devices td:nth-last-child(2) { width: 3%; }
   .devices th:nth-last-child(3), .devices td:nth-last-child(3) { width: 3%; }
   .devices th:nth-last-child(4), .devices td:nth-last-child(4) { width: 3%; }
@@ -24,16 +26,15 @@
     %th -
     %th 分组名称
     %th 主机名称
-    %th 系统类型
+    %th 监控与否
     %th 代理状态
+    %th 系统类型
     %th 最近提交
-    %th 代理 IP
-    %th 记录数量
     %th SSH 状态
     %th 刷新
     %th 编辑
     %th 删除
-    %th 创建时间
+    %th 更新时间
   %tbody
     - @records.each_with_index do |record, index|
       %tr{id: "dom_#{record.id}"}
@@ -41,14 +42,13 @@
         %td
           %span.label.label-default= link_to record.device_group.name, "/dashboard/#{record.device_group.uuid}", style: "color:white;" if record.device_group
         %td.name= link_to record.human_name || record.hostname, url_for("/#{record.id}")
-        %td= "#{record.os_type}#{record.os_version}"
+        %td.monitor-state= link_to (record.monitor_state ? '关闭' : '开启'), 'javascript:void(0);', onclick: "window.Device.setMonitorState(#{record.id})"
         %td
           - interval = (Time.now.to_i - record.updated_at.to_i) < 600
           %span.label{class: "#{interval ? 'label-success' : 'label-danger'}"}
             = interval ? '正常' : '异常'
+        %td= "#{record.os_type}#{record.os_version}"
         %td= record.updated_at.strftime('%y/%m/%d %H:%M')
-        %td= record.request_ip
-        %td= link_to record.record_count, url_for("/#{record.id}/records"), class: "badge"
         %td
           %span.label{class: "label-#{record.ssh_state ? 'success' : 'warning'}"}
             = record.ssh_state ? '启用' : '关闭'
@@ -61,7 +61,7 @@
         %td
           %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.Device.remove(#{record.id});"}
             .span.glyphicon.glyphicon-trash
-        %td= record.created_at.strftime('%y/%m/%d %H:%M')
+        %td= record.updated_at.strftime('%y/%m/%d %H:%M')
 
 = will_paginater @records
 
@@ -95,6 +95,23 @@
               window.Loading.show("删除失败");
           }).always(function(res, status, xhr) {
               window.Loading.hide();
+          });
+        },
+        setMonitorState: function(id) {
+          $.ajax({
+            type: 'post',
+            url: "#{url_for('/monitor-state')}?id=" + id
+          }).done(function(res, status, xhr) {
+              console.log(res);
+            if(res.code === 201) {
+              $("#dom_" + id + " .monitor-state a").html(res.data == true ? '关闭' : '开启');
+            } else {
+              console.log(res);
+            }
+          }).fail(function(xhr, status, error) {
+            console.log(xhr);
+          }).always(function(res, status, xhr) {
+            console.log(res);
           });
         }
       }

@@ -38,3 +38,5 @@ gem 'httparty', '~> 0.13.7'
 
 gem 'net-ssh', '~>4.2.0'
 gem 'net-scp', '~>1.2.1'
+
+gem 'whenever', '~>0.10.0'

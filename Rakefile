@@ -21,3 +21,6 @@ namespace :db do
     require File.expand_path('../config/boot.rb', __FILE__)
   end
 end
+
+
+Dir.glob('lib/tasks/*.rake') { |filepath| load(filepath) }

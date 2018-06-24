@@ -59,6 +59,13 @@ module Account
       haml :edit, layout: settings.layout
     end
 
+    post '/monitor-state' do
+      record = Device.find_by(id: params[:id])
+      record.update_columns({monitor_state: !record.monitor_state})
+      
+      respond_with_json({data: record.monitor_state}, 201)
+    end
+
     post '/:id' do
       record = Device.find_by(id: params[:id])
         

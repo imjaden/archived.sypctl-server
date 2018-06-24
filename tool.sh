@@ -90,7 +90,7 @@ case "$1" in
         git pull origin ${git_current_branch}
     ;;
     start)
-        test -d logs || mkdir -p logs
+        mkdir -p logs/crontab
         fun_print_table_header "start process" "process" "status"
         command_text="bundle exec unicorn -c ${unicorn_config_file} -p ${app_port} -E production -D"
         process_start "${unicorn_pid_file}" "unicorn" "${command_text}"
@@ -100,6 +100,9 @@ case "$1" in
         fun_print_table_header "stop process" "process" "status"
         process_stop "${unicorn_pid_file}" "unicorn"
         fun_print_table_footer
+    ;;
+    crontab:update)
+        bundle exec whenever --update-crontab
     ;;
     restart)
         bash $0 stop
