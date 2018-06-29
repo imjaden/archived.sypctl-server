@@ -14,7 +14,7 @@
   .devices th:nth-last-child(1), .devices td:nth-child(1) { width: 4%; }
   .devices th:nth-last-child(2), .devices td:nth-child(2) { width: 4%; }
   .devices th:nth-last-child(3), .devices td:nth-child(3) { width: 4%; }
-%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.devices
+%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.devices#devices
   %thead
     %th.more -
     %th.more 归属群组
@@ -28,9 +28,11 @@
   %tbody
     - @records.each_with_index do |record, index|
       - record_hash = record.latest_record
-      %tr{id: "dom_#{record.id}"}
+      - device_group = record.device_group
+      - order_index = (device_group ? device_group.order_index : 0) * 1000 + record.order_index
+      %tr{id: "dom_#{record.id}", "data-order" => order_index}
         %td.more= index+1
-        %td.more= record.device_group.name if record.device_group
+        %td.more= device_group.name if device_group
         %td.name= record.human_name || record.hostname
         %td
           - interval = (Time.now.to_i - record.updated_at.to_i) < 600
@@ -69,6 +71,21 @@
     $(".more").addClass("hidden");
     $(".container").css({"padding-left": "0px", "padding-right": "0px"});
   }
+
+  // sort devices with group order index and device order index
+  var $trs = $('#devices tbody tr');
+  $trs.sort(function(a, b){
+    var valveNumOfa = $(a).data("order");
+    var valveNumOfb = $(b).data("order");
+    if(parseInt(valveNumOfa) < parseInt(valveNumOfb)) 
+      return -1;
+    else 
+      return 1;
+  });
+  $trs.detach().appendTo('#devices tbody');
+  $('#devices tbody tr').each(function(inx, el, arr) {
+    $(el).find("td:eq(0)").html(inx + 1);
+  })
 
   window.Device = {
     humanSize: function(num) {

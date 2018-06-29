@@ -9,23 +9,49 @@
         主机管理
         %span.glyphicon.glyphicon-check
 
+= javascript_include_tag "jquery-ui.js"
 :css   
   .devices th:nth-child(n+1), .devices td:nth-child(n+1) { text-align: center; width: 5%; }
-  .devices th:nth-child(2), .devices td:nth-child(2) { text-align: left;width: 20%; }
-  .devices th:nth-child(3), .devices td:nth-child(3) { text-align: left;width: 20%; }
-  .devices th:nth-last-child(1), .devices td:nth-last-child(1) { text-align: center; width: 10%; }
+  .devices th:nth-child(2), .devices td:nth-child(2) { text-align: left;width: 15%; }
+  .devices th:nth-child(3), .devices td:nth-child(3) { text-align: left;width: 30%; }
+  .devices th:nth-last-child(1), .devices td:nth-last-child(1) { text-align: center; width: 5%; }
+  .devices th:nth-last-child(2), .devices td:nth-last-child(2) { text-align: center; width: 10%; }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.records.smart-table.devices
   %thead
-    %th ID
+    %th 序号
     %th 主机名称
     %th 主机UUID
     %th 更新时间
-  %tbody
+    %th 拖动排序
+  %tbody#sortable-table
     - @records.each do |record|
-      %tr{id: "dom_#{record.id}"}
-        %td.id=record.id
+      %tr.ui-state-default{id: "dom_#{record.id}", "data-id" => record.id}
+        %td.id=record.order_index
         %td.name= record.human_name || record.hostname
         %td.file_name= record.uuid
         %td= (record.updated_at || Time.now).strftime('%y/%m/%d %H:%M')
+        %td.sort-icon
+          %span.glyphicon.glyphicon-sort
 
-= will_paginater @records
+:javascript
+  $("#sortable-table").sortable({axis: "y"});
+  $("#sortable-table").on("sortupdate", function(event, ui) {
+    var ids = [];
+    $("#sortable-table tr").each(function() {
+      ids.push($(this).data("id"))
+    });
+    $.ajax({
+      type: "post",
+      url: "#{url_for('/devices/order')}",
+      data: {
+        id: #{params[:id]},
+        ids: ids
+      }
+    }).done(function(res, status, xhr) {
+      if(res.code == 201) {
+        window.location.reload();
+      } else {
+        console.log(res);
+      }
+    })
+  });

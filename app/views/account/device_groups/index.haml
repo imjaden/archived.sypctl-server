@@ -6,24 +6,27 @@
       新建分组
       %span.glyphicon.glyphicon-plus
 
+= javascript_include_tag "jquery-ui.js"
 :css   
   .device-groups th:nth-child(n+1), .device-groups td:nth-child(n+1) { text-align: center; width: 5%; }
   .device-groups th:nth-child(2), .device-groups td:nth-child(2) { text-align: left; width: 15%; }
   .device-groups th:nth-child(3), .device-groups td:nth-child(3) { text-align: left; width: 20%; }
-  .device-groups th:nth-last-child(1), .device-groups td:nth-last-child(1) { text-align: center; width: 10%; }
+  .device-groups th:nth-last-child(1), .device-groups td:nth-last-child(1) { text-align: center; width: 5%; }
+  .device-groups th:nth-last-child(2), .device-groups td:nth-last-child(2) { text-align: center; width: 10%; }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.device-groups
   %thead
-    %th 分组ID
+    %th 序号
     %th 分组名称
     %th 分组描述
     %th 应用列表
     %th 编辑
     %th 删除
     %th 更新时间
-  %tbody
+    %th 拖动排序
+  %tbody#sortable-table
     - @records.each do |record|
-      %tr{id: "dom_#{record.id}"}
-        %td= record.id
+      %tr{id: "dom_#{record.id}", "data-id" => record.id}
+        %td= record.order_index
         %td.name= record.name
         %td= record.description
         %td
@@ -36,40 +39,59 @@
           %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.DeviceGroup.remove(#{record.id});"}
             .span.glyphicon.glyphicon-trash
         %td= record.updated_at.strftime('%y/%m/%d %H:%M')
-
-= will_paginater @records
+        %td.sort-icon
+          %span.glyphicon.glyphicon-sort
 
 :javascript
   (function() {
-      window.DeviceGroup = {
-        remove: function(id) {
-          var name = $("#dom_" + id + " .name").text();
-
-          if(!confirm('确定删除「' + name + '」?')) {
-            return false;
-          }
-
-          window.Loading.show("删除中...");
-          $.ajax({
-            type: 'delete',
-            url: "#{url_for('/')}" + id
-          }).done(function(res, status, xhr) {
-            if(res.code === 201) {
-              $("#dom_" + id).remove();
-              window.Loading.show("删除成功");
-
-              try {
-                var objects = {device_group: { id: id, name: name }}
-                window.OperationLogger.record("device_group.delete", objects);
-              } catch(e) { console.log(e) }
-            } else {
-              window.Loading.show("删除失败");
-            }
-          }).fail(function(xhr, status, error) {
-              window.Loading.show("删除失败");
-          }).always(function(res, status, xhr) {
-              window.Loading.hide();
-          });
+    $("#sortable-table").sortable({axis: "y"});
+    $("#sortable-table").on("sortupdate", function(event, ui) {
+      var ids = [];
+      $("#sortable-table tr").each(function() {
+        ids.push($(this).data("id"))
+      });
+      $.ajax({
+        type: "post",
+        url: "#{url_for('/order')}",
+        data: {ids: ids}
+      }).done(function(res, status, xhr) {
+        if(res.code == 201) {
+          window.location.reload();
+        } else {
+          console.log(res);
         }
+      })
+    });
+
+    window.DeviceGroup = {
+      remove: function(id) {
+        var name = $("#dom_" + id + " .name").text();
+
+        if(!confirm('确定删除「' + name + '」?')) {
+          return false;
+        }
+
+        window.Loading.show("删除中...");
+        $.ajax({
+          type: 'delete',
+          url: "#{url_for('/')}" + id
+        }).done(function(res, status, xhr) {
+          if(res.code === 201) {
+            $("#dom_" + id).remove();
+            window.Loading.show("删除成功");
+
+            try {
+              var objects = {device_group: { id: id, name: name }}
+              window.OperationLogger.record("device_group.delete", objects);
+            } catch(e) { console.log(e) }
+          } else {
+            window.Loading.show("删除失败");
+          }
+        }).fail(function(xhr, status, error) {
+            window.Loading.show("删除失败");
+        }).always(function(res, status, xhr) {
+            window.Loading.hide();
+        });
       }
+    }
   }).call(this);

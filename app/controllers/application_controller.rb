@@ -104,8 +104,11 @@ class ApplicationController < Sinatra::Base
   end
 
   get '/monitor' do
-    @records = Device.where(monitor_state: true)
-    
+    timestamp = Device.maximum(:updated_at)
+    cache_with_custom_defined([timestamp])
+
+    @records = Device.where(monitor_state: true).order(order_index: :asc)
+
     haml :monitor, layout: settings.layout
   end
 
@@ -191,6 +194,16 @@ class ApplicationController < Sinatra::Base
 
   def digest_file_md5(filepath)
     Digest::MD5.file(filepath).hexdigest
+  end
+
+  def cache_with_custom_defined(timestamps = [], etag_content = nil)
+    return if ENV['RACK_ENV'] == 'development'
+
+    timestamp = timestamps.compact.max
+    timestamp ||= (settings.startup_time || Time.now)
+
+    last_modified timestamp
+    etag md5(etag_content || timestamp)
   end
 
   private

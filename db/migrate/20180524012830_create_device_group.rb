@@ -10,6 +10,7 @@ class CreateDeviceGroup < ActiveRecord::Migration[5.1]
       t.string   :name, null: false, comment: '分组名称'
       t.integer  :device_count, default: 0, comment: '关联的设备数量'
       t.text     :description
+      t.integer  :order_index, default: 0, comment: '排序序号'
 
       t.timestamps null: false
     end

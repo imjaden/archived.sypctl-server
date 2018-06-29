@@ -9,7 +9,7 @@ module Account
     end
 
     get '/' do
-      @records = DeviceGroup.paginate(page: params[:page], per_page: 15).order(id: :desc)
+      @records = DeviceGroup.order(order_index: :asc)
 
       haml :index, layout: settings.layout
     end
@@ -49,6 +49,17 @@ module Account
       haml :edit, layout: settings.layout
     end
 
+    post '/order' do
+      (params[:ids] || []).each_with_index do |id, index|
+        if device = DeviceGroup.find_by(id: id)
+          device.update_attributes({order_index: index+1})
+        end
+      end
+
+      flash[:success] = "更新排序成功"
+      respond_with_json({data: "successfully"}, 201)
+    end
+
     post '/:id' do
       record = DeviceGroup.find_by(id: params[:id])
         
@@ -71,7 +82,7 @@ module Account
 
     get '/:id/devices' do
       @record = DeviceGroup.find_by(id: params[:id])
-      @records = @record.devices.paginate(page: params[:page], per_page: 15).order(id: :desc)
+      @records = @record.devices.order(order_index: :asc)
 
       haml :devices, layout: settings.layout
     end
@@ -87,6 +98,17 @@ module Account
       record = Device.find_by(id: params[:id])
       record.update_attributes({device_group_id: (params[:state].to_s == 'true' ? params[:device_group_id] : nil)})
 
+      respond_with_json({data: "successfully"}, 201)
+    end
+
+    post '/devices/order' do
+      (params[:ids] || []).each_with_index do |id, index|
+        if device = Device.find_by(id: id)
+          device.update_attributes({order_index: index+1})
+        end
+      end
+
+      flash[:success] = "更新排序成功"
       respond_with_json({data: "successfully"}, 201)
     end
   end
