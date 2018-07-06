@@ -15,34 +15,44 @@ namespace :monitor do
       exit
     end
 
-    include Mail::Methods
+    begin
+      include Mail::Methods
 
-    output_path = File.join(ENV['APP_ROOT_PATH'], 'tmp/device.html')
-    template_path = File.join(ENV['APP_ROOT_PATH'], 'lib/tasks/templates/device.erb')
-    File.open(output_path, "w:utf-8") do |file|
-      file.puts ERB.new(File.read(template_path)).result(binding)
+      output_path = File.join(ENV['APP_ROOT_PATH'], 'tmp/device.html')
+      template_path = File.join(ENV['APP_ROOT_PATH'], 'lib/tasks/templates/device.erb')
+      File.open(output_path, "w:utf-8") do |file|
+        file.puts ERB.new(File.read(template_path)).result(binding)
+      end
+
+      response = send_email(Setting.notify.sender, Setting.notify.email_receivers, "设备异常报告 #{Time.now.strftime('%y%m%m%H%M')}", File.read(output_path))
+      puts Time.now
+      puts response.inspect
+    rescue => e
+      puts "#{File.basename(__FILE__)}:#{__LINE__} - #{e.message}"
+      puts e.message
     end
 
-    response = send_email(Setting.notify.sender, Setting.notify.email_receivers, "设备异常报告 #{Time.now.strftime('%y%m%m%H%M')}", File.read(output_path))
-    puts Time.now
-    puts response.inspect
-
-    options = {
-      "api_token": Setting.notify.push_api_token,
-      "user_nums": Setting.notify.push_receivers,
-      "title": "监控设备通知",
-      "content": "监控到 #{@devices.count} 台设备异常，点击查看明细...",
-      "template_id": -1,
-      "extra_params": {
-        "type": "analyse",
-        "title": "监控设备列表",
-        "url": "http://sypctl.ibi.ren/monitor",
-        "obj_id": 1004,
-        "obj_type": 6
+    begin
+      options = {
+        "api_token": Setting.notify.push_api_token,
+        "user_nums": Setting.notify.push_receivers,
+        "title": "监控设备通知",
+        "content": "监控到 #{@devices.count} 台设备异常，点击查看明细...",
+        "template_id": -1,
+        "extra_params": {
+          "type": "analyse",
+          "title": "监控设备列表",
+          "url": "http://sypctl.ibi.ren/monitor",
+          "obj_id": 1004,
+          "obj_type": 6
+        }
       }
-    }
-    response = HTTParty.post("http://shengyiplus.com/api/v2/users/push_message", body: options.to_json)
-    puts Time.now
-    puts response.inspect
+      response = HTTParty.post("http://shengyiplus.com/api/v2/users/push_message", body: options.to_json)
+      puts Time.now
+      puts response.inspect
+    rescue => e
+      puts "#{File.basename(__FILE__)}:#{__LINE__} - #{e.message}"
+      puts e.message
+    end
   end
 end
