@@ -88,7 +88,7 @@ module Account
 
     get '/:id/records' do
       @device = Device.find_by(id: params[:id])
-      @records = @device.records.paginate(page: params[:page], per_page: 15).order(id: :desc)
+      @records = @device.records.paginate(page: params[:page], per_page: 20).order(id: :desc)
 
       haml :'records/index', layout: settings.layout
     end

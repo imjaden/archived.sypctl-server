@@ -5,8 +5,7 @@
 
 :css   
   .table th:nth-child(n+1), .table td:nth-child(n+1) { text-align: center; width: 20%; }
-  .table th:nth-child(3), .table td:nth-child(3) { width: 10%; }
-  .table th:nth-last-child(1), .table td:nth-last-child(1) { width: 10%; }
+  .table-condensed>tbody>tr>td, .table-condensed>tbody>tr>th, .table-condensed>tfoot>tr>td, .table-condensed>tfoot>tr>th, .table-condensed>thead>tr>td, .table-condensed>thead>tr>th { padding: 3px 5px;}
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table
   %thead
     %th 内存使用
@@ -18,7 +17,7 @@
   %tbody
     - @records.each do |record|
       %tr{id: "dom_#{record.id}"}
-        %td= record.memory_usage
+        %td= "#{record.memory_usage}%"
         %td= record.cpu_usage
         %td= record.disk_usage
         %td= record.whoami
