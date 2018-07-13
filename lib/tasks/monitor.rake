@@ -43,7 +43,8 @@ namespace :monitor do
           "content": "#{device_group ? device_group.name : '未配置分组'}，#{device.human_name || device.hostname} 运行异常，请及时运维，点击查看明细...",
           "template_id": -1,
           "extra_params": {
-            "type": "analyse",
+            "type": "toolbox",
+            "template_id": -1,
             "title": "监控设备列表",
             "url": "http://sypctl.ibi.ren/monitor",
             "obj_id": 1004,
