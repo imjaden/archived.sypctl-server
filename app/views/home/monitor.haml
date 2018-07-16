@@ -112,7 +112,7 @@
         $("#deviceModal .modal-body").html("<table class='table table-bordered table-condensed'></table>");
         var hash = $(ctl).data("content"), key;
         for(key in hash) {
-          $("#deviceModal .modal-body table").append("<tr><td>" + key + "</td><td>" + window.Device.humanSize(hash[key]) + "</td><tr>")
+          $("#deviceModal .modal-body table").append("<tr><td style='width:30%;'>" + key + "</td><td>" + window.Device.humanSize(hash[key]) + "</td><tr>")
         }
       } catch(e) {
         $("#deviceModal .modal-body").html(JSON.stringify($(ctl).data("content")));
@@ -122,7 +122,15 @@
       $("#deviceModal").modal('show');
       $("#deviceModal .modal-title").html($(ctl).data("title"));
       
-      $("#deviceModal .modal-body").html(JSON.stringify($(ctl).data("content")));
+      try {
+        $("#deviceModal .modal-body").html("<table class='table table-bordered table-condensed'></table>");
+        var hash = $(ctl).data("content"), key;
+        for(key in hash) {
+          $("#deviceModal .modal-body table").append("<tr><td style='width:30%;'>" + key + "</td><td>" + hash[key] + "</td><tr>")
+        }
+      } catch(e) {
+        $("#deviceModal .modal-body").html(JSON.stringify($(ctl).data("content")));
+      }
     },
     showDiskModal: function(ctl) {
       $("#deviceModal").modal('show');

@@ -6,8 +6,15 @@ require 'lib/utils/mail_sender.rb'
 namespace :monitor do
   task device: :environment do
 
+    alarm_hash = {}
     @devices = Device.where(monitor_state: true).map do |device|
-      device if (Time.now.to_i - device.updated_at.to_i) > 600
+      alarm_hash[device.id] = []
+      alarm_hash[device.id].push("宕机") if (Time.now.to_i - device.updated_at.to_i) > 600
+      record_hash = device.latest_record
+      alarm_hash[device.id].push("内存>90%") if record_hash[:memory_usage] && record_hash[:memory_usage].to_i > 90
+      alarm_hash[device.id].push("磁盘>95%") if record_hash[:disk_usage] && record_hash[:disk_usage].to_i > 95
+
+      device unless alarm_hash[device.id].empty?
     end.compact
 
     if @devices.empty?
@@ -30,17 +37,20 @@ namespace :monitor do
     rescue => e
       puts "#{File.basename(__FILE__)}:#{__LINE__} - #{e.message}"
       puts e.message
+      puts e.backtrace
     end
 
+    exit
     begin
       @devices.each do |device|
         device_group = device.device_group
+        alarm_items = alarm_hash[device.id]
 
         options = {
           "api_token": Setting.notify.push_api_token,
           "user_nums": Setting.notify.push_receivers,
-          "title": "监控设备通知",
-          "content": "#{device_group ? device_group.name : '未配置分组'}，#{device.human_name || device.hostname} 运行异常，请及时运维，点击查看明细...",
+          "title": "设备异常通知",
+          "content": "#{device_group ? device_group.name : '未配置分组'}，#{device.human_name || device.hostname} #{alarm_items.join(',')}，请及时运维，点击查看...",
           "template_id": -1,
           "extra_params": {
             "type": "toolbox",
@@ -58,6 +68,7 @@ namespace :monitor do
     rescue => e
       puts "#{File.basename(__FILE__)}:#{__LINE__} - #{e.message}"
       puts e.message
+      puts e.backtrace
     end
   end
 end

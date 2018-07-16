@@ -7,20 +7,25 @@
       <th>主机名称</th>
       <th>系统类型</th>
       <th>代理状态</th>
+      <th>CPU</th>
+      <th>内存使用</th>
+      <th>磁盘使用</th>
       <th>最近提交</th>
-      <th>超时</th>
     </tr>
   </thead>
   <tbody>
     <% @devices.each do |device| %>
-    <tr>
-      <td><%= device.device_group.name if device.device_group %></td>
-      <td><%= device.human_name || device.hostname %></td>
-      <td><%= "#{device.os_type}#{device.os_version}" %></td>
-      <td><%= (Time.now.to_i - device.updated_at.to_i) < 600 ? '正常' : '异常' %></td>
-      <td><%= device.updated_at.strftime('%y/%m/%d %H:%M') %></td>
-      <td><%= (Time.now.to_i - device.updated_at.to_i)/60 - 5 %>分钟</td>
-    </tr>
+      <% record_hash = device.latest_record %>
+      <tr>
+        <td><%= device.device_group.name if device.device_group %></td>
+        <td><%= device.human_name || device.hostname %></td>
+        <td><%= "#{device.os_type}#{device.os_version}" %></td>
+        <td><%= (Time.now.to_i - device.updated_at.to_i) < 600 ? '正常' : '异常' %></td>
+        <td><%= record_hash[:cpu_usage] %></td>
+        <td><%= record_hash[:memory_usage] + "%" %></td>
+        <td><%= record_hash[:disk_usage] %></td>
+        <td><%= device.updated_at.strftime('%y/%m/%d %H:%M') %></td>
+      </tr>
     <% end %>
   </tbody>
 </table>
