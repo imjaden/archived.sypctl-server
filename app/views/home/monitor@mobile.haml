@@ -1,0 +1,133 @@
+%ol.breadcrumb
+  %li 监控中心
+  %li 设备列表
+  %li= Time.now.strftime("%y-%m-%d %H:%M:%S")
+
+:css   
+  .devices th:nth-child(n+1), .devices td:nth-child(n+1) { text-align: center; width: 5%; }
+  .devices th:nth-child(1), .devices td:nth-child(1) { text-align: left; width: 20%; }
+  .devices th:nth-child(2), .devices td:nth-child(2) { width: 10%; }
+  .devices th:nth-child(3), .devices td:nth-child(3) { width: 7%; }
+  .devices th:nth-child(4), .devices td:nth-child(4) { width: 13%; }
+%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.devices#devices
+  %thead
+    %th 主机名称
+    %th 系统类型
+    %th 状态
+    %th 更新时间
+  %tbody
+    - @records.each_with_index do |record, index|
+      - record_hash = record.latest_record
+      - device_group = record.device_group
+      - order_index = (device_group ? device_group.order_index : 0) * 1000 + record.order_index
+      %tr{id: "dom_#{record.id}", "data-order" => order_index}
+        %td
+          %a{onclick: "window.Device.showDeviceInfo(this);", "data-title" => "设备状态", "data-memory" => record_hash[:memory_usage], "data-memorydesc" => record_hash[:memory_usage_description], "data-cpu" => record_hash[:cpu_usage], "data-cpudesc" => record_hash[:cpu_usage_description], "data-disk" => record_hash[:disk_usage], "data-diskdesc" => record_hash[:disk_usage_description]}
+            = record.human_name || record.hostname
+        %td
+          %span.label.label-default= "#{record.os_type}#{record.os_version}"
+        %td
+          - interval = (Time.now.to_i - record.updated_at.to_i) < 600
+          %span.label{class: "#{interval ? 'label-success' : 'label-danger'}"}
+            = interval ? '正常' : '异常'
+        %td= record_hash[:created_at].first(14)
+
+#deviceModal.modal.fade{"aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+          %span{"aria-hidden" => "true"} ×
+        %h4.modal-title 设备状态
+      .modal-body{style: "max-height:550px;overflow:scroll;padding:15px;"}
+        .memory-area
+          loading memory...
+        .disk-area
+          loading disk...
+        .cpu-area
+          loading cpu...
+
+:javascript
+  $(".navbar").addClass("hidden");
+  setInterval(function() { window.location.reload(); }, 60000);
+
+
+  $(".container").css({"padding-left": "0px", "padding-right": "0px"});
+  
+
+  // sort devices with group order index and device order index
+  var $trs = $('#devices tbody tr');
+  $trs.sort(function(a, b){
+    var valveNumOfa = $(a).data("order");
+    var valveNumOfb = $(b).data("order");
+    if(parseInt(valveNumOfa) < parseInt(valveNumOfb)) 
+      return -1;
+    else 
+      return 1;
+  });
+  $trs.detach().appendTo('#devices tbody');
+
+  window.Device = {
+    humanSize: function(num) {
+      var humanText = num;
+
+      try {
+        num = parseInt(num);
+        if(num > 1024) {
+          humanText = (num/1024).toFixed(0) + "G " + (num % 1024) + "M"
+        } else {
+          humanText = num + "M"
+        }
+      } catch(e) {
+        console.log(e);
+      }
+      return humanText;
+    },
+    showDeviceInfo: function(ctl) {
+      $("#deviceModal").modal('show');
+      $("#deviceModal .modal-title").html($(ctl).data("title"));
+      
+      try {
+        var hash = $(ctl).data("memorydesc"), memory = $(ctl).data("memory"), key;
+        $("#memoryTable").append("<caption>内存：" + memory + "%</caption>")
+        $("#deviceModal .modal-body .memory-area").html("<table id='memoryTable' class='table table-bordered table-condensed'></table>");
+        for(key in hash) {
+          $("#memoryTable").append("<tr><td style='width:30%;'>" + key + "</td><td>" + window.Device.humanSize(hash[key]) + "</td><tr>")
+        }
+      } catch(e) {
+        $("#deviceModal .modal-body .memory-area").html(JSON.stringify($(ctl).data("memorydesc")));
+      }
+      
+      try {
+        var hash = $(ctl).data("cpudesc"), cpu = $(ctl).data("cpu"), key;
+        $("#deviceModal .modal-body .cpu-area").html("<table id='cpuTable' class='table table-bordered table-condensed'></table>");
+        $("#cpuTable").append("<caption>CPU" + cpu + "</caption>")
+        for(key in hash) {
+          $("#cpuTable").append("<tr><td style='width:30%;'>" + key + "</td><td>" + hash[key] + "</td><tr>")
+        }
+      } catch(e) {
+        $("#deviceModal .modal-body .cpu-area").html(JSON.stringify($(ctl).data("cpudesc")));
+      }
+
+      try {
+        var array = $(ctl).data("diskdesc"), disk = $(ctl).data("disk"), hash, key, pairs, headers = [];
+        $("#deviceModal .modal-body .disk-area").html("<table id='diskTable' class='table table-bordered table-condensed'></table>");
+        $("#diskTable").append("<caption>磁盘：" + disk + "</caption>")
+        for(var i = 0, len = array.length; i < len; i ++) {
+          hash = array[i];
+          pairs = [];
+          for(key in hash) {
+            pairs.push("<td>" + hash[key] + "</td>")
+            headers.push("<td style='font-weight: bold;'>" + key + "</td>")
+          }
+          if(i == 0) {
+            $("#diskTable").append("<tr>" + headers.join("") + "<tr>")
+          }
+          $("#diskTable").append("<tr>" + pairs.join("") + "<tr>")
+        }
+      } catch(e) {
+        console.log(e);
+        $("#deviceModal .modal-body .disk-area").html(JSON.stringify($(ctl).data("diskdesc")));
+      }
+    }
+  }

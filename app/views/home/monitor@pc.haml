@@ -5,26 +5,26 @@
 
 :css   
   .devices th:nth-child(n+1), .devices td:nth-child(n+1) { text-align: center; width: 5%; }
-  .devices th:nth-child(1), .devices td:nth-child(1) { width: 3%; }
-  .devices th:nth-child(2), .devices td:nth-child(2) { text-align: left;width: 7%; }
+  .devices th:nth-child(1), .devices td:nth-child(1) { width: 1%; }
+  .devices th:nth-child(2), .devices td:nth-child(2) { text-align: left;width: 5%; }
   .devices th:nth-child(3), .devices td:nth-child(3) { text-align: left;width: 8%; }
   .devices th:nth-child(4), .devices td:nth-child(4) { width: 4%; }
-  .devices th:nth-child(5), .devices td:nth-child(5) { width: 5%; }
-  .devices th:nth-child(6), .devices td:nth-child(6) { width: 7%; }
-  .devices th:nth-last-child(1), .devices td:nth-child(1) { width: 4%; }
-  .devices th:nth-last-child(2), .devices td:nth-child(2) { width: 4%; }
+  .devices th:nth-child(5), .devices td:nth-child(5) { width: 3%; }
+  .devices th:nth-last-child(1), .devices td:nth-child(1) { width: 5%; }
+  .devices th:nth-last-child(2), .devices td:nth-child(2) { width: 3%; }
   .devices th:nth-last-child(3), .devices td:nth-child(3) { width: 4%; }
+  .devices th:nth-last-child(4), .devices td:nth-child(4) { width: 3%; }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.devices#devices
   %thead
     %th.more -
     %th.more 归属群组
     %th 主机名称
-    %th 代理状态
     %th 系统类型
-    %th 最近提交
+    %th 代理状态
     %th.more 内存情况
     %th.more CPU 情况
     %th.more 磁盘情况
+    %th 更新时间
   %tbody
     - @records.each_with_index do |record, index|
       - record_hash = record.latest_record
@@ -35,11 +35,11 @@
         %td.more= device_group.name if device_group
         %td.name= record.human_name || record.hostname
         %td
+          %span.label.label-default= "#{record.os_type}#{record.os_version}"
+        %td
           - interval = (Time.now.to_i - record.updated_at.to_i) < 600
           %span.label{class: "#{interval ? 'label-success' : 'label-danger'}"}
             = interval ? '正常' : '异常'
-        %td= "#{record.os_type}#{record.os_version}"
-        %td= record_hash[:created_at].first(14)
         %td.more
           %a{onclick: "window.Device.showMemoryModal(this);", "data-title" => "内存明细", "data-content" => record_hash[:memory_usage_description]}
             = record_hash[:memory_usage] + "%"
@@ -49,6 +49,7 @@
         %td.more
           %a{onclick: "window.Device.showDiskModal(this);", "data-title" => "磁盘明细", "data-content" => record_hash[:disk_usage_description]}
             = record_hash[:disk_usage]
+        %td= record_hash[:created_at].first(14)
 
 #deviceModal.modal.fade{"aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
   .modal-dialog{:role => "document"}

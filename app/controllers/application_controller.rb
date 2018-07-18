@@ -109,7 +109,8 @@ class ApplicationController < Sinatra::Base
 
     @records = Device.where(monitor_state: true).order(order_index: :asc)
 
-    haml :monitor, layout: settings.layout
+    template = mobile? ? :'monitor@mobile' : :'monitor@pc'
+    haml template, layout: settings.layout
   end
 
   # GET /logout
