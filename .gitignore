@@ -24,6 +24,7 @@ config/daemon-services.json
 config/*.y[a]ml
 config/setting-*.json
 coverage
+release/
 
 # 项目本地文件夹
 logs/

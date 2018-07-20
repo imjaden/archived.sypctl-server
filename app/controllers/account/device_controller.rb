@@ -112,7 +112,7 @@ module Account
       @device_group = DeviceGroup.find_by(id: params[:device_group_id])
       @records = @device_group.devices.order(order_index: :asc)
       
-      haml :group, layout: settings.layout
+      haml :'device_group/index', layout: settings.layout
     end
   end
 end

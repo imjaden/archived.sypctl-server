@@ -1,10 +1,12 @@
 %ol.breadcrumb
   %li 设备中心
   %li= link_to "主机管理", url_for('/') + "?page=#{params[:page] || 1}"
-  %li
-    %a{href: "#{url_for('/new')}?page=#{params[:page] || 1}"}
-      新建主机
-      %span.glyphicon.glyphicon-plus
+  %li= @device_group.name
+  %li 
+    设备列表
+    &nbsp;&nbsp|&nbsp;&nbsp;
+    %a{href: "/dashboard/#{@device_group.uuid}", target: '_blank'}
+      %span.glyphicon.glyphicon-share-alt
 
 :css   
   .devices th:nth-child(n+1), .devices td:nth-child(n+1) { text-align: center; width: 5%; }
@@ -40,7 +42,7 @@
       %tr{id: "dom_#{record.id}"}
         %td= index+1
         %td
-          %span.label.label-default= link_to record.device_group.name, url_for("/device_group/#{record.device_group.id}"), style: "color:white;" if record.device_group
+          %span.label.label-default= link_to record.device_group.name, "/dashboard/#{record.device_group.uuid}", style: "color:white;" if record.device_group
         %td.name= link_to record.human_name || record.hostname, url_for("/#{record.id}")
         %td
           - if record.monitor_state
@@ -66,8 +68,6 @@
           %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.Device.remove(#{record.id});"}
             .span.glyphicon.glyphicon-trash
         %td= record.updated_at.strftime('%y/%m/%d %H:%M')
-
-= will_paginater @records
 
 :javascript
   (function() {
