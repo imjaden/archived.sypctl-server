@@ -12,31 +12,32 @@
   .devices th:nth-child(n+1), .devices td:nth-child(n+1) { text-align: center; width: 5%; }
   .devices th:nth-child(1), .devices td:nth-child(1) { width: 3%; }
   .devices th:nth-child(2), .devices td:nth-child(2) { text-align: left; width: 10%; }
-  .devices th:nth-child(3), .devices td:nth-child(3) { text-align: left; width: 15%; }
-  .devices th:nth-child(4), .devices td:nth-child(4) { width: 5%; }
-  .devices th:nth-child(4), .devices td:nth-child(5) { width: 5%; }
-  .devices th:nth-child(6), .devices td:nth-child(6) { width: 5%; }
-  .devices th:nth-child(7), .devices td:nth-child(7) { text-align:left; width: 8%; }
-  .devices th:nth-child(8), .devices td:nth-child(8) { width: 5%; }
-  .devices th:nth-child(8), .devices td:nth-child(9) { width: 5%; }
+  .devices th:nth-child(3), .devices td:nth-child(3) { text-align: left; width: 13%; }
+  .devices th:nth-child(4), .devices td:nth-child(4) { width: 4%; }
+  .devices th:nth-child(5), .devices td:nth-child(5) { width: 6%; }
+  .devices th:nth-child(6), .devices td:nth-child(6) { width: 3%; }
+  .devices th:nth-child(7), .devices td:nth-child(7) { width: 3%; }
+  .devices th:nth-child(8), .devices td:nth-child(8) { width: 4%; }
+  .devices th:nth-child(9), .devices td:nth-child(9) { width: 4%; }
+  .devices th:nth-last-child(1), .devices td:nth-last-child(1) { width: 3%; }
   .devices th:nth-last-child(2), .devices td:nth-last-child(2) { width: 3%; }
   .devices th:nth-last-child(3), .devices td:nth-last-child(3) { width: 3%; }
-  .devices th:nth-last-child(4), .devices td:nth-last-child(4) { width: 3%; }
-  .devices th:nth-last-child(1), .devices td:nth-last-child(1) { width: 8%; }
+  .devices th:nth-last-child(4), .devices td:nth-last-child(4) { width: 8%; }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.devices
   %thead
     %th -
-    %th 分组名称
-    %th 主机名称
-    %th 监控操作
-    %th 代理状态
-    %th 系统类型
+    %th 组名
+    %th 主机
+    %th 状态
+    %th 系统
+    %th 内存
+    %th CPU
+    %th 磁盘
+    %th 监控
     %th 最近提交
-    %th SSH 状态
     %th 刷新
     %th 编辑
     %th 删除
-    %th 更新时间
   %tbody
     - @records.each_with_index do |record, index|
       %tr{id: "dom_#{record.id}"}
@@ -45,19 +46,19 @@
           %span.label.label-default= link_to record.device_group.name, "/dashboard/#{record.device_group.uuid}", style: "color:white;" if record.device_group
         %td.name= link_to record.human_name || record.hostname, url_for("/#{record.id}")
         %td
+          - interval = (Time.now.to_i - record.updated_at.to_i) < 600
+          %span.label{class: "#{interval ? 'label-success' : 'label-danger'}"}
+            = interval ? '正常' : '异常'
+        %td.text-muted= "#{record.os_type}#{record.os_version}"
+        %td.text-muted= record.memory.split(/\s+/)[0]
+        %td.text-muted= record.cpu
+        %td.text-muted= record.disk.split(/\s+/)[0]
+        %td
           - if record.monitor_state
             .monitor-state= link_to '关闭', 'javascript:void(0);', onclick: "window.Device.setMonitorState(#{record.id})"
           - else
             .monitor-state= link_to '开启', 'javascript:void(0);', onclick: "window.Device.setMonitorState(#{record.id})", class: "btn btn-xs btn-success"
-        %td
-          - interval = (Time.now.to_i - record.updated_at.to_i) < 600
-          %span.label{class: "#{interval ? 'label-success' : 'label-danger'}"}
-            = interval ? '正常' : '异常'
-        %td= "#{record.os_type}#{record.os_version}"
         %td= record.updated_at.strftime('%y/%m/%d %H:%M')
-        %td
-          %span.label{class: "label-#{record.ssh_state ? 'success' : 'warning'}"}
-            = record.ssh_state ? '启用' : '关闭'
         %td
           %a{href: url_for("/#{record.id}/create_job")}
             %span.glyphicon.glyphicon-refresh
@@ -67,7 +68,6 @@
         %td
           %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.Device.remove(#{record.id});"}
             .span.glyphicon.glyphicon-trash
-        %td= record.updated_at.strftime('%y/%m/%d %H:%M')
 
 :javascript
   (function() {

@@ -19,22 +19,20 @@
   .devices th:nth-child(8), .devices td:nth-child(9) { width: 5%; }
   .devices th:nth-last-child(2), .devices td:nth-last-child(2) { width: 3%; }
   .devices th:nth-last-child(3), .devices td:nth-last-child(3) { width: 3%; }
-  .devices th:nth-last-child(4), .devices td:nth-last-child(4) { width: 3%; }
   .devices th:nth-last-child(1), .devices td:nth-last-child(1) { width: 8%; }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.devices
   %thead
     %th -
-    %th 分组名称
-    %th 主机名称
-    %th 监控操作
-    %th 代理状态
-    %th 系统类型
+    %th 组名
+    %th 主机
+    %th 监控
+    %th 状态
+    %th 系统
     %th 最近提交
     %th SSH 状态
     %th 刷新
     %th 编辑
     %th 删除
-    %th 更新时间
   %tbody
     - @records.each_with_index do |record, index|
       %tr{id: "dom_#{record.id}"}
@@ -65,7 +63,6 @@
         %td
           %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.Device.remove(#{record.id});"}
             .span.glyphicon.glyphicon-trash
-        %td= record.updated_at.strftime('%y/%m/%d %H:%M')
 
 = will_paginater @records
 
