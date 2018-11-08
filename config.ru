@@ -23,7 +23,8 @@ use Unicorn::WorkerKiller::Oom, (192*(1024**2)), (256*(1024**2))
   '/account/job_templates' => 'Account::JobTemplateController',
   '/account/operation_logs' => 'Account::OperationLogController',
   '/api' => 'API::ApplicationController',
-  '/api/v1' => 'API::V1Controller'
+  '/api/v1' => 'API::V1Controller',
+  '/api/v2' => 'API::V2Controller'
 }.each_pair do |path, mod|
  map(path) { run mod.constantize }
 end

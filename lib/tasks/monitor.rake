@@ -1,4 +1,5 @@
 # encoding: utf-8
+require 'uri'
 require 'erb'
 require 'httparty'
 require 'lib/utils/mail_sender.rb'
@@ -11,8 +12,8 @@ namespace :monitor do
       alarm_hash[device.id] = []
       alarm_hash[device.id].push("宕机") if (Time.now.to_i - device.updated_at.to_i) > 600
       record_hash = device.latest_record
-      alarm_hash[device.id].push("内存>90%") if record_hash[:memory_usage] && record_hash[:memory_usage].to_i > 90
-      alarm_hash[device.id].push("磁盘>95%") if record_hash[:disk_usage] && record_hash[:disk_usage].to_i > 95
+      alarm_hash[device.id].push("内存>90") if record_hash[:memory_usage] && record_hash[:memory_usage].to_i > 90
+      alarm_hash[device.id].push("磁盘>95") if record_hash[:disk_usage] && record_hash[:disk_usage].to_i > 95
 
       device unless alarm_hash[device.id].empty?
     end.compact
@@ -37,10 +38,8 @@ namespace :monitor do
     rescue => e
       puts "#{File.basename(__FILE__)}:#{__LINE__} - #{e.message}"
       puts e.message
-      puts e.backtrace
     end
 
-    exit
     begin
       @devices.each do |device|
         device_group = device.device_group
@@ -62,13 +61,12 @@ namespace :monitor do
           }
         }
         response = HTTParty.post("http://shengyiplus.com/api/v2/users/push_message", body: options.to_json)
-        puts Time.now
+        puts options.to_json
         puts response.inspect
       end
     rescue => e
       puts "#{File.basename(__FILE__)}:#{__LINE__} - #{e.message}"
       puts e.message
-      puts e.backtrace
     end
   end
 end

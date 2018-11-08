@@ -36,7 +36,7 @@
         %td
           %span.label.label-success= record.file_type
         %td= link_to record.version_count, url_for("/#{record.id}/version"), class: "badge"
-        %td= link_to "#{record.latest_version}(#{record.latest_build})", url_for("/#{record.id}/version/#{record.latest_version_id}") if record.latest_version_id
+        %td= link_to record.latest_version, url_for("/#{record.id}/version/#{record.latest_version_id}") if record.latest_version_id
         %td
           %a{href: url_for("/#{record.id}/version/new")}
             %span.glyphicon.glyphicon-upload

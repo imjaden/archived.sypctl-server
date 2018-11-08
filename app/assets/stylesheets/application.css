@@ -283,4 +283,9 @@ iframe {
   max-width: 30px;
   max-height: 30px;
 }
-s
+.text-more {
+  word-break:keep-all;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}

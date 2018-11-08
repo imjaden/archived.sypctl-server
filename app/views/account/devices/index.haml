@@ -23,8 +23,8 @@
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.devices
   %thead
     %th -
-    %th 组名
     %th 主机
+    %th 组名
     %th 监控
     %th 状态
     %th 系统
@@ -37,9 +37,9 @@
     - @records.each_with_index do |record, index|
       %tr{id: "dom_#{record.id}"}
         %td= index+1
+        %td.name= link_to record.human_name || record.hostname, url_for("/#{record.id}")
         %td
           %span.label.label-default= link_to record.device_group.name, url_for("/device_group/#{record.device_group.id}"), style: "color:white;" if record.device_group
-        %td.name= link_to record.human_name || record.hostname, url_for("/#{record.id}")
         %td
           - if record.monitor_state
             .monitor-state= link_to '关闭', 'javascript:void(0);', onclick: "window.Device.setMonitorState(#{record.id})"

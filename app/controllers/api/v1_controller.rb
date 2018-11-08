@@ -125,6 +125,26 @@ module API
       `date +'%s'`.strip
     end
 
+    post '/service' do
+      api_authen_params([:uuid])
+
+      if service = Service.find_by(uuid: params[:uuid])
+        service.update_attributes(params[:service])
+      else
+        service = Service.create(params[:service])
+      end
+
+      device = Device.find_by(uuid: params[:uuid])
+      device.update_attributes({
+        service_state: true,
+        service_monitor: params[:service][:monitor],
+        service_count: params[:service][:total_count],
+        service_stopped_count: params[:service][:stopped_count]
+      }) if device
+
+      respond_with_formt_json({message: '接收成功'}, 201)
+    end
+
     protected
 
     def authen_api_token(api_token)

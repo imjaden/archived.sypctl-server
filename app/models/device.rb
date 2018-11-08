@@ -9,6 +9,7 @@ class Device < ActiveRecord::Base
 
   has_many :records, primary_key: :uuid, foreign_key: :uuid
   belongs_to :device_group
+  has_one :service, primary_key: :uuid, foreign_key: :uuid
 
   after_create :validate_ssh_state
   after_update :validate_ssh_state

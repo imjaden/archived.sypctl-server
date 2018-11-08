@@ -36,7 +36,7 @@ class ApplicationController < Sinatra::Base
   before do
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Headers'] = 'origin, x-csrftoken, content-type, accept'
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     response.headers["P3P"] = "CP='IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT'"
 
     request_hash = request_params
