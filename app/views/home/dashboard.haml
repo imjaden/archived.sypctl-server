@@ -68,7 +68,8 @@
       .modal-header
         %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
           %span{"aria-hidden" => "true"} ×
-        %h4.modal-title 日志模板
+        %h4.modal-title{style: "display:inline;"} 日志模板
+        %small 时间戳
       .modal-body{style: "max-height:490px;overflow:scroll;padding:15px;"}
         loading...
 
@@ -93,7 +94,8 @@
     },
     showMemoryModal: function(ctl) {
       $("#deviceModal").modal('show');
-      $("#deviceModal .modal-title").html($(ctl).data("title"));
+      $("#deviceModal .modal-header h4").html($(ctl).data("title"));
+      $("#deviceModal .modal-header small").html("");
       
       try {
         $("#deviceModal .modal-body").html("<table class='table table-bordered table-condensed'></table>");
@@ -107,7 +109,8 @@
     },
     showCPUModal: function(ctl) {
       $("#deviceModal").modal('show');
-      $("#deviceModal .modal-title").html($(ctl).data("title"));
+      $("#deviceModal .modal-header h4").html($(ctl).data("title"));
+      $("#deviceModal .modal-header small").html("");
       
       try {
         $("#deviceModal .modal-body").html("<table class='table table-bordered table-condensed'></table>");
@@ -121,7 +124,8 @@
     },
     showDiskModal: function(ctl) {
       $("#deviceModal").modal('show');
-      $("#deviceModal .modal-title").html($(ctl).data("title"));
+      $("#deviceModal .modal-header h4").html($(ctl).data("title"));
+      $("#deviceModal .modal-header small").html("");
       
       try {
         $("#deviceModal .modal-body").html("<table class='table table-bordered table-condensed'></table>");
@@ -143,14 +147,15 @@
       }
     },
     showServiceModal: function(ctl) {
+      var $table = $("#deviceModal .modal-body table"),
+          monitor = $(ctl).data("content");
       $("#deviceModal").modal('show');
-      $("#deviceModal .modal-title").html($(ctl).data("title"));
+      $("#deviceModal .modal-header h4").html($(ctl).data("title"));
+      $("#deviceModal .modal-header small").html(monitor.timestamp || "");
       
       try {
         $("#deviceModal .modal-body").html("<table class='table table-bordered table-condensed'></table>");
-        var $table = $("#deviceModal .modal-body table");
-            monitor = $(ctl).data("content"),
-            thead = "<thead>" + monitor.heads.map(function(ele, inx, arr) { return "<th class='text-more'>" + ele + "</th>"; }).join("") + "</thead>",
+        var thead = "<thead>" + monitor.heads.map(function(ele, inx, arr) { return "<th class='text-more'>" + ele + "</th>"; }).join("") + "</thead>",
             tbody = "<tbody>" + monitor.data.map(function(ele, inx, arr) {
               var tds = ele.map(function(item) { return "<td class='text-more'>" + item + "</td>"; })
               return "<tr>" + tds.join("") + "</tr>"
