@@ -147,15 +147,15 @@
       }
     },
     showServiceModal: function(ctl) {
-      var $table = $("#deviceModal .modal-body table"),
-          monitor = $(ctl).data("content");
+      var monitor = $(ctl).data("content");
       $("#deviceModal").modal('show');
       $("#deviceModal .modal-header h4").html($(ctl).data("title"));
       $("#deviceModal .modal-header small").html(monitor.timestamp || "");
       
       try {
         $("#deviceModal .modal-body").html("<table class='table table-bordered table-condensed'></table>");
-        var thead = "<thead>" + monitor.heads.map(function(ele, inx, arr) { return "<th class='text-more'>" + ele + "</th>"; }).join("") + "</thead>",
+        var $table = $("#deviceModal .modal-body table"),
+            thead = "<thead>" + monitor.heads.map(function(ele, inx, arr) { return "<th class='text-more'>" + ele + "</th>"; }).join("") + "</thead>",
             tbody = "<tbody>" + monitor.data.map(function(ele, inx, arr) {
               var tds = ele.map(function(item) { return "<td class='text-more'>" + item + "</td>"; })
               return "<tr>" + tds.join("") + "</tr>"
