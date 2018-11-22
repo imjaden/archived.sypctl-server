@@ -2,6 +2,9 @@
 require 'digest/md5'
 require 'securerandom'
 
+#
+# sypctl 代理使用
+#
 module API
   class V1Controller < API::ApplicationController
 

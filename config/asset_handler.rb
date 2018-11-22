@@ -14,7 +14,14 @@ class AssetHandler < Sinatra::Base
     # logger_file = File.join(ENV['APP_ROOT_PATH'], 'log/#{ENV['RACK_ENV']}.log')
     # logger = ::Logger.new(::File.new(logger_file, 'a+'))
     # use Rack::CommonLogger, logger
-
+    set :protection, :allow_if => lambda { |env|
+      if (env.has_key?('HTTP_REFERER') && env['HTTP_REFERER'] == "https://servicewechat.com/#{ENV['wxmp_app_id']}/devtools/page-frame.html") ||
+         (env['HTTP_ORIGIN'] || env['HTTP_X_ORIGIN']).nil?
+        true
+      else
+        false
+      end
+    }
     set :root,  ENV['APP_ROOT_PATH']
     set :views, ENV['VIEW_PATH']
     set :public_folder, ENV['APP_ROOT_PATH'] + '/app/assets'

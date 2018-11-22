@@ -47,9 +47,57 @@ class Device < ActiveRecord::Base
   def to_hash
     result = self.class.column_names.each_with_object({}) do |column_name, hsh|
       value = send(column_name)
-      hsh[column_name.to_sym] = (value.is_a?(Time) ? value.strftime('%y/%m/%d %H:%M:%S') : value)
+      hsh[column_name.to_sym] = (value.is_a?(Time) ? value.strftime('%Y/%m/%d %H:%M:%S') : value)
     end
     result[:human_name] ||= result[:hostname]
     result
+  end
+
+  def to_wx_hash
+    hsh = to_hash
+    black_keys = [:memory_description, :cpu_description, :disk_description, :service_monitor, :ssh_username, :ssh_password, :ssh_port, :username, :password]
+    black_keys.each { |key| hsh.delete(key) }
+    hsh[:health_type] = health_type
+    hsh[:health_value] = health_value
+
+    return hsh
+  end
+
+  def health_map
+    {
+      success: 0,
+      blue: 1,
+      info: 2,
+      warning: 3,
+      error: 4
+    }
+  end
+
+  # const error = "#ED1111";
+  # const warning = "#FF9900";
+  # const info = "#11A50A";
+  # const blue = "#108EE9";
+  # const success = "#19BE6B";
+  def health_type
+    if service_count <= 0
+      return 'blue'
+    elsif service_stopped_count <= 0
+      return 'success'
+    elsif service_stopped_count*1.0/service_count >= 0.75
+      return 'error'
+    elsif service_stopped_count*1.0/service_count >= 0.5
+      return 'blue'
+    elsif service_stopped_count*1.0/service_count >= 0.25
+      return 'info'
+    else
+      return 'warning'
+    end
+  rescue => e
+    puts "service_count: #{service_count}, service_stopped_count: #{service_stopped_count}, exception: #{e.message}"
+    'error'
+  end
+
+  def health_value
+    health_map[health_type.to_sym]
   end
 end

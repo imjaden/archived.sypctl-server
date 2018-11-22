@@ -1,0 +1,6 @@
+{
+  "unicorn": {
+    "start": "bundle exec unicorn -c ./config/unicorn.rb -p 8085 -E production -D",
+    "pid": "./tmp/pids/unicorn.pid"
+  }
+}

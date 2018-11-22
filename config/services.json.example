@@ -1,0 +1,18 @@
+{
+  "unicorn": {
+    "start": "bundle exec unicorn -c ./config/unicorn.rb -p 8085 -E production -D",
+    "pid": "./tmp/pids/unicorn.pid"
+  },
+  "sidekiq": {
+    "start": "bundle exec sidekiq -r ./config/boot.rb -C ./config/sidekiq.yaml -e production -d",
+    "pid": "./tmp/pids/sidekiq.pid"
+  },
+  "redis": {
+    "start": "sudo /usr/local/bin/redis-server /etc/redis/redis.conf",
+    "pid": "/var/run/redis_6379.pid"
+  },
+  "nginx": {
+    "start": "nginx",
+    "pid": "/var/run/nginx.pid"
+  }
+}

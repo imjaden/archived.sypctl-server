@@ -33,6 +33,14 @@ class ApplicationController < Sinatra::Base
   enable :sessions, :logging, :static, :method_override
   enable :dump_errors, :raise_errors, :show_exceptions unless ENV['RACK_ENV'].eql?('production')
 
+  set :protection, :allow_if => lambda { |env|
+    if (env.has_key?('HTTP_REFERER') && env['HTTP_REFERER'] == "https://servicewechat.com/#{ENV['wxmp_app_id']}/devtools/page-frame.html") ||
+       (env['HTTP_ORIGIN'] || env['HTTP_X_ORIGIN']).nil?
+      true
+    else
+      false
+    end
+  }
   before do
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Headers'] = 'origin, x-csrftoken, content-type, accept'

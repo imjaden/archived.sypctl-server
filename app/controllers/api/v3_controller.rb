@@ -3,10 +3,10 @@ require 'digest/md5'
 require 'securerandom'
 
 #
-# portal ui 使用
+# weixin mp 使用
 #
 module API
-  class V2Controller < API::ApplicationController
+  class V3Controller < API::ApplicationController
 
     before do
       if Setting.website.api_key
@@ -44,15 +44,24 @@ module API
     end
 
     get '/device-group/list' do
-      records = DeviceGroup.paginate(page: params[:page] || 1, per_page: params[:limit] || 20).order(id: :desc)
+      records = DeviceGroup.paginate(page: params[:page] || 1, per_page: params[:limit] || 20).order(order_index: :asc)
 
-      respond_with_formt_json({data: {items: records.map(&:to_hash), total: DeviceGroup.count}, message: '接收成功'}, 201)
+      respond_with_formt_json({data: records.map(&:to_wx_hash), total: DeviceGroup.count, message: '接收成功'}, 201)
     end
 
     get '/device/list' do
-      records = Device.paginate(page: params[:page] || 1, per_page: params[:limit] || 20).order(updated_at: :desc)
+      api_authen_params([:device_group_id])
+      records = Device.where(device_group_id: params[:device_group_id]).paginate(page: params[:page] || 1, per_page: params[:limit] || 20).order(order_index: :asc)
 
-      respond_with_formt_json({data: {items: records.map(&:to_hash), total: Device.count}, message: '接收成功'}, 201)
+      respond_with_formt_json({data: records.map(&:to_wx_hash), total: Device.count, message: '接收成功'}, 201)
+    end
+
+    get '/device/info' do
+      api_authen_params([:device_id])
+      record = Device.find_by(id: params[:device_id])
+      halt_with_format_json({data: record, message: '查询结果为空', code: 404}, 404) unless record
+
+      respond_with_formt_json({data: record.to_wx_hash, message: '接收成功'}, 201)
     end
 
     protected

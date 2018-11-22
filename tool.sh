@@ -5,95 +5,75 @@
 #  SYPCTL Server Command Tool
 #
 ########################################
-#
-# Usage:
-#
-# bash /tool.sh {config|start|stop|start_redis|stop_redis|restart|deploy}
-#
-#
-# Crontab env:
-#
-# make sure the commands that used in this script will be valid! 
-# the below tips should be obeyed:
-#
-# 1. load .env-files first
-# 2. implement the env $PATH to let the commands in script can be find
-# 3. check it by hand and then within crontab job
-# 
-#     bash tool.sh commands:version
-# 
 
-#
-# script env
-#
 app_root_path="$(pwd)"
 export LANG=zh_CN.UTF-8
 test -f .env-files && while read filepath; do
     test -f "${filepath}" && source "${filepath}"
 done < .env-files
-source lib/utils/toolsh_common_functions.sh
-cd ${app_root_path}
-
-fun_configuration_guides ".app-port" "运行端口号"  "4567"
-app_default_port=$(cat .app-port)
-app_port=${2:-${app_default_port}}
-
-unicorn_config_file=config/unicorn.rb
-unicorn_pid_file=tmp/pids/unicorn.pid
+source lib/scripts/toolsh_common_functions.sh
+test -f .services && source .services
 
 cd "${app_root_path}" || exit 1
 case "$1" in
-    state)
-        title "## 检测当前部署情况："
-        test -f .app-port && echo "- 运行端口号: $(cat .app-port)" || echo "- 未配置运行端口号"
-        test -f .env-files && {
-            echo "- 上下文环境文档："
-            cat .env-files
-        } || echo "- 未配置上下文环境文档"
+    config)
+        mkdir -p logs/crontab
+        mkdir -p tmp/pids
 
-
-        title "## 检测进程运行状态："
-        if [[ -f ${unicorn_pid_file} ]]; then
-            pid=$(cat ${unicorn_pid_file})
-            /bin/ps ax | awk '{print $1}' | grep -e "^${pid}$" &> /dev/null
-            if [[ $? -eq 0 ]]; then
-                echo "- sypctl 服务运行中($pid)"
-            else
-                rm -f ${unicorn_pid_file}
-                echo "- sypctl 服务未运行"
-            fi
+        if [[ -f config/services.json ]]; then
+            bundle exec rake service:load RACK_ENV=production 
+            test -f .services && source .services
         else
-            echo "- sypctl 服务未运行"
+            echo "Warning: config/services.json 不存在请配置，具有可参考: config/services.json.example"
         fi
     ;;
-    deploy)
-        bash $0 state
-        echo
+    upgrade)
+        echo -e "## 下拉最新代码\n"
+        local_modified=$(git status -s)
+        if [[ ! -z "${local_modified}" ]]; then
+            git status
+            read -p "本地代码有修改，可能会产生冲突，是否继续？y/n " user_input
+            if [[ "${user_input}" != "y" ]]; then
+                echo "退出操作！"
+                exit 2
+            fi
 
-        test -f .app-port && current_app_port=$(cat .app-port)
-        read -p "请输入运行端口号，默认 4567: " user_input
-        echo ${user_input:-4567} > .app-port
-
-        if [[ -f ~/.bash_profile ]]; then
-            [[ $(uname -s) = "Darwin" ]] && env_path=$(greadlink -f ~/.bash_profile) || env_path=$(readlink -f ~/.bash_profile)
-            echo "${env_path}" > .env-files
+            git checkout ./
+            echo "已撤销本地代码修改"
         fi
+        bash $0 git:pull
 
-        title "$ bundle install"
-        bundle install
+        echo -e "\n## 刷新项目配置\n"
+        bash $0 config
 
+        echo -e "\n## 刷新定时任务\n"
+        bundle exec whenever --update-crontab
+
+        echo -e "\n## 适配数据库快照\n"
+        bundle exec rake mysql:snapshot:load RACK_ENV=production
+
+        echo -e "\n## 检查 FTP 基础目录\n"
+        bundle exec rake sftp:mkdir_p
+
+        echo -e "\n## 重启 App 服务\n"
         bash $0 restart
     ;;
-    git:pull|upgrade)
+    git:pull)
         git_current_branch=$(git rev-parse --abbrev-ref HEAD)
         echo "$ git pull origin ${git_current_branch}"
         git pull origin ${git_current_branch}
     ;;
+    crontab:update)
+        bundle exec whenever --update-crontab
+    ;;
+    start:dev)
+        bundle exec unicorn -p 8085
+    ;;
     start)
-        mkdir -p logs/crontab
+        bash $0 config
+
         fun_print_table_header "start process" "process" "status"
-        command_text="bundle exec unicorn -c ${unicorn_config_file} -p ${app_port} -E production -D"
-        process_start "${unicorn_pid_file}" "unicorn" "${command_text}"
+        bash $0 unicorn:start
         fun_print_table_footer
     ;;
     stop)
@@ -101,15 +81,29 @@ case "$1" in
         process_stop "${unicorn_pid_file}" "unicorn"
         fun_print_table_footer
     ;;
-    crontab:update)
-        bundle exec whenever --update-crontab
-    ;;
     restart)
         bash $0 stop
+        sleep 2
         bash $0 start
     ;;
     restart:hot)
-        cat "${unicorn_pid_file}" | xargs -I pid kill -USR2 pid
+        cat "${unicorn_pid}" | xargs -I pid kill -USR2 pid
+    ;;
+    *:start|*:stop|*:restart)
+        service=${1%:*}
+        operate=${1#*:}
+        var_start="${service}_start"
+        var_pid="${service}_pid"
+
+        if [[ ${operate} = "restart" ]]; then
+            bash $0 "${service}:stop"
+            sleep 1
+            bash $0 "${service}:start"
+        else
+            test ${operate} = "start" \
+                && process_start "${!var_pid}" "${service}" "${!var_start}" \
+                || process_stop "${!var_pid}" "${service}"
+        fi
     ;;
     *)
         echo "warning: unkown params - $@"
