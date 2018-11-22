@@ -49,11 +49,8 @@ case "$1" in
         echo -e "\n## 刷新定时任务\n"
         bundle exec whenever --update-crontab
 
-        echo -e "\n## 适配数据库快照\n"
-        bundle exec rake mysql:snapshot:load RACK_ENV=production
-
-        echo -e "\n## 检查 FTP 基础目录\n"
-        bundle exec rake sftp:mkdir_p
+        # echo -e "\n## 适配数据库快照\n"
+        # bundle exec rake mysql:snapshot:load RACK_ENV=production
 
         echo -e "\n## 重启 App 服务\n"
         bash $0 restart
