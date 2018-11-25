@@ -80,7 +80,7 @@ case "$1" in
     ;;
     stop)
         fun_print_table_header "stop process" "process" "status"
-        process_stop "${unicorn_pid_file}" "unicorn"
+        bash $0 unicorn:stop
         fun_print_table_footer
     ;;
     restart)

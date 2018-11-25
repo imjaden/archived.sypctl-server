@@ -44,7 +44,7 @@ module API
     end
 
     get '/device-group/list' do
-      records = DeviceGroup.paginate(page: params[:page] || 1, per_page: params[:limit] || 20).order(order_index: :asc)
+      records = DeviceGroup.where(publicly: true).paginate(page: params[:page] || 1, per_page: params[:limit] || 20).order(order_index: :asc)
 
       respond_with_formt_json({data: records.map(&:to_wx_hash), total: DeviceGroup.count, message: '接收成功'}, 201)
     end

@@ -46,7 +46,7 @@ function process_start() {
     local command_text="$3"
 
     if [[ -f ${pid_file} ]]; then
-        local pid=$(cat ${pid_file})
+        local pid=$(cat ${pid_file} | head -n 1)
         /bin/ps ax | awk '{print $1}' | grep -e "^${pid}$" &> /dev/null
         if [[ $? -eq 0 ]]; then
             printf "$two_cols_table_format" "${process_name}" "running(${pid})"
@@ -69,7 +69,7 @@ function process_start() {
     run_result_text="$([[ $? -eq 0 ]] && echo 'successfully' || echo 'failed')(${run_result})"
 
     printf "$two_cols_table_format" "${process_name}" "run ${run_result_text}"
-    # echo -e "$ run \`${command_text}\`"
+    process_start "${pid_file}" "${process_name}" "${command_text}"
 }
 
 function process_stop() {
@@ -78,16 +78,17 @@ function process_stop() {
     local exec_status='failed'
 
     if [[ ! -f ${pid_file} ]]; then
-        echo -e "${process_name} never started"
+        printf "$two_cols_table_format" "${process_name}" "pid not exist"
         return 1
     fi
 
-    cat "${pid_file}" | xargs -I pid sudo kill -QUIT pid
+    local pid=$(cat "${pid_file}" | head -n 1)
+    sudo kill -QUIT ${pid}
     if [[ $? -eq 0  ]]; then
         sudo rm -f ${pid_file} &> /dev/null
         exec_status='successfully'
     fi
-    echo -e "${process_name} stop ${exec_status}"
+    printf "$two_cols_table_format" "${process_name}" "kill(${pid}) ${exec_status}"
 }
 
 function process_checker() {
