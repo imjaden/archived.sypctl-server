@@ -18,10 +18,39 @@ class DeviceGroup < ActiveRecord::Base
     hsh = to_hash
     hsh[:device_count] = self.devices.count
     hsh[:device_unhealth_count] = self.devices.count { |device| device.health_value >= 3 }
+    hsh[:device_latest_submited_time] = device_latest_submited_time
+    hsh[:device_latest_submited_interval] = device_latest_submited_interval.to_i
+    hsh[:device_latest_submited_state] = device_latest_submited_state
     hsh[:health_type] = health_type(hsh[:device_count], hsh[:device_unhealth_count])
     hsh[:health_value] = health_map[hsh[:health_type].to_sym]
 
     return hsh
+  end
+
+  def latest_submited_at
+    return @latest_submited_at if @latest_submited_at
+
+    if record = self.devices.max { |a, b| a.updated_at <=> b.updated_at }
+      @latest_submited_at = record.updated_at
+    end
+
+    return @latest_submited_at
+  end
+
+  def device_latest_submited_time
+    latest_submited_at ? latest_submited_at.strftime('%Y/%m/%d %H:%M:%S') : '2000/01/01 01:01:01'
+  end
+
+  def device_latest_submited_interval
+    latest_submited_at ? (Time.now - latest_submited_at)/60 : -1
+  end
+
+  def device_latest_submited_state
+    if latest_submited_at
+      (Time.now - latest_submited_at)/60 > 10 ? '异常' : '正常'
+    else
+      '无数据'
+    end
   end
 
   def health_map

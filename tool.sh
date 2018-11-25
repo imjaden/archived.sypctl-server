@@ -17,7 +17,8 @@ test -f .services && source .services
 cd "${app_root_path}" || exit 1
 case "$1" in
     config)
-        mkdir -p logs/crontab
+        mkdir -p db/{backups,snapshots}
+        mkdir -p logs/{crontab,archived}
         mkdir -p tmp/pids
 
         if [[ -f config/services.json ]]; then
@@ -25,6 +26,7 @@ case "$1" in
             test -f .services && source .services
         else
             echo "Warning: config/services.json 不存在请配置，具有可参考: config/services.json.example"
+            exit 2
         fi
     ;;
     upgrade)
@@ -49,8 +51,11 @@ case "$1" in
         echo -e "\n## 刷新定时任务\n"
         bundle exec whenever --update-crontab
 
-        # echo -e "\n## 适配数据库快照\n"
-        # bundle exec rake mysql:snapshot:load RACK_ENV=production
+        echo -e "\n## Migrate 业务数据表\n"
+        bundle exec rake db:migrate RACK_ENV=production
+
+        echo -e "\n## 适配数据库快照\n"
+        bundle exec rake mysql:snapshot:load RACK_ENV=production
 
         echo -e "\n## 重启 App 服务\n"
         bash $0 restart

@@ -9,7 +9,11 @@
     .form-group
       = f.label '分组描述', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.text_area :description, class: "form-control"
+        = f.text_area :description, class: "form-control", rows: 10
+    .form-group
+      = f.label '是否公开', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.check_box :publicly, style: 'margin-top: 10px'
     .form-group
       .col-sm-offset-2.col-sm-10
         = f.submit "提交", class: "btn btn-primary hidden"

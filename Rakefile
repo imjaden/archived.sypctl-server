@@ -4,6 +4,9 @@
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
+require 'lib/utils/rake_instance_methods'
+require 'lib/utils/rake_utils_instance_methods'
+
 task default: [:environment]
 
 desc 'bundle exec rake task_name RACK_ENV=development'

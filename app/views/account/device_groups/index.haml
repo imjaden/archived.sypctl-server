@@ -8,16 +8,14 @@
 
 = javascript_include_tag "jquery-ui.js"
 :css   
-  .device-groups th:nth-child(n+1), .device-groups td:nth-child(n+1) { text-align: center; width: 5%; }
-  .device-groups th:nth-child(2), .device-groups td:nth-child(2) { text-align: left; width: 15%; }
-  .device-groups th:nth-child(3), .device-groups td:nth-child(3) { text-align: left; width: 20%; }
-  .device-groups th:nth-last-child(1), .device-groups td:nth-last-child(1) { text-align: center; width: 5%; }
+  .device-groups th:nth-child(n+1), .device-groups td:nth-child(n+1) { text-align: center; width: 6%; }
+  .device-groups th:nth-child(2), .device-groups td:nth-child(2) { text-align: left; width: 50%; }
   .device-groups th:nth-last-child(2), .device-groups td:nth-last-child(2) { text-align: center; width: 10%; }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.device-groups
   %thead
     %th 序号
     %th 分组名称
-    %th 分组描述
+    %th 是否公开
     %th 应用列表
     %th 编辑
     %th 删除
@@ -27,8 +25,11 @@
     - @records.each do |record|
       %tr{id: "dom_#{record.id}", "data-id" => record.id}
         %td= record.order_index
-        %td.name= record.name
-        %td= record.description
+        %td.name
+          %a{tabindex: "0", role: 'button', 'data-toggle' => 'popover', 'data-trigger'=> 'focus', 'data-title' => record.name || '无标题', 'data-content' => record.description.present? ? record.description : '无描述'}
+            = record.name
+        %td
+          %span.label{class: record.publicly ? 'label-success' : 'label-default'}= record.publicly ? '公开' : '私有'
         %td
           %a.btn.btn-xs.btn-link{href: url_for("/#{record.id}/devices?page=#{params[:page] || 1}")}
             .span.glyphicon.glyphicon-th
