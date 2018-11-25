@@ -56,7 +56,7 @@ class Device < ActiveRecord::Base
   def to_wx_hash
     hsh = to_hash
     black_keys = [:memory_description, :cpu_description, :disk_description, :service_monitor, :ssh_username, :ssh_password, :ssh_port, :username, :password]
-    black_keys.each { |key| hsh.delete(key) }
+    # black_keys.each { |key| hsh.delete(key) }
     hsh[:health_type] = health_type
     hsh[:health_value] = health_value
 
