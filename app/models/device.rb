@@ -80,15 +80,11 @@ class Device < ActiveRecord::Base
   # const success = "#19BE6B";
   def health_type
     if service_count <= 0
-      return 'blue'
+      return 'success'
     elsif service_stopped_count <= 0
       return 'success'
-    elsif service_stopped_count*1.0/service_count >= 0.75
-      return 'error'
     elsif service_stopped_count*1.0/service_count >= 0.5
-      return 'blue'
-    elsif service_stopped_count*1.0/service_count >= 0.25
-      return 'info'
+      return 'error'
     else
       return 'warning'
     end

@@ -1,3 +1,4 @@
+
 # encoding: utf-8
 require 'sinatra/activerecord'
 
@@ -17,7 +18,7 @@ class DeviceGroup < ActiveRecord::Base
   def to_wx_hash
     hsh = to_hash
     hsh[:device_count] = self.devices.count
-    hsh[:device_unhealth_count] = self.devices.count { |device| device.health_value >= 3 }
+    hsh[:device_unhealth_count] = self.devices.count { |device| ![0, -1].include?(device.health_value) }
     hsh[:device_latest_submited_time] = device_latest_submited_time
     hsh[:device_latest_submited_interval] = device_latest_submited_interval.to_i
     hsh[:device_latest_submited_state] = device_latest_submited_state
@@ -73,12 +74,8 @@ class DeviceGroup < ActiveRecord::Base
       return 'blue'
     elsif device_unhealth_count <= 0
       return 'success'
-    elsif device_unhealth_count*1.0/device_count >= 0.75
-      return 'error'
     elsif device_unhealth_count*1.0/device_count >= 0.5
-      return 'blue'
-    elsif device_unhealth_count*1.0/device_count >= 0.25
-      return 'info'
+      return 'error'
     else
       return 'warning'
     end
