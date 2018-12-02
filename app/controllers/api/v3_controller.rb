@@ -115,7 +115,14 @@ module API
         access_token = get_weixin_access_token
         options = {
           page: 'pages/group-list/main',
-          scene: CGI.unescape(scene)
+          scene: CGI.unescape(scene),
+          auto_color: false,
+          line_color: {
+            r: 128,
+            g: 0,
+            b: 128
+          },
+          is_hyaline: true
         }
         headers = {
           'Content-Type' => 'application/json;charset=UTF-8;'

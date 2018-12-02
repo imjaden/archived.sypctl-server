@@ -8,7 +8,7 @@
     "pid": "./tmp/pids/sidekiq.pid"
   },
   "redis": {
-    "start": "sudo /usr/local/bin/redis-server /etc/redis/redis.conf",
+    "start": "redis-server /etc/redis/redis.conf",
     "pid": "/var/run/redis_6379.pid"
   },
   "nginx": {

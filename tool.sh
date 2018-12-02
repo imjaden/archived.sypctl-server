@@ -78,6 +78,7 @@ case "$1" in
         bash $0 config
 
         fun_print_table_header "start process" "process" "status"
+        bash $0 redis:start
         bash $0 unicorn:start
         fun_print_table_footer
     ;;
