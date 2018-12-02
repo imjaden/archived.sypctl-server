@@ -31,10 +31,12 @@ require 'active_support/core_ext/numeric/time'
 require 'active_support/cache'
 require 'config/asset_handler'
 require 'lib/utils/boot.rb'
+require 'app/models/setting.rb'
 include Utils::Boot
 
 require 'asset_handler'
 Time.zone = 'Beijing'
+ENV['REDIS_URL'] ||= Setting.redis_url
 
 traverser_settings_yaml_to_env
 

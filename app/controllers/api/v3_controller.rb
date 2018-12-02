@@ -1,4 +1,7 @@
 # encoding: utf-8
+require 'cgi'
+require 'json'
+require 'fileutils'
 require 'digest/md5'
 require 'securerandom'
 
@@ -18,6 +21,19 @@ module API
 
     options '/*' do
       respond_with_formt_json({message: '接收成功'}, 201)
+    end
+
+    get '/wxmp_access_token' do
+      access_token = get_weixin_access_token
+
+      respond_with_formt_json({data: access_token, message: '获取成功'}, 200)
+    end
+
+    get '/wxmp_acode' do
+      api_authen_params([:page, :scene])
+
+      image_path = get_weixin_acode(params[:scene])
+      send_file(image_path, type: 'image/png', filename: File.basename(image_path), disposition: 'inline')
     end
 
     post '/login' do
@@ -68,6 +84,51 @@ module API
 
     def authen_api_token(api_token)
       Setting.api_keys.any? { |key| md5("#{key}#{request.path}#{key}") == api_token }
+    end
+
+    def get_weixin_access_token
+      redis_key = 'wxmp-access-token'
+      return redis.get(redis_key) if redis.exists(redis_key)
+
+      res = HTTParty.get("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=#{Setting.wxmp.app_id}&secret=#{Setting.wxmp.app_secret}")
+      puts res.code
+      puts res.message
+      puts res.body
+      if res.code == 200
+        hsh = JSON.parse(res.body)
+        redis.set(redis_key, hsh['access_token'])
+        redis.expire(redis_key, hsh['expires_in'] - 60)
+        return redis.get(redis_key)
+      else
+        return res.message
+      end
+    end
+
+    def get_weixin_acode(scene)
+      image_folder = app_root_join('public/images/wxacode')
+      FileUtils.mkdir_p(image_folder) unless File.exists?(image_folder)
+
+      image_name = scene.gsub('=', '-').gsub('&', '_') + '.png'
+      image_path = File.join(image_folder, image_name)
+
+      unless File.exists?(image_path)
+        access_token = get_weixin_access_token
+        options = {
+          page: 'pages/group-list/main',
+          scene: CGI.unescape(scene)
+        }
+        headers = {
+          'Content-Type' => 'application/json;charset=UTF-8;'
+        }
+        res = HTTParty.post("https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=#{access_token}", headers: headers, body: JSON.generate(options))
+        puts "res.code: #{res.code}"
+        puts "res.message: #{res.message}"
+
+        puts res.body if res.body.length < 1000
+        File.open(image_path, 'w:utf-8') { |file| file.puts(res.body.force_encoding('utf-8')) }
+      end
+
+      image_path
     end
   end
 end

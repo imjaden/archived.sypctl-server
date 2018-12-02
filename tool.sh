@@ -48,6 +48,9 @@ case "$1" in
         echo -e "\n## 刷新项目配置\n"
         bash $0 config
 
+        echo -e "\n## 检查项目配置\n"
+        bundle exec rake boom:setting RACK_ENV=production 
+
         echo -e "\n## 刷新定时任务\n"
         bundle exec whenever --update-crontab
 
