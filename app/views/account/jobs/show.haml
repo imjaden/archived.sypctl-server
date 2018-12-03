@@ -4,12 +4,13 @@
   %li= @record.title
 
 :css   
-  .app th:nth-child(1), .app td:nth-child(1) { width: 15%; }
-  .app th:nth-child(2), .app td:nth-child(2) { width: 80%; }
+  .app th:nth-child(1), .app td:nth-child(1) { min-width: 100px; width: 10%; }
+  .app th:nth-child(2), .app td:nth-child(2) { max-width: 800px; width: 90%; }
+  .app pre {
+    max-width: 700px;
+    max-height: 200px;
+  }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.app
-  %thead
-    %th 键值
-    %th 内容
   %tbody
     %tr
       %td 任务名称

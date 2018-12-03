@@ -5,14 +5,14 @@
     - field_set_tag do
       .form-group
         = f.label '任务标题', class: "col-sm-2 control-label"
-        .col-sm-6
+        .col-sm-9
           = f.text_field :title, class: "form-control", placeholder: "任务标题，必填项"
-        .col-sm-1{style: "padding-top:10px;"}
-          %a{onclick: "window.Job.listJobTemplates(0);"}
-            %span.glyphicon.glyphicon-check
+          %span{style: "padding-top:10px;"}
+            %a{onclick: "window.Job.listJobTemplates(0);"}
+              %span.glyphicon.glyphicon-check
       .form-group
         = f.label '设备名称', class: "col-sm-2 control-label"
-        .col-sm-6
+        .col-sm-9
           = f.hidden_field :device_list
           = f.text_area :device_name, class: "form-control", rows: 1, placeholder: "要部署的设备，必填项"
         .col-sm-1{style: "padding-top:10px;"}
@@ -20,7 +20,7 @@
             %span.glyphicon.glyphicon-check
       .form-group
         = f.label '应用名称', class: "col-sm-2 control-label"
-        .col-sm-6
+        .col-sm-9
           = f.hidden_field :app_id
           = f.text_field :app_name, class: "form-control", placeholder: "要部署的应用"
         .col-sm-1{style: "padding-top:10px;"}
@@ -28,7 +28,7 @@
             %span.glyphicon.glyphicon-check
       .form-group
         = f.label '版本名称', class: "col-sm-2 control-label"
-        .col-sm-6
+        .col-sm-9
           = f.hidden_field :version_id
           = f.text_field :version_name, class: "form-control", placeholder: "要部署的版本"
         .col-sm-1{style: "padding-top:10px;"}
@@ -36,15 +36,15 @@
             %span.glyphicon.glyphicon-check
       .form-group
         = f.label '部署脚本', class: "col-sm-2 control-label"
-        .col-sm-7
+        .col-sm-9
           = f.text_area :command, class: "form-control", rows: 8, placeholder: "部署脚本，必填项"
       .form-group
         = f.label '执行时间', class: "col-sm-2 control-label"
-        .col-sm-7
+        .col-sm-9
           = f.text_field :executed_at, class: "form-control", placeholder: "执行时间，定时任务功能"
       .form-group
         = f.label '任务描述', class: "col-sm-2 control-label"
-        .col-sm-7
+        .col-sm-9
           = f.text_area :description, class: "form-control", rows: 2, placeholder: "任务描述"
       .form-group
         .col-sm-offset-2.col-sm-10
@@ -53,13 +53,21 @@
           = button_tag "取消", class: "btn btn-default", onclick: "window.history.go(-1);"
 
 .col-sm-3
+  :css
+    .list-group .items {
+      width: 100%;
+      padding-left: 0;
+      max-height: 500px;
+      overflow: scroll;
+    }
   .list-group
 
 :javascript
   window.Job = {
     setJobTemplate: function(ctl) {
-      $("#job_title").val($(ctl).data("title"))
-      $("#job_command").val($(ctl).data("content"))
+      $li = $(ctl).closest("li");
+      $("#job_title").val($li.data("title"))
+      $("#job_command").val($li.data("content"))
     },
     listJobTemplates: function(page) {
       $.ajax({
@@ -73,14 +81,17 @@
         if(!res.data.length) {
           $(".list-group").append("<button class='list-group-item disabled' type='button' \>无数据</button>");
         }
+
+        $(".list-group").append("<ul class='items'></ul>");
+        let $ul = $(".list-group ul.items");
         res.data.forEach(function(el) {
-          $(".list-group").append(" \
-            <button class='list-group-item' \
+
+          $ul.append(" \
+            <li class='list-group-item' \
                     type='button' \
-                    onclick='window.Job.setJobTemplate(this);' \
                     data-content='" + el.content + "' \
                     data-title='" + el.title + "'> \
-            " + el.title + "</button> \
+            <input class='device' type='radio' name='job-template' onclick='window.Job.setJobTemplate(this);' \>&nbsp;" + el.title + "</li> \
           ")
         })
       }).fail(function(res, status, xhr) {
@@ -122,8 +133,10 @@
         if(!res.data.length) {
           $(".list-group").append("<button class='list-group-item disabled' type='button' \>无数据</button>");
         }
+        $(".list-group").append("<ul class='items'></ul>");
+        let $ul = $(".list-group ul.items");
         res.data.forEach(function(el) {
-          $(".list-group").append(" \
+          $ul.append(" \
             <li class='list-group-item' \
                     type='button' \
                     data-uuid='" + el.uuid + "' \
