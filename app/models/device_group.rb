@@ -22,7 +22,7 @@ class DeviceGroup < ActiveRecord::Base
     hsh[:device_latest_submited_time] = device_latest_submited_time
     hsh[:device_latest_submited_interval] = device_latest_submited_interval.to_i
     hsh[:device_latest_submited_state] = device_latest_submited_state
-    hsh[:health_type] = health_type(hsh[:device_count], hsh[:device_unhealth_count])
+    hsh[:health_type] = health_type(hsh)
     hsh[:health_value] = health_map[hsh[:health_type].to_sym]
 
     return hsh
@@ -69,7 +69,10 @@ class DeviceGroup < ActiveRecord::Base
   # const info = "#11A50A";
   # const blue = "#108EE9";
   # const success = "#19BE6B";
-  def health_type(device_count, device_unhealth_count)
+  def health_type(hsh)
+    device_count = hsh[:device_count] 
+    device_unhealth_count = hsh[:device_unhealth_count]
+
     if device_count <= 0
       return 'blue'
     elsif device_unhealth_count <= 0

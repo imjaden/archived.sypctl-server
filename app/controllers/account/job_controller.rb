@@ -9,13 +9,13 @@ module Account
     end
 
     get '/' do
-      @records = Job.paginate(page: params[:page], per_page: 15).order(id: :desc)
+      @records = JobGroup.paginate(page: params[:page], per_page: 15).order(id: :desc)
 
       haml :index, layout: settings.layout
     end
 
     get '/new' do
-      @record = Job.new
+      @record = JobGroup.new
       @record.uuid = SecureRandom.uuid
       @record.executed_at = Time.now.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -23,21 +23,37 @@ module Account
     end
 
     post '/' do
-      device_list = JSON.parse(params[:job].delete(:device_list))
-      device_list.each do |hsh|
-        params[:job][:uuid] = SecureRandom.uuid
-        params[:job][:device_name] = hsh['name']
-        params[:job][:device_uuid] = hsh['uuid']
+      device_list = params[:job_group].delete(:device_list)
+      device_name = params[:job_group].delete(:device_name)
+      job_group = JobGroup.create(params[:job_group])
 
-        Job.create(params[:job])
+      options = params[:job_group]
+      options.delete(:device_count)
+      JSON.parse(device_list).each do |hsh|
+        options[:uuid] = SecureRandom.uuid
+        options[:job_group_uuid] = job_group.uuid
+        options[:device_name] = hsh['name']
+        options[:device_uuid] = hsh['uuid']
+
+        Job.create(options)
       end
+      job_group.update_attributes({device_count: job_group.jobs.count})
 
-      flash[:success] = "创建 #{device_list.length} 个任务成功"
+      flash[:success] = "创建 #{job_group.device_count} 个任务成功"
       redirect to("/")
     end
 
-    get '/:id' do
-      unless @record = Job.find_by(id: params[:id])
+    get '/group/:uuid' do
+      unless @record = JobGroup.find_by(uuid: params[:uuid])
+        @record = JobGroup.new
+        @record.title = '任务不存在'
+      end
+
+      haml :show, layout: settings.layout
+    end
+
+    get '/:uuid' do
+      unless @record = Job.find_by(uuid: params[:uuid])
         @record = Job.new
         @record.title = '任务不存在'
       end
@@ -45,29 +61,32 @@ module Account
       haml :show, layout: settings.layout
     end
 
-    get '/:id/edit' do
-      @record = Job.find_by(id: params[:id])
-
-      haml :edit, layout: settings.layout
-    end
-
+    # 拷贝功能待考虑
     get '/:id/copy' do
-      @job = Job.find_by(id: params[:id])
+      @job = JobGroup.find_by(id: params[:id])
       options = @job.to_hash
       options.delete(:id)
       options.delete(:state)
       options.delete(:device_name)
       options.delete(:device_uuid)
 
-      @record = Job.new(options)
+      @record = JobGroup.new(options)
       @record.uuid = SecureRandom.uuid
       @record.executed_at = Time.now.strftime("%Y-%m-%d %H:%M:%S")
 
       haml :copy, layout: settings.layout
     end
 
-    post '/:id' do
-      record = Job.find_by(id: params[:id])
+    # 禁止编辑
+    get '/:uuid/edit' do
+      @record = JobGroup.find_by(uuid: params[:uuid])
+
+      haml :edit, layout: settings.layout
+    end
+
+    # 禁止编辑
+    post '/:uuid' do
+      record = JobGroup.find_by(uuid: params[:uuid])
         
       if record.update_attributes(params[:job])
         flash[:success] = '更新成功'
@@ -78,12 +97,25 @@ module Account
       end
     end
 
-    delete '/:id' do
-      if record = Job.find_by(id: params[:id])
-        record.destroy
+    delete '/:uuid' do
+      job = Job.find_by(uuid: params[:uuid])
+      halt_with_format_json({data: params[:uuid], message: '查询 job 失败'}, 404) unless job
+      
+      job.destroy
+      if job_group = job.job_group
+        job_group.update_attributes({device_count: job_group.jobs.count})
+        job_group.destroy if job_group.device_count.zero?
       end
       
-      respond_with_json({message: "「#{record.title}」删除成功"}, 201)
+      respond_with_json({message: "「#{job.title}」删除成功"}, 201)
+    end
+
+    delete '/group/:uuid' do
+      job_group = JobGroup.find_by(uuid: params[:uuid])
+      halt_with_format_json({data: params[:uuid], message: '查询 job group 失败'}, 404) unless job_group
+      
+      job_group.destroy
+      respond_with_json({message: "「#{job_group.title}」删除成功"}, 201)
     end
   end
 end

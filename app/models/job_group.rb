@@ -1,11 +1,11 @@
 # encoding: utf-8
 require 'sinatra/activerecord'
 
-# 任务表
-class Job < ActiveRecord::Base
-  self.table_name = 'sys_jobs'
+# 任务组表
+class JobGroup < ActiveRecord::Base
+  self.table_name = 'sys_job_groups'
 
-  has_one :job_group, primary_key: :job_group_uuid, foreign_key: :uuid
+  has_many :jobs, primary_key: :uuid, foreign_key: :job_group_uuid
 
   def to_hash
     self.class.column_names.each_with_object({}) do |column_name, hsh|

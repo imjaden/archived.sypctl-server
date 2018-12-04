@@ -1,87 +1,57 @@
 %ol.breadcrumb
   %li 部署中心
-  %li= link_to '任务管理', url_for('/')
+  %li= link_to '任务管理', 'javascript:void(0);', onclick: 'window.history.go(-1)'
   %li= @record.title
 
 :css   
   .app th:nth-child(1), .app td:nth-child(1) { min-width: 100px; width: 10%; }
   .app th:nth-child(2), .app td:nth-child(2) { max-width: 800px; width: 90%; }
-  .app pre {
-    max-width: 700px;
-    max-height: 200px;
-  }
-%table.table.table-hover.table-condensed.table-strip.table-bordered.app
-  %tbody
-    %tr
-      %td 任务名称
-      %td.name= @record.title
-    %tr
-      %td 任务 UUID
-      %td= @record.uuid
-    %tr
-      %td 主机名称
-      %td= @record.device_name
-    %tr
-      %td 主机 UUID
-      %td= @record.device_uuid
-    %tr
-      %td 任务状态
-      %td
-        %span.label.label-info= @record.state
-    %tr
-      %td 部署脚本
-      %td
-        %pre= @record.command
-    - if @record.output
-      %tr
-        %td 脚本输出
-        %td
-          %pre= @record.output
-    %tr
-      %td 创建时间
-      %td= @record.created_at.strftime('%y/%m/%d %H:%M:%S')
-    %tr
-      %td 更新时间
-      %td= @record.updated_at.strftime('%y/%m/%d %H:%M:%S')
-    %tr
-      %td 删除
-      %td
-        %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.Job.remove(#{@record.id});"}
-          .span.glyphicon.glyphicon-trash
+  .app pre { max-width: 700px; max-height: 200px; }
+#JobShow.row
+  .col-sm-3
+    %button.list-group-item.disabled{type: 'button', 'v-text' => '"设备列表：(" + jobList.length + " 台)"'}
+    %ul.list-group{style: 'max-height:500px;overflow:scroll;'}
+      %li.list-group-item{'v-for' => '(item, index) in jobList', ':class' => '{active: item.uuid === job.uuid}', ':key' => 'item.id', '@click' => 'switchJob(item)'}
+        %span.badge{'v-text' => 'item.state'}
+        {{ item.device_name }}
 
-:javascript
-  (function() {
-      window.Job = {
-        remove: function(id) {
-          var name = $(".name").text();
+  .col-sm-9
+    %table.table.table-hover.table-condensed.table-strip.table-bordered.app
+      %tbody
+        %tr
+          %td 主机名称
+          %td{'v-text' => 'job.device_name'}
+        %tr
+          %td 主机 UUID
+          %td{'v-text' => 'job.device_uuid'}
+        %tr
+          %td 任务名称
+          %td.name{'v-text' => 'job.title'}
+        %tr
+          %td 任务 UUID
+          %td{'v-text' => 'job.uuid'}
+        %tr
+          %td 任务状态
+          %td
+            %span.label.label-info{'v-text' => 'job.state'}
+        %tr
+          %td 部署脚本
+          %td
+            %pre{'v-text' => 'job.command'}
+        %tr
+          %td 脚本输出
+          %td
+            %pre{'v-text' => 'job.output || "无日志输出"'}
+        %tr
+          %td 创建时间
+          %td{'v-text' => 'job.created_at'}
+        %tr
+          %td 更新时间
+          %td{'v-text' => 'job.updated_at'}
+        %tr
+          %td 删除
+          %td
+            %a.btn.btn-xs.btn-link{style: "color: red;", '@click' => "removeJob(job)"}
+              .span.glyphicon.glyphicon-trash
 
-          if(!confirm('确定删除「' + name + '」?')) {
-            return false;
-          }
-
-          window.Loading.show("删除中...");
-          $.ajax({
-            type: 'delete',
-            url: "#{url_for('/')}" + id
-          }).done(function(res, status, xhr) {
-            if(res.code === 201) {
-              $("#dom_" + id).remove();
-              window.Loading.show("删除成功");
-
-              try {
-                var objects = {job: { id: id, name: name }}
-                window.OperationLogger.record("job.delete", objects);
-              } catch(e) { console.log(e) }
-              
-              window.location.href = "#{url_for('/')}";
-            } else {
-              window.Loading.show("删除失败");
-            }
-          }).fail(function(xhr, status, error) {
-              window.Loading.show("删除失败");
-          }).always(function(res, status, xhr) {
-              window.Loading.hide();
-          });
-        }
-      }
-  }).call(this);
+= erb :'_show.js'

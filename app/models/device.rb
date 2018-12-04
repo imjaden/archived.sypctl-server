@@ -59,6 +59,7 @@ class Device < ActiveRecord::Base
     # black_keys.each { |key| hsh.delete(key) }
     hsh[:health_type] = health_type
     hsh[:health_value] = health_value
+    hsh[:submit_time_color] = (!updated_at || (Time.now - updated_at) > 10*60 ? 'error' : 'none')
 
     return hsh
   end
@@ -79,6 +80,7 @@ class Device < ActiveRecord::Base
   # const blue = "#108EE9";
   # const success = "#19BE6B";
   def health_type
+    return 'error' if !updated_at || (Time.now - updated_at) > 10*60
     if service_count <= 0
       return 'success'
     elsif service_stopped_count <= 0

@@ -13,8 +13,8 @@
     onsubmit: function() {
       try {
         var objects = {
-          job: { id: "-1", name: $("#job_title").val() }, 
-          device: { id: $("#job_device_uuid").val(), name: $("#job_device_name").val() }
+          job: { id: "-1", name: $("#job_group_title").val() }, 
+          device: { id: $("#job_group_device_list").val(), name: $("#job_group_device_name").val() }
         }
         window.OperationLogger.record("job.new", objects);
       } catch(e) { console.log(e) }

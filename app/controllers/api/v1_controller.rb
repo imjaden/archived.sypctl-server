@@ -101,8 +101,18 @@ module API
       respond_with_paginate(JobTemplate, records, params)
     end
 
+    # 二级排序：先按设备组序号升序、再按设备序号升序
+    #
+    # select 
+    #   sdg.name, sdg.order_index, sd.human_name, sd.order_index 
+    # from sys_devices as sd
+    # left join sys_device_groups as sdg on sdg.id = sd.device_group_id
+    # order by 
+    #   if(isnull(sdg.order_index), 1000, sdg.order_index) asc, 
+    #   if(isnull(sd.order_index), 1000, sd.order_index)
+
     get '/devices' do
-      records = Device.order(id: :desc).offset(params[:page]*params[:page_size]).limit(params[:page_size]).map(&:to_hash)
+      records = Device.order("if(isnull(order_index), 1000, order_index) asc").offset(params[:page]*params[:page_size]).limit(params[:page_size]).map(&:to_hash)
 
       respond_with_paginate(Device, records, params)
     end

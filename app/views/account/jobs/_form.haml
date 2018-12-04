@@ -7,6 +7,7 @@
         = f.label '任务标题', class: "col-sm-2 control-label"
         .col-sm-9
           = f.text_field :title, class: "form-control", placeholder: "任务标题，必填项"
+        .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
           %span{style: "padding-top:10px;"}
             %a{onclick: "window.Job.listJobTemplates(0);"}
               %span.glyphicon.glyphicon-check
@@ -15,7 +16,7 @@
         .col-sm-9
           = f.hidden_field :device_list
           = f.text_area :device_name, class: "form-control", rows: 1, placeholder: "要部署的设备，必填项"
-        .col-sm-1{style: "padding-top:10px;"}
+        .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
           %a{onclick: "window.Job.listDevices(0);"}
             %span.glyphicon.glyphicon-check
       .form-group
@@ -23,7 +24,7 @@
         .col-sm-9
           = f.hidden_field :app_id
           = f.text_field :app_name, class: "form-control", placeholder: "要部署的应用"
-        .col-sm-1{style: "padding-top:10px;"}
+        .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
           %a{onclick: "window.Job.listApps(0);"}
             %span.glyphicon.glyphicon-check
       .form-group
@@ -31,7 +32,7 @@
         .col-sm-9
           = f.hidden_field :version_id
           = f.text_field :version_name, class: "form-control", placeholder: "要部署的版本"
-        .col-sm-1{style: "padding-top:10px;"}
+        .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
           %a{onclick: "window.Job.listAppVersions(0);"}
             %span.glyphicon.glyphicon-check
       .form-group
@@ -66,8 +67,8 @@
   window.Job = {
     setJobTemplate: function(ctl) {
       $li = $(ctl).closest("li");
-      $("#job_title").val($li.data("title"))
-      $("#job_command").val($li.data("content"))
+      $("#job_group_title").val($li.data("title"))
+      $("#job_group_command").val($li.data("content"))
     },
     listJobTemplates: function(page) {
       $.ajax({
@@ -110,8 +111,8 @@
             device_names.push("<" + $li.data("name") + ">");
           }
       });
-      $("#job_device_name").val(device_names.join(","));
-      $("#job_device_list").val(JSON.stringify(device_list));
+      $("#job_group_device_name").val(device_names.join(","));
+      $("#job_group_device_list").val(JSON.stringify(device_list));
     },
     selectAllDevice: function() {
       var device_list = [], device_names = [], $li;
@@ -149,8 +150,8 @@
       });
     },
     setApp: function(ctl) {
-      $("#job_app_id").val($(ctl).data("id"));
-      $("#job_app_name").val($(ctl).data("name"));
+      $("#job_group_app_id").val($(ctl).data("id"));
+      $("#job_group_app_name").val($(ctl).data("name"));
     },
     listApps: function(page) {
       $.ajax({
@@ -179,11 +180,11 @@
       });
     },
     setAppVersion: function(ctl) {
-      $("#job_version_id").val($(ctl).data("id"));
-      $("#job_verison_name").val($(ctl).data("name"));
+      $("#job_group_version_id").val($(ctl).data("id"));
+      $("#job_group_verison_name").val($(ctl).data("name"));
     },
     listAppVersions: function(page) {
-      var app_id = parseInt($("#job_app_id").val());
+      var app_id = parseInt($("#job_group_app_id").val());
       if(isNaN(app_id) || app_id <= 0) {
         window.Loading.popup("请选择应用")
         return;
@@ -214,12 +215,12 @@
       });
     },
     cleanCommand: function() {
-      var command = $("#job_command").val();
+      var command = $("#job_group_command").val();
       if(command.length) {
         command = command.split("\n").map(function(el) {
           return $.trim(el);
         }).join("\n");
-        $("#job_command").val(command);
+        $("#job_group_command").val(command);
       }
     }
   }

@@ -8,7 +8,7 @@ class CreateOperationLog < ActiveRecord::Migration[5.2]
       t.string   :operator, null: false, comment: '操作者'
       t.text     :description, comment: '行为描述'
       t.string   :template, comment: '模板'
-      t.string   :objects, comment: '对象'
+      t.text     :objects, comment: '对象'
       t.string   :tags, comment: '标签'
       t.string   :ip, comment: '请求 IP'
       t.text     :browser, comment: '操作浏览器'

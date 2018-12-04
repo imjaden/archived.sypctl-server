@@ -1,0 +1,50 @@
+<script>
+new Vue({
+  el: '#JobShow',
+  data: function() {
+    return { 
+      jobList: <%= @record.jobs.map(&:to_hash).map(&:to_json) %>.map(function(job) { return JSON.parse(job); }),
+      job: null
+    }
+  },
+  created() {
+    this.job = this.jobList[0]
+  },
+  methods: {
+    switchJob(job) {
+      this.job = job
+    },
+    removeJob(job) {
+      if(!confirm('确定删除「' + job.title + '」?')) {
+        return false;
+      }
+
+      let that = this;
+      window.Loading.show("删除中...");
+      $.ajax({
+        type: 'delete',
+        url: "<%= url_for('/') %>" + job.uuid
+      }).done(function(res, status, xhr) {
+        if(res.code === 201) {
+          window.Loading.show("删除成功");
+          let jobIndex = that.jobList.findIndex(function(job) { return job.uuid === that.job.uuid; });
+          that.$nextTick(function() {
+            that.jobList.splice(jobIndex, 1)
+          })
+
+          try {
+            var objects = {job: { id: job.id, name: job.title }}
+            window.OperationLogger.record("job.delete", objects);
+          } catch(e) { console.log(e) }
+        } else {
+          window.Loading.show("删除失败");
+        }
+      }).fail(function(xhr, status, error) {
+          window.Loading.show("删除失败");
+      }).always(function(res, status, xhr) {
+          window.Loading.hide();
+      });
+    }
+  }
+})
+</script>
