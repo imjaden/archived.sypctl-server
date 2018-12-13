@@ -22,7 +22,8 @@ module Account
 
     post '/' do
       record = Version.new(params[:version])
-
+      record.uuid ||= generate_uuid
+      
       if record.save(validate: true)
         flash[:success] = '创建成功'
         redirect to("/#{record.id}")

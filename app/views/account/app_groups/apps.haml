@@ -5,7 +5,7 @@
       %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 分组管理
     %li= "「#{@record.name}」"
     %li
-      %a{href: "#{url_for('/')}#{params[:id]}/apps/add?obj_type=#{params[:obj_type] || 1}"}
+      %a{href: "#{url_for('/')}#{params[:uuid]}/apps/add?obj_type=#{params[:obj_type] || 1}"}
         应用管理
         %span.glyphicon.glyphicon-check
 
@@ -22,8 +22,8 @@
     %th 更新时间
   %tbody
     - @records.each do |record|
-      %tr{id: "dom_#{record.id}"}
-        %td.id=record.id
+      %tr{id: "dom_#{record.uuid}"}
+        %td.id=record.uuid
         %td.name= record.name
         %td.file_name= record.file_name
         %td= (record.updated_at || Time.now).strftime('%y/%m/%d %H:%M')

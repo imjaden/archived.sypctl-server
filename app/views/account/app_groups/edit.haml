@@ -1,7 +1,7 @@
 %ol.breadcrumb
   %li 应用中心
   %li= link_to "分组管理", url_for("/")
-  %li= link_to @record.name, url_for("/#{@record.id}")
+  %li= link_to @record.name, url_for("/#{@record.uuid}")
   %li 编辑分组
 
 = haml :_form

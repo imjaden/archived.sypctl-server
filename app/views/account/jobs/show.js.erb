@@ -30,6 +30,7 @@ new Vue({
           let jobIndex = that.jobList.findIndex(function(job) { return job.uuid === that.job.uuid; });
           that.$nextTick(function() {
             that.jobList.splice(jobIndex, 1)
+            that.job = that.jobList[0]
           })
 
           try {

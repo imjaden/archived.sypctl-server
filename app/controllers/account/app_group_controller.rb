@@ -22,6 +22,7 @@ module Account
 
     post '/' do
       record = AppGroup.new(params[:app_group])
+      record.uuid ||= generate_uuid
 
       if record.save(validate: true)
         flash[:success] = '创建成功'
@@ -32,8 +33,8 @@ module Account
       end
     end
 
-    get '/:id' do
-      unless @record = AppGroup.find_by(id: params[:id])
+    get '/:uuid' do
+      unless @record = AppGroup.find_by(uuid: params[:uuid])
         @record = AppGroup.new
         @record.name = '分组不存在'
       end
@@ -41,49 +42,49 @@ module Account
       haml :show, layout: settings.layout
     end
 
-    get '/:id/edit' do
-      @record = AppGroup.find_by(id: params[:id])
+    get '/:uuid/edit' do
+      @record = AppGroup.find_by(uuid: params[:uuid])
 
       haml :edit, layout: settings.layout
     end
 
-    post '/:id' do
-      record = AppGroup.find_by(id: params[:id])
+    post '/:uuid' do
+      record = AppGroup.find_by(uuid: params[:uuid])
         
       if record.update_attributes(params[:app_group])
         flash[:success] = '更新成功'
-        redirect to("/?page=#{params[:page] || 1}&id=#{params[:id]}")
+        redirect to("/?uuid=#{params[:uuid]}")
       else
         flash[:danger] = record.errors.messages.to_s
-        redirect to("/?page=#{params[:page] || 1}&id=#{params[:id]}")
+        redirect to("/?uuid=#{params[:uuid]}")
       end
     end
 
-    delete '/:id' do
-      if record = AppGroup.find_by(id: params[:id])
+    delete '/:uuid' do
+      if record = AppGroup.find_by(uuid: params[:uuid])
         record.destroy
       end
       
       respond_with_json({message: "「#{record.name}」删除成功"}, 201)
     end
 
-    get '/:id/apps' do
-      @record = AppGroup.find_by(id: params[:id])
+    get '/:uuid/apps' do
+      @record = AppGroup.find_by(uuid: params[:uuid])
       @records = @record.apps.paginate(page: params[:page], per_page: 15).order(id: :desc)
 
       haml :apps, layout: settings.layout
     end
 
-    get '/:id/apps/add' do
-      @record = AppGroup.find_by(id: params[:id])
+    get '/:uuid/apps/add' do
+      @record = AppGroup.find_by(uuid: params[:uuid])
       @records = App.paginate(page: params[:page], per_page: 15).order(id: :desc)
 
       haml :apps_add, layout: settings.layout
     end
 
     post '/apps/state' do
-      record = App.find_by(id: params[:id])
-      record.update_attributes({app_group_id: (params[:state].to_s == 'true' ? params[:app_group_id] : nil)})
+      record = App.find_by(uuid: params[:uuid])
+      record.update_attributes({app_group_uuid: (params[:state].to_s == 'true' ? params[:app_group_uuid] : nil)})
 
       respond_with_json({data: "successfully"}, 201)
     end

@@ -1,8 +1,8 @@
 %ol.breadcrumb
   %li 应用中心
   %li= link_to "应用管理", url_for("/")
-  %li= link_to @app.name, url_for("/#{@app.id}")
-  %li 上传版本
+  %li= link_to @app.name, url_for("/#{@app.uuid}")
+  %li 新建版本
 
 = haml :'version/_form'
 

@@ -1,7 +1,7 @@
 %ol.breadcrumb
   %li 应用中心
   %li= link_to "应用管理", url_for("/")
-  %li= link_to @app.name, url_for("/#{@app.id}")
+  %li= link_to @app.name, url_for("/#{@app.uuid}")
   %li 
     版本列表
     &nbsp;|&nbsp;
@@ -10,23 +10,28 @@
       %span.glyphicon.glyphicon-upload
 :css   
   .apps th:nth-child(n+1), .apps td:nth-child(n+1) { text-align: center; width: 5%; }
-  .apps th:nth-child(1), .apps td:nth-child(1) { width: 20%; }
-  .apps th:nth-child(2), .apps td:nth-child(2) { width: 15%; }
+  .apps th:nth-child(1), .apps td:nth-child(1) { width: 5%; }
+  .apps th:nth-child(2), .apps td:nth-child(2) { width: 5%; }
+  .apps th:nth-child(3), .apps td:nth-child(3) { width: 20%; }
+  .apps th:nth-child(4), .apps td:nth-child(4) { width: 20%; }
+  .apps th:nth-child(5), .apps td:nth-child(5) { width: 5%; }
   .apps th:nth-last-child(1), .apps td:nth-last-child(1) { text-align: center; width: 10%; }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.apps
   %thead
     %th 版本号
-    %th build 值
+    %th build
+    %th 文件名称
+    %th 文件哈希
     %th 文件大小
-    %th CDN 状态
     %th 上传时间
   %tbody
-    - @records.each do |record|
-      %tr{id: "dom_#{record.id}"}
-        %td= link_to record.version, url_for("/#{@app.id}/version/#{record.id}")
+    - @versions.each do |record|
+      %tr{id: "dom_#{record.uuid}"}
+        %td= link_to record.version, url_for("/#{@app.id}/version/#{record.uuid}")
         %td= record.build
+        %td= record.file_name
+        %td= record.md5
         %td= record.file_size
-        %td= record.cdn_state
         %td= record.created_at.strftime('%y/%m/%d %H:%M')
 
-= will_paginater @records
+= will_paginater @versions

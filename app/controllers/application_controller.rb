@@ -172,6 +172,10 @@ class ApplicationController < Sinatra::Base
     redirect '/login', 302
   end
 
+  def generate_uuid
+    SecureRandom.uuid.gsub('-', '')
+  end
+
   def app_root_join(path)
     File.join(settings.root, path)
   end

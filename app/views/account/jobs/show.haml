@@ -7,6 +7,9 @@
   .app th:nth-child(1), .app td:nth-child(1) { min-width: 100px; width: 10%; }
   .app th:nth-child(2), .app td:nth-child(2) { max-width: 800px; width: 90%; }
   .app pre { max-width: 700px; max-height: 200px; }
+  .list-group-item:hover {
+    cursor: pointer;
+  }
 #JobShow.row
   .col-sm-3
     %button.list-group-item.disabled{type: 'button', 'v-text' => '"设备列表：(" + jobList.length + " 台)"'}
@@ -19,12 +22,6 @@
     %table.table.table-hover.table-condensed.table-strip.table-bordered.app
       %tbody
         %tr
-          %td 主机名称
-          %td{'v-text' => 'job.device_name'}
-        %tr
-          %td 主机 UUID
-          %td{'v-text' => 'job.device_uuid'}
-        %tr
           %td 任务名称
           %td.name{'v-text' => 'job.title'}
         %tr
@@ -34,6 +31,12 @@
           %td 任务状态
           %td
             %span.label.label-info{'v-text' => 'job.state'}
+        %tr
+          %td 主机名称
+          %td{'v-text' => 'job.device_name'}
+        %tr
+          %td 主机 UUID
+          %td{'v-text' => 'job.device_uuid'}
         %tr
           %td 部署脚本
           %td
@@ -54,4 +57,4 @@
             %a.btn.btn-xs.btn-link{style: "color: red;", '@click' => "removeJob(job)"}
               .span.glyphicon.glyphicon-trash
 
-= erb :'_show.js'
+= erb :'show.js'

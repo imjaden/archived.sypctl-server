@@ -16,7 +16,7 @@ module Account
 
     get '/new' do
       @record = JobGroup.new
-      @record.uuid = SecureRandom.uuid
+      @record.uuid = generate_uuid
       @record.executed_at = Time.now.strftime("%Y-%m-%d %H:%M:%S")
 
       haml :new, layout: settings.layout
@@ -25,12 +25,13 @@ module Account
     post '/' do
       device_list = params[:job_group].delete(:device_list)
       device_name = params[:job_group].delete(:device_name)
+      params[:job_group][:uuid] ||= generate_uuid
       job_group = JobGroup.create(params[:job_group])
 
       options = params[:job_group]
       options.delete(:device_count)
       JSON.parse(device_list).each do |hsh|
-        options[:uuid] = SecureRandom.uuid
+        options[:uuid] = generate_uuid
         options[:job_group_uuid] = job_group.uuid
         options[:device_name] = hsh['name']
         options[:device_uuid] = hsh['uuid']
@@ -71,7 +72,7 @@ module Account
       options.delete(:device_uuid)
 
       @record = JobGroup.new(options)
-      @record.uuid = SecureRandom.uuid
+      @record.uuid = generate_uuid
       @record.executed_at = Time.now.strftime("%Y-%m-%d %H:%M:%S")
 
       haml :copy, layout: settings.layout

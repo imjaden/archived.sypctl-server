@@ -16,13 +16,14 @@ module Account
 
     get '/new' do
       @record = JobTemplate.new
-      @record.uuid = SecureRandom.uuid
+      @record.uuid = generate_uuid
 
       haml :new, layout: settings.layout
     end
 
     post '/' do
       record = JobTemplate.new(params[:job_template])
+      record.uuid ||= generate_uuid
 
       if record.save(validate: true)
         flash[:success] = '创建成功'
@@ -54,7 +55,7 @@ module Account
       options.delete(:id)
 
       @record = JobTemplate.new(options)
-      @record.uuid = SecureRandom.uuid
+      @record.uuid = generate_uuid
 
       haml :copy, layout: settings.layout
     end

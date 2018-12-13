@@ -7,6 +7,14 @@ class Job < ActiveRecord::Base
 
   has_one :job_group, primary_key: :job_group_uuid, foreign_key: :uuid
 
+  def update_job_group_state
+
+    if record = self.job_group
+      is_done = record.jobs.all? { |job| job.state == 'done' }
+      record.update_attributes({state: 'done'}) if is_done
+    end
+  end
+
   def to_hash
     self.class.column_names.each_with_object({}) do |column_name, hsh|
       value = send(column_name)

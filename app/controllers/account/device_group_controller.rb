@@ -16,13 +16,13 @@ module Account
 
     get '/new' do
       @record = DeviceGroup.new
-      @record.uuid = SecureRandom.uuid
 
       haml :new, layout: settings.layout
     end
 
     post '/' do
       record = DeviceGroup.new(params[:device_group])
+      record.uuid ||= generate_uuid
 
       if record.save(validate: true)
         flash[:success] = '创建成功'
@@ -44,7 +44,7 @@ module Account
 
     get '/:id/edit' do
       @record = DeviceGroup.find_by(id: params[:id])
-      @record.uuid = SecureRandom.uuid unless @record.uuid
+      @record.uuid = generate_uuid unless @record.uuid
 
       haml :edit, layout: settings.layout
     end

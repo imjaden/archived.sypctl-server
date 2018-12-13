@@ -21,17 +21,17 @@
     %th 更新时间
   %tbody
     - @records.each do |record|
-      %tr{id: "dom_#{record.id}"}
+      %tr{id: "dom_#{record.uuid}"}
         %td.name= record.name
         %td= record.description
         %td
-          %a.btn.btn-xs.btn-link{href: url_for("/#{record.id}/apps?page=#{params[:page] || 1}")}
+          %a.btn.btn-xs.btn-link{href: url_for("/#{record.uuid}/apps?page=#{params[:page] || 1}")}
             .span.glyphicon.glyphicon-th
         %td
-          %a{href: url_for("/#{record.id}/edit")}
+          %a{href: url_for("/#{record.uuid}/edit")}
             %span.glyphicon.glyphicon-edit
         %td
-          %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.AppGroup.remove(#{record.id});"}
+          %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.AppGroup.remove(#{record.uuid});"}
             .span.glyphicon.glyphicon-trash
         %td= record.updated_at.strftime('%y/%m/%d %H:%M')
 

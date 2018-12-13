@@ -1,9 +1,8 @@
 %ol.breadcrumb
   %li 应用中心
   %li= link_to "应用管理", url_for("/")
-  %li= link_to @app.name, url_for("/#{@app.id}")
-  %li= "#{@record.version}(#{@record.build})"
-
+  %li= link_to @app.name, url_for("/#{@app.uuid}")
+  %li= "#{@version.version}/#{@version.build}"
 
 :css   
   .version th:nth-child(1), .version td:nth-child(1) { width: 15%; }
@@ -15,31 +14,31 @@
   %tbody
     %tr
       %td 应用名称
-      %td= link_to @app.name, url_for("/#{@app.id}")
+      %td= link_to @app.name, url_for("/#{@app.uuid}")
     %tr
       %td 文件名称(业务)
       %td= @app.file_name
     %tr
       %td 版本号
-      %td= @record.version
+      %td= @version.version
     %tr
       %td build 值
-      %td= @record.build
+      %td= @version.build
     %tr
       %td 文件名称(版本)
-      %td= @record.file_name
+      %td= @version.file_name
     %tr
       %td 文件大小
-      %td= @record.file_size
+      %td= @version.file_size
     %tr
       %td 文件 MD5
-      %td= @record.md5
+      %td= @version.md5
     %tr
       %td CDN 链接
-      %td= @record.cdn_link
+      %td= @version.cdn_link
     %tr
       %td 版本描述
-      %td= @record.description
+      %td= @version.description
     %tr
       %td 创建时间
-      %td= @record.created_at.strftime('%y/%m/%d %H:%M:%S')
+      %td= @version.created_at.strftime('%y/%m/%d %H:%M:%S')

@@ -1,10 +1,10 @@
-- url = url_for(@record ? "/#{@record.id}?page=#{params[:page] || 1}" : "/")
+- url = url_for(@record ? "/#{@record.uuid}" : "/")
 - form_for @record, url, method: "post", class: "form-horizontal", id: "recordForm" do |f|
   - field_set_tag do
     .form-group
       = f.label '应用分组', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.select :app_group_id, options: AppGroup.all.map { |r| [r.name, r.id] }, class: "form-control"
+        = f.select :app_group_uuid, options: AppGroup.all.map { |r| [r.name, r.uuid] }, class: "form-control"
     .form-group
       = f.label '应用名称', class: "col-sm-2 control-label"
       .col-sm-7

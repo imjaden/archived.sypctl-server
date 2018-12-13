@@ -2,85 +2,89 @@
   %li 应用中心
   %li= link_to "应用管理", url_for("/")
   %li
-    %a{href: "#{url_for('/new')}?page=#{params[:page] || 1}"}
+    %a{href: "#{url_for('/new')}"}
       新建应用
       %span.glyphicon.glyphicon-plus
 :css   
-  .apps th:nth-child(n+1), .apps td:nth-child(n+1) { text-align: center; width: 6%; }
-  .apps th:nth-child(1), .apps td:nth-child(1) { width: 12%; }
-  .apps th:nth-child(2), .apps td:nth-child(2) { text-align: left; width: 15%; }
-  .apps th:nth-child(3), .apps td:nth-child(3) { text-align: left; width: 15%; }
-  .apps th:nth-child(4), .apps td:nth-child(4) { width: 10%; }
-  .apps th:nth-child(8), .apps td:nth-child(8) { width: 5%; }
-  .apps th:nth-child(9), .apps td:nth-child(9) { width: 5%; }
-  .apps th:nth-last-child(1), .apps td:nth-last-child(1) { text-align: center; width: 8%; }
-%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.apps
-  %thead
-    %th 应用分组
-    %th 应用名称
-    %th 文件名称
-    %th 文件类型
-    %th 版本数量
-    %th 最新版本
-    %th 上传版本
-    %th 编辑
-    %th 删除
-    %th 更新时间
-  %tbody
-    - @records.each do |record|
-      %tr{id: "dom_#{record.id}"}
+  .apps th:nth-child(1), .apps td:nth-child(1) { text-align: left; width: 30%; }
+  .apps th:nth-child(2), .apps td:nth-child(2) { text-align: left; width: 20%; }
+  .apps th:nth-child(3), .apps td:nth-child(3) { text-align: center; width: 8%; }
+  .apps th:nth-child(4), .apps td:nth-child(4) { text-align: center; width: 8%; }
+  .apps th:nth-child(5), .apps td:nth-child(5) { text-align: center; width: 8%; }
+  .apps th:nth-child(6), .apps td:nth-child(6) { text-align: center; width: 5%; }
+  .apps th:nth-child(7), .apps td:nth-child(7) { text-align: center; width: 5%; }
+  .apps th:nth-last-child(1), .apps td:nth-last-child(1) { text-align: center; width: 15%; }
+#AppIndex
+  %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.apps
+    %thead
+      %th 应用名称
+      %th 文件名称
+      %th 类型
+      %th 最新版本
+      %th 上传版本
+      %th 编辑
+      %th 删除
+      %th 更新时间
+    %tbody{'v-for' => 'app in apps'}
+      %tr{':id' => "'dom_'+app.uuid"}
+        %td.name
+          %a{'v-text' => 'app.name', ':href' => "'#{url_for('/')}' + app.uuid"}
         %td
-          %span.label.label-default= record.app_group.name if record.app_group
-        %td.name= link_to record.name, url_for("/#{record.id}")
-        %td= record.file_name
+          %span.label.label-default{'v-text' => 'app.file_name'}
         %td
-          %span.label.label-success= record.file_type
-        %td= link_to record.version_count, url_for("/#{record.id}/version"), class: "badge"
-        %td= link_to record.latest_version, url_for("/#{record.id}/version/#{record.latest_version_id}") if record.latest_version_id
+          %span.label.label-success{'v-text' => 'app.file_type'}
         %td
-          %a{href: url_for("/#{record.id}/version/new")}
+          %a{'v-text' => 'app.latest_version', ':href' => "'#{url_for('/')}' + app.uuid + '/version/' + app.latest_version_uuid"}
+        %td
+          %a{':href' => "'#{url_for('/')}' + app.uuid + '/version/upload'"}
             %span.glyphicon.glyphicon-upload
         %td
-          %a{href: url_for("/#{record.id}/edit")}
+          %a{':href' => "'#{url_for('/')}' + app.uuid + '/edit'"}
             %span.glyphicon.glyphicon-edit
         %td
-          %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.AppObject.remove(#{record.id});"}
+          %a.btn.btn-xs.btn-link{'@click' => "removeApp(app)", style: "color: red;"}
             .span.glyphicon.glyphicon-trash
-        %td= record.updated_at.strftime('%y/%m/%d %H:%M')
+        %td{'v-text' => 'app.updated_at'}
 
-= will_paginater @records
+  = will_paginater @records
 
 :javascript
-  (function() {
-      window.AppObject = {
-        remove: function(id) {
-          var name = $("#dom_" + id + " .name").text();
-
-          if(!confirm('确定删除「' + name + '」?')) {
-            return false;
-          }
-
-          window.Loading.show("删除中...");
-          $.ajax({
-            type: 'delete',
-            url: "#{url_for('/')}" + id
-          }).done(function(res, status, xhr) {
-            if(res.code === 201) {
-              $("#dom_" + id).remove();
-              window.Loading.show("删除成功");
-
-              try {
-                var objects = {app: { id: id, name: name }}
-                window.OperationLogger.record("app.delete", objects);
-              } catch(e) { console.log(e) }
-            } else {
-              window.Loading.show("删除失败");
-            }
-          }).fail(function(xhr, status, error) {
-              window.Loading.show("删除失败");
-          }).always(function(res, status, xhr) {
-              window.Loading.hide();
-          });
-        }
+  new Vue({
+    el: '#AppIndex',
+    data: function() {
+      return { 
+        apps: #{@records.map(&:to_hash).map(&:to_json) }.map(function(record) { return JSON.parse(record); })
       }
-  }).call(this);
+    },
+    created() {
+      console.log('apps:', this.apps)
+    },
+    methods: {
+      removeApp(app) {
+        if(!confirm('确定删除应用「' + app.name + '」?')) {
+          return false;
+        }
+
+        let that = this;
+        window.Loading.show("删除中...");
+        $.ajax({
+          type: 'delete',
+          url: "#{url_for('/')}" + app.uuid
+        }).done(function(res, status, xhr) {
+          if(res.code === 201) {
+            window.Loading.show("删除成功");
+            let appIndex = that.apps.findIndex(function(ele) { return ele.uuid === app.uuid; });
+            that.$nextTick(function() {
+              that.apps.splice(appIndex, 1)
+            })
+          } else {
+            window.Loading.show("删除失败");
+          }
+        }).fail(function(xhr, status, error) {
+            window.Loading.show("删除失败");
+        }).always(function(res, status, xhr) {
+            window.Loading.hide();
+        });
+      }
+    }
+  })

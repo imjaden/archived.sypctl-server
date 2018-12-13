@@ -5,7 +5,7 @@ require 'sinatra/activerecord'
 class AppGroup < ActiveRecord::Base
   self.table_name = 'sys_app_groups'
 
-  has_many :apps, primary_key: :id, foreign_key: :app_group_id
+  has_many :apps, primary_key: :uuid, foreign_key: :app_group_uuid
   
   def to_hash
     self.class.column_names.each_with_object({}) do |column_name, hsh|

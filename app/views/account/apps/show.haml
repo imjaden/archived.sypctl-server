@@ -23,10 +23,10 @@
         %span.label.label-info= @record.file_type
     %tr
       %td 最新版本
-      %td= link_to "#{@record.latest_version}(#{@record.latest_build})", url_for("/#{@record.id}/version/#{@record.latest_version_id}")
+      %td= link_to "#{@record.latest_version}/#{@record.latest_build}", url_for("/#{@record.uuid}/version/#{@record.latest_version_uuid}")
     %tr
       %td 版本数量
-      %td= link_to @record.version_count, url_for("/#{@record.id}/version")
+      %td= link_to @record.version_count, url_for("/#{@record.uuid}/version")
     %tr
       %td 应用描述
       %td= @record.description
@@ -39,12 +39,12 @@
     %tr
       %td 编辑
       %td
-        %a{href: url_for("/#{@record.id}/edit"), class: 'btn btn-xs btn-link'}
+        %a{href: url_for("/#{@record.uuid}/edit"), class: 'btn btn-xs btn-link'}
           %span.glyphicon.glyphicon-edit
     %tr
       %td 删除
       %td
-        %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.AppObject.remove(#{@record.id});"}
+        %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.AppObject.remove(#{@record.uuid});"}
           .span.glyphicon.glyphicon-trash
 
 :javascript

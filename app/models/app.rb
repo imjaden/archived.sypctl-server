@@ -5,7 +5,7 @@ require 'sinatra/activerecord'
 class App < ActiveRecord::Base
   self.table_name = 'sys_apps'
 
-  has_many :versions, primary_key: :id, foreign_key: :app_id
+  has_many :versions, primary_key: :uuid, foreign_key: :app_uuid
   belongs_to :app_group
 
   def to_hash

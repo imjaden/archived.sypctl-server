@@ -1,11 +1,18 @@
-- url = url_for("/#{@app.id}/version?page=#{params[:page] || 1}")
-- form_for @record, url, method: "post", class: "form-horizontal", enctype: "multipart/form-data", id: "recordForm" do |f|
-  = f.hidden_field :app_id, class: "form-control"
+- url = url_for("/#{@app.uuid}/version/#{@version.uuid}")
+- form_for @version, url, method: "post", class: "form-horizontal", enctype: "multipart/form-data", id: "recordForm" do |f|
   - field_set_tag do
     .form-group
-      = f.label '版本文件', class: "col-sm-2 control-label"
+      = f.label '文件名称', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.file_field :file, class: "form-control"
+        = f.text_field :file_name, class: "form-control", disabled: 'disabled'
+    .form-group
+      = f.label '文件哈希', class: "col-sm-2 control-label", disabled: 'disabled'
+      .col-sm-7
+        = f.text_field :md5, class: "form-control", disabled: 'disabled'
+    .form-group
+      = f.label '文件大小', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :file_size, class: "form-control", disabled: 'disabled'
     .form-group
       = f.label '版本号', class: "col-sm-2 control-label"
       .col-sm-7

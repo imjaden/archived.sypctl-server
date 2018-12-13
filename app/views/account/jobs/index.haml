@@ -16,24 +16,24 @@
     %thead
       %th 创建时间
       %th 任务标题
+      %th 部署进度
       %th 设备数量
       %th 应用名称
       %th 版本信息
-      %th 部署进度
       %th.hidden 拷贝
-      %th 删除
+      %th.hidden 删除
       %th 更新时间
     %tbody{'v-for' => 'record in groupList'}
       %tr{':id' => "'dom_'+record.id"}
         %td{'v-text' => 'record.created_at.replace(/:|\/|\s/g, "")'}
         %td.name
           %a{'v-text' => 'record.title', ':href' => "'#{url_for('/group/')}'+record.uuid"}
+        %td
+          %span.label{'v-text' => 'record.state', ':class' => "{'label-primary': record.state == 'waiting', 'label-default': record.state != 'waiting'}"}
         %td{'v-text' => 'record.device_count'}
         %td{'v-text' => 'record.app_name'}
         %td{'v-text' => 'record.version_name'}
-        %td
-          %span.label{'v-text' => 'record.state', ':class' => "{'label-primary': record.state == 'waiting', 'label-default': record.state != 'waiting'}"}
-        %td
+        %td.hidden
           %a.btn.btn-xs.btn-link{'@click' => 'removeGroup(record)', style: 'color:red;'}
             .span.glyphicon.glyphicon-trash
         %td{'v-text' => 'record.updated_at'}
@@ -49,7 +49,7 @@
       }
     },
     created() {
-      console.log(this.groupList)
+      console.log('grouplist:', this.groupList)
     },
     methods: {
       removeGroup(group) {

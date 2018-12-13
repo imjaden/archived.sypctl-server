@@ -17,13 +17,14 @@ module Account
     get '/new' do
       @record = Device.new
       @record.ssh_port = 22
-      @record.uuid = "random-#{SecureRandom.uuid}"
+      @record.uuid = "random-#{generate_uuid}"
 
       haml :new, layout: settings.layout
     end
 
     post '/' do
       record = Device.new(params[:device])
+      record.uuid ||= generate_uuid
 
       if record.save(validate: true)
         flash[:success] = '创建成功'
@@ -54,7 +55,7 @@ module Account
 
     get '/:id/edit' do
       @record = Device.find_by(id: params[:id])
-      @record.uuid = "random-#{SecureRandom.uuid}" unless @record.uuid
+      @record.uuid = "random-#{generate_uuid}" unless @record.uuid
 
       haml :edit, layout: settings.layout
     end
@@ -96,7 +97,7 @@ module Account
     get '/:id/create_job' do
       device = Device.find_by(id: params[:id])
       Job.create(
-        uuid: SecureRandom.uuid,
+        uuid: generate_uuid,
         title: "重新提交代理主机信息",
         device_uuid: device.uuid,
         device_name: device.human_name || device.hostname,

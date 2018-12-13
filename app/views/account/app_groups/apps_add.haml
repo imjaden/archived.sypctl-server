@@ -4,27 +4,28 @@
     %li
       %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 分组管理
     %li
-      %a{href: "#{url_for('/')}#{params[:id]}/apps?obj_type=#{params[:obj_type] || 1}"}
+      %a{href: "#{url_for('/')}#{params[:uuid]}/apps?obj_type=#{params[:obj_type] || 1}"}
         ="「#{@record.name}」"
     %li分组权限
 
 :css   
   .apps th:nth-child(n+1), .apps td:nth-child(n+1) { text-align: center; width: 5%; }
+  .apps th:nth-child(2), .apps td:nth-child(2) { text-align: left; width: 30%; }
   .apps th:nth-child(3), .apps td:nth-child(3) { text-align: left; width: 20%; }
   .apps th:nth-child(4), .apps td:nth-child(4) { text-align: left; width: 20%; }
   .apps th:nth-last-child(1), .apps td:nth-last-child(1) { text-align: center; width: 10%; }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.records.smart-table.apps
   %thead
-    %th ID
     %th 应用名称
     %th 文件名称
+    %th UUID
     %th 更新时间
   %tbody
     - @records.each do |record|
-      %tr{id: "dom_#{record.id}", "data-id": record.id, "data-groupid": record.app_group_id}
-        %td.id= record.id
+      %tr{id: "dom_#{record.uuid}", "data-uuid": record.uuid, "data-groupuuid": record.app_group_uuid}
         %td.name= record.name
         %td.file_name= record.file_name
+        %td.uuid= record.uuid
         %td= (record.updated_at || Time.now).strftime('%y/%m/%d %H:%M')
 
 = will_paginater @records
@@ -48,28 +49,28 @@
     },
     getState: function() {
       $("table.records tbody tr").each(function() {
-        if(parseInt($(this).data("groupid")) === #{@record.id}) {
-          $("#dom_" + $(this).data("id") + " input").prop("checked", "checked");
+        if($(this).data("groupuuid") === '#{@record.uuid}') {
+          $("#dom_" + $(this).data("uuid") + " input").prop("checked", "checked");
         }
       })
     },
     setState: function(ctl) {
-      var id = parseInt($(ctl).closest("tr").find(".id").text()),
+      var uuid = $(ctl).closest("tr").find(".uuid").text(),
           app_name = $(ctl).closest("tr").find(".name").text(),
           check_state = $(ctl).prop("checked"),
           options = {
             type: 'post',
             url: "#{url_for('/apps/state')}",
             data: {
-              id: id,
-              app_group_id: #{params[:id]},
+              uuid: uuid,
+              app_group_uuid: '#{params[:uuid]}',
               state: check_state
             }
           };
       var operation = ($(ctl).prop("checked") ? "" : "取消") + "关联",
           state = confirm("确认" + operation + "分组「#{@record.name}」?");
       if(!state) {
-        $("#dom_" + id + " .item-checkbox").prop("checked", !check_state);
+        $("#dom_" + uuid + " .item-checkbox").prop("checked", !check_state);
         return false;
       }
 
@@ -81,7 +82,7 @@
 
           try {
             var objects = {
-              role: { id: id, name: app_name, type: "app" },
+              role: { id: uuid, name: app_name, type: "app" },
               menu: { id: "#{@record.id}", name: "#{@record.name}", type: "app_group"}
             }
             // window.OperationLogger.record("app_group.move_app_" + (check_state ? "into" : "out"), objects);

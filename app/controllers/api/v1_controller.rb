@@ -39,7 +39,7 @@ module API
     post '/register' do
       api_authen_params([:device])
 
-      params[:device][:api_token] = Digest::MD5.hexdigest(SecureRandom.uuid)
+      params[:device][:api_token] = Digest::MD5.hexdigest(generate_uuid)
       params[:device][:request_ip] = request.ip
       params[:device][:request_agent] = request.user_agent
       
@@ -80,11 +80,12 @@ module API
     post '/job' do
       api_authen_params([:job])
 
-      if record = Job.find_by(uuid: params[:job][:uuid])
-        record.update_attributes(params[:job])
+      if job = Job.find_by(uuid: params[:job][:uuid])
+        job.update_attributes(params[:job])
+        job.update_job_group_state if params[:job][:state] == 'done'
       end
 
-      respond_with_json({id: record.id}, 201)
+      respond_with_json({data: job.to_hash, message: '更新任务成功'}, 201)
     end
 
     post '/operation/logger' do
