@@ -36,7 +36,9 @@ include Utils::Boot
 
 require 'asset_handler'
 Time.zone = 'Beijing'
-ENV['REDIS_URL'] ||= Setting.redis_url
+
+ENV['CACHE_NAMESPACE']  ||= Setting.app_name
+ENV['REDIS_URL']        ||= Setting.redis_url
 
 traverser_settings_yaml_to_env
 

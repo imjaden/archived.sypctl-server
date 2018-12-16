@@ -74,10 +74,44 @@ module API
 
     get '/device/info' do
       api_authen_params([:device_id])
+
       record = Device.find_by(id: params[:device_id])
       halt_with_format_json({data: record, message: '查询结果为空', code: 404}, 404) unless record
 
       respond_with_formt_json({data: record.to_wx_hash, message: '接收成功'}, 201)
+    end
+
+    #
+    # 微信小程序接口
+    #
+
+    # 登录凭证校验
+    post '/wxmp/jscode2session' do
+      api_authen_params([:code])
+
+      url_template = "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code"
+      url = format(url_template, Setting.wxmp.app_id, Setting.wxmp.app_secret, params[:code])
+      puts url
+      res = HTTParty.get(url)
+      puts res.body, res.code, res.message, res.headers.inspect
+
+      respond_with_json({message: "获取成功", data: res.body}, 200)
+    end
+
+    # 创建或更新微信用户信息
+    post '/wxmp/user' do
+      api_authen_params([:user])
+
+      params[:user][:name] = params[:user][:name].to_s.escape_emoji
+      params[:user][:nick_name] = params[:user][:nick_name].to_s.escape_emoji
+      if record = WxUser.find_by(openid: params[:user][:openid])
+        record.update_attributes(params[:user])
+      else
+        params[:user][:uuid] ||= generate_uuid
+        record = WxUser.create(params[:user])
+      end
+
+      respond_with_formt_json({data: record.to_hash, message: '创建/更新成功'}, 201)
     end
 
     protected
