@@ -24,7 +24,7 @@ module API
     end
 
     get '/wxmp_access_token' do
-      access_token = get_weixin_access_token
+      access_token = get_wxmp_access_token
 
       respond_with_formt_json({data: access_token, message: '获取成功'}, 200)
     end
@@ -119,7 +119,7 @@ module API
       api_authen_params([:openid, :formid])
     
       redis_key = 'wxmp/formid'
-      expired_timestamp = Time.now.to_i + 7 * 24 * 60
+      expired_timestamp = Time.now.to_f + 7 * 24 * 60
       redis_hkey = "#{params[:openid]}@#{expired_timestamp}"
       redis.hset(redis_key, redis_hkey, params[:formid])
 
@@ -146,8 +146,8 @@ module API
       Setting.api_keys.any? { |key| md5("#{key}#{request.path}#{key}") == api_token }
     end
 
-    def get_weixin_access_token
-      redis_key = 'wxmp-access-token'
+    def get_wxmp_access_token
+      redis_key = 'wxmp/access-token'
       return redis.get(redis_key) if redis.exists(redis_key)
 
       res = HTTParty.get("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=#{Setting.wxmp.app_id}&secret=#{Setting.wxmp.app_secret}")
@@ -172,7 +172,7 @@ module API
       image_path = File.join(image_folder, image_name)
 
       unless File.exists?(image_path)
-        access_token = get_weixin_access_token
+        access_token = get_wxmp_access_token
         options = {
           page: 'pages/group-list/main',
           scene: CGI.unescape(scene),

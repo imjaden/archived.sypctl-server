@@ -3,26 +3,95 @@ require 'uri'
 require 'erb'
 require 'httparty'
 require 'lib/utils/mail_sender.rb'
+require 'lib/sinatra/extension_redis'
 
 namespace :monitor do
+  def get_wxmp_access_token(redis)
+    redis_key = 'wxmp/access-token'
+    return redis.get(redis_key) if redis.exists(redis_key)
+
+    url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=#{Setting.wxmp.app_id}&secret=#{Setting.wxmp.app_secret}"
+    res = HTTParty.get(url)
+    return res.message if res.code != 200
+      
+    hsh = JSON.parse(res.body)
+    redis.set(redis_key, hsh['access_token'])
+    redis.expire(redis_key, hsh['expires_in'] - 60)
+    return redis.get(redis_key)
+  end
+
+  def post_wxmp_message(redis, alarm_hash, wxuser)
+    # 设备编号: 100001
+    # 设备名称: 友靠智能柜
+    # 解决方法: 请打开小程序进行修复
+    # 故障信息: 该设备 XX 配件已损坏
+    # 异常时间: 2015-12-14 10:20
+    access_token = get_wxmp_access_token(redis)
+    url = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=#{access_token}"
+    options = {
+      access_token: access_token,
+      touser: wxuser[:openid],
+      form_id: wxuser[:formid],
+      template_id: Setting.wxmp.template_id.device_exception,
+      page: 'pages/group-list/main',
+      data: {
+        keyword1: {
+          value: alarm_hash[:ip]
+        },
+        keyword2: {
+          value: alarm_hash[:name]
+        },
+        keyword3: {
+          value: '请尽快登录系统人工运维'
+        },
+        keyword4: {
+          value: alarm_hash[:exceptions]
+        },
+        keyword5: {
+          value: Time.now.strftime('%Y-%m-%d %H:%M')
+        }
+      }
+    }
+
+    res = HTTParty.post(url, body: options.to_json)
+    puts JSON.pretty_generate(options)
+    puts res.code
+    puts res.message
+    puts res.body
+  end
+
+  desc '定时扫描所有设置'
   task device: :environment do
+    register Sinatra::Redis
 
-    alarm_hash = {}
-    @devices = Device.where(monitor_state: true).map do |device|
-      alarm_hash[device.id] = []
-      alarm_hash[device.id].push("宕机") if (Time.now.to_i - device.updated_at.to_i) > 600
+    Device.where(monitor_state: true).each do |device|
+      exceptions = []
+      exceptions.push("提交时间超出10分钟可能宕机") if (Time.now.to_i - device.updated_at.to_i) > 600
       record_hash = device.latest_record
-      alarm_hash[device.id].push("内存>90") if record_hash[:memory_usage] && record_hash[:memory_usage].to_i > 90
-      alarm_hash[device.id].push("磁盘>95") if record_hash[:disk_usage] && record_hash[:disk_usage].to_i > 95
-
-      device unless alarm_hash[device.id].empty?
-    end.compact
-
-    if @devices.empty?
-      puts "所有监控设备运行正常"
-      exit
+      exceptions.push("内存>90") if record_hash[:memory_usage] && record_hash[:memory_usage].to_i > 90
+      exceptions.push("磁盘>90") if record_hash[:disk_usage] && record_hash[:disk_usage].to_i > 90
+      next if exceptions.empty?
+      
+      alarm_hash = {
+        ip: device.wan_ip,
+        name: device.human_name,
+        exceptions: exceptions.join(';')
+      }
+      WxUser.where('openid is not null').each do |wx_user|
+        openid = wx_user.openid
+        redis_key = 'wxmp/formid'
+        redis_hkey = 'count@' + openid
+        cursor, result = redis.hscan(redis_key, 0, match: openid+'*', count: 1)
+        if result && !result.empty?
+          post_wxmp_message(redis, alarm_hash, {openid: openid, formid: result[0][1]})
+          redis.hdel(redis_key, result[0][0])
+          redis.hincrby(redis_key, redis_hkey, -1)
+        end
+      end
     end
+  end
 
+  task deprecated: :environment do
     begin
       include Mail::Methods
 
