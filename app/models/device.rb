@@ -61,7 +61,14 @@ class Device < ActiveRecord::Base
     hsh[:health_value] = health_value
     hsh[:submit_time_color] = (!updated_at || (Time.now - updated_at) > 10*60 ? 'error' : 'none')
 
-    return hsh
+    latest_record_hash = latest_record
+    [:id, :uuid, :created_at, :updated_at].each do |key|
+      latest_record_hash.delete(key)
+    end
+    hsh[:cpu_description] = latest_record_hash[:cpu_usage_description]
+    hsh[:disk_description] = latest_record_hash[:disk_usage_description]
+    hsh[:memory_description] = latest_record_hash[:memory_usage_description]
+    return hsh.merge(latest_record_hash)
   end
 
   def health_map

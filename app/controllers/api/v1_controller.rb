@@ -69,7 +69,9 @@ module API
       jobs = []
       record = Record.create(params[:device])
       if device = Device.find_by(uuid: params[:device][:uuid])
-        device.update_attributes({record_count: device.record_count + 1})
+        device.update_attributes({
+          record_count: device.record_count + 1
+        })
         jobs = Job.where(device_uuid: device.uuid, state: 'waiting').map(&:to_hash)
       end
 

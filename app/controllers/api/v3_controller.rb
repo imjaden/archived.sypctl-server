@@ -114,6 +114,32 @@ module API
       respond_with_formt_json({data: record.to_hash, message: '创建/更新成功'}, 201)
     end
 
+    # 提交 formid
+    post '/wxmp/formid' do
+      api_authen_params([:openid, :formid])
+    
+      redis_key = 'wxmp/formid'
+      expired_timestamp = Time.now.to_i + 7 * 24 * 60
+      redis_hkey = "#{params[:openid]}@#{expired_timestamp}"
+      redis.hset(redis_key, redis_hkey, params[:formid])
+
+      redis_hkey = "count@#{params[:openid]}"
+      redis.hincrby(redis_key, redis_hkey, 1)
+      formid_count = redis.hget(redis_key, redis_hkey) || 0
+      
+      respond_with_formt_json({data: formid_count, message: '提交成功'}, 201)
+    end
+
+    get '/wxmp/formid_count' do
+      api_authen_params([:openid])
+
+      redis_key = 'wxmp/formid'
+      redis_hkey = "count@#{params[:openid]}"
+      formid_count = redis.hget(redis_key, redis_hkey) || 0
+      
+      respond_with_formt_json({data: formid_count, message: '获取成功'}, 200)
+    end
+
     protected
 
     def authen_api_token(api_token)
