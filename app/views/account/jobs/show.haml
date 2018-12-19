@@ -22,11 +22,11 @@
     %table.table.table-hover.table-condensed.table-strip.table-bordered.app
       %tbody
         %tr
-          %td 任务名称
-          %td.name{'v-text' => 'job.title'}
-        %tr
           %td 任务 UUID
           %td{'v-text' => 'job.uuid'}
+        %tr
+          %td 任务名称
+          %td.name{'v-text' => 'job.title'}
         %tr
           %td 任务状态
           %td
@@ -35,8 +35,11 @@
           %td 主机名称
           %td{'v-text' => 'job.device_name'}
         %tr
-          %td 主机 UUID
-          %td{'v-text' => 'job.device_uuid'}
+          %td 应用名称
+          %td{'v-text' => 'job.app_name'}
+        %tr
+          %td 应用版本
+          %td{'v-text' => 'job.version_name'}
         %tr
           %td 部署脚本
           %td

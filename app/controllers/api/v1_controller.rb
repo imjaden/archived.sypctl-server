@@ -126,11 +126,49 @@ module API
       respond_with_paginate(Device, records, params)
     end
 
-    get '/:app_id/versions' do
-      app = App.find_by(id: params[:app_id])
+    get '/app' do
+      api_authen_params([:uuid])
+
+      app = App.find_by(uuid: params[:uuid])
+
+      respond_with_formt_json({data: app.to_hash, message: '查询成功'}, 200)
+    end
+
+    get '/app/latest_version' do
+      api_authen_params([:uuid])
+      
+      version = Version.find_by(uuid: params[:uuid])
+      halt_with_format_json({data: {}, message: '查询失败'}, 200) unless version
+
+      respond_with_formt_json({data: version.to_hash, message: '查询成功'}, 200)
+    end
+
+    get '/app/versions' do
+      api_authen_params([:uuid])
+
+      app = App.find_by(uuid: params[:uuid])
       records = app.versions.order(id: :desc).offset(params[:page]*params[:page_size]).limit(params[:page_size]).map(&:to_hash)
 
       respond_with_paginate(app.versions, records, params)
+    end
+
+    get '/app/version' do
+      api_authen_params([:uuid])
+
+      version = Version.find_by(uuid: params[:uuid])
+      data = version.to_hash
+      data[:download_path] = "/api/v1/download/version?app_uuid=#{version.app_uuid}&version_file_name=#{version.file_name}"
+
+      respond_with_formt_json({data: data, message: '查询成功'}, 200)
+    end
+
+    get '/download/version' do
+      api_authen_params([:app_uuid, :version_file_name])
+
+      version_file_path = app_tmp_join("versions/#{params[:app_uuid]}/#{params[:version_file_name]}")
+      halt_with_format_json({data: {}, message: '版本文件不存在', code: 403}, 403) unless File.exists?(version_file_path)
+
+      send_file(version_file_path, type: 'application/java-archive', filename: File.basename(version_file_path), disposition: 'attachment')
     end
 
     get '/ifconfig.me' do

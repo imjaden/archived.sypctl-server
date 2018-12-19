@@ -13,6 +13,9 @@
     %th 内容
   %tbody
     %tr
+      %td UUID
+      %td= @version.uuid
+    %tr
       %td 应用名称
       %td= link_to @app.name, url_for("/#{@app.uuid}")
     %tr

@@ -12,15 +12,22 @@
     %th 内容
   %tbody
     %tr
+      %td UUID
+      %td= @record.uuid
+    %tr
       %td 应用名称
       %td.name= @record.name
     %tr
       %td 文件名称
       %td= @record.file_name
     %tr
-      %td 文件名称
+      %td 文件类型
       %td
         %span.label.label-info= @record.file_type
+    %tr
+      %td 部署路径
+      %td
+        %code= @record.file_path
     %tr
       %td 最新版本
       %td= link_to "#{@record.latest_version}/#{@record.latest_build}", url_for("/#{@record.uuid}/version/#{@record.latest_version_uuid}")

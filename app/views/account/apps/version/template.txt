@@ -1,0 +1,13 @@
+sypctl app:config init
+sypctl app:config app.uuid {{app.uuid}}
+sypctl app:config app.name {{app.uuid}}
+sypctl app:config app.file_name {{app.file_name}}
+sypctl app:config app.file_path {{app.file_path}}
+sypctl app:config version.uuid {{app.latest_version.uuid}}
+sypctl app:config version.name {{app.latest_version.version}}
+sypctl app:config version.backup_path /data/backup/
+
+sypctl app:deploy
+sypctl service restart saas-api
+
+

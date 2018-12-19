@@ -1,229 +1,98 @@
-.col-sm-9
-  - url = url_for(@record ? "/#{@record.id}?page=#{params[:page] || 1}" : "/")
-  - form_for @record, url, method: "post", class: "form-horizontal", id: "recordForm" do |f|
-    = f.hidden_field :uuid
-    - field_set_tag do
-      .form-group
-        = f.label '任务标题', class: "col-sm-2 control-label"
-        .col-sm-9
-          = f.text_field :title, class: "form-control", placeholder: "任务标题，必填项"
-        .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
-          %span{style: "padding-top:10px;"}
-            %a{onclick: "window.Job.listJobTemplates(0);"}
-              %span.glyphicon.glyphicon-check
-      .form-group
-        = f.label '设备名称', class: "col-sm-2 control-label"
-        .col-sm-9
-          = f.hidden_field :device_list
-          = f.text_area :device_name, class: "form-control", rows: 1, placeholder: "要部署的设备，必填项"
-        .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
-          %a{onclick: "window.Job.listDevices(0);"}
-            %span.glyphicon.glyphicon-check
-      .form-group
-        = f.label '应用名称', class: "col-sm-2 control-label"
-        .col-sm-9
-          = f.hidden_field :app_id
-          = f.text_field :app_name, class: "form-control", placeholder: "要部署的应用"
-        .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
-          %a{onclick: "window.Job.listApps(0);"}
-            %span.glyphicon.glyphicon-check
-      .form-group
-        = f.label '版本名称', class: "col-sm-2 control-label"
-        .col-sm-9
-          = f.hidden_field :version_id
-          = f.text_field :version_name, class: "form-control", placeholder: "要部署的版本"
-        .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
-          %a{onclick: "window.Job.listAppVersions(0);"}
-            %span.glyphicon.glyphicon-check
-      .form-group
-        = f.label '部署脚本', class: "col-sm-2 control-label"
-        .col-sm-9
-          = f.text_area :command, class: "form-control", rows: 8, placeholder: "部署脚本，必填项"
-      .form-group
-        = f.label '执行时间', class: "col-sm-2 control-label"
-        .col-sm-9
-          = f.text_field :executed_at, class: "form-control", placeholder: "执行时间，定时任务功能"
-      .form-group
-        = f.label '任务描述', class: "col-sm-2 control-label"
-        .col-sm-9
-          = f.text_area :description, class: "form-control", rows: 2, placeholder: "任务描述"
-      .form-group
-        .col-sm-offset-2.col-sm-10
-          = f.submit "提交", class: "btn btn-primary hidden"
-          = link_to "提交", "javascript:void(0);", class: "btn btn-primary", onclick: "window.JobObject.onsubmit();"
-          = button_tag "取消", class: "btn btn-default", onclick: "window.history.go(-1);"
-
-.col-sm-3
-  :css
-    .list-group .items {
-      width: 100%;
-      padding-left: 0;
-      max-height: 500px;
-      overflow: scroll;
-    }
-  .list-group
-
-:javascript
-  window.Job = {
-    setJobTemplate: function(ctl) {
-      $li = $(ctl).closest("li");
-      $("#job_group_title").val($li.data("title"))
-      $("#job_group_command").val($li.data("content"))
-    },
-    listJobTemplates: function(page) {
-      $.ajax({
-        method: 'get',
-        url: '/api/v1/job_templates',
-        contentType: 'application/json',
-        data: {page: page, page_size: 100}
-      }).done(function(res, status, xhr) {
-        $(".list-group").html("")
-        $(".list-group").append("<button class='list-group-item disabled' type='button' \>模板列表：</button>");
-        if(!res.data.length) {
-          $(".list-group").append("<button class='list-group-item disabled' type='button' \>无数据</button>");
-        }
-
-        $(".list-group").append("<ul class='items'></ul>");
-        let $ul = $(".list-group ul.items");
-        res.data.forEach(function(el) {
-
-          $ul.append(" \
-            <li class='list-group-item' \
-                    type='button' \
-                    data-content='" + el.content + "' \
-                    data-title='" + el.title + "'> \
-            <input class='device' type='radio' name='job-template' onclick='window.Job.setJobTemplate(this);' \>&nbsp;" + el.title + "</li> \
-          ")
-        })
-      }).fail(function(res, status, xhr) {
-      }).always(function(res, status, xhr) {
-      });
-    },
-    setDevice: function(ctl) {
-      var device_list = [], device_names = [], $li;
-      $(".list-group input[type=checkbox]:checked").each(function() {
-          $li = $(this).closest("li");
-          if($li.data("name")) {
-            device_list.push({
-              name: $li.data("name"),
-              uuid: $li.data("uuid")
-            });
-            device_names.push("<" + $li.data("name") + ">");
-          }
-      });
-      $("#job_group_device_name").val(device_names.join(","));
-      $("#job_group_device_list").val(JSON.stringify(device_list));
-    },
-    selectAllDevice: function() {
-      var device_list = [], device_names = [], $li;
-      $(".list-group input[type=checkbox]").each(function() {
-          if($(this).hasClass('device')) {
-            $(this).click();
-          }
-      });
-    },
-    listDevices: function(page) {
-      $.ajax({
-        method: 'get',
-        url: '/api/v1/devices',
-        contentType: 'application/json',
-        data: {page: page, page_size: 100}
-      }).done(function(res, status, xhr) {
-        $(".list-group").html("")
-        $(".list-group").append("<span class='list-group-item' style='background:#eee;'>设备列表：<input class='no' type='checkbox' onclick='window.Job.selectAllDevice();' \>&nbsp;全选</span>");
-        if(!res.data.length) {
-          $(".list-group").append("<button class='list-group-item disabled' type='button' \>无数据</button>");
-        }
-        $(".list-group").append("<ul class='items'></ul>");
-        let $ul = $(".list-group ul.items");
-        res.data.forEach(function(el) {
-          $ul.append(" \
-            <li class='list-group-item' \
-                    type='button' \
-                    data-uuid='" + el.uuid + "' \
-                    data-name='" + el.human_name + "'> \
-            <input class='device' type='checkbox' onclick='window.Job.setDevice(this);' \>&nbsp;" + el.human_name + "</li> \
-          ")
-        })
-      }).fail(function(res, status, xhr) {
-      }).always(function(res, status, xhr) {
-      });
-    },
-    setApp: function(ctl) {
-      $("#job_group_app_id").val($(ctl).data("id"));
-      $("#job_group_app_name").val($(ctl).data("name"));
-    },
-    listApps: function(page) {
-      $.ajax({
-        method: 'get',
-        url: '/api/v1/apps',
-        contentType: 'application/json',
-        data: {page: page, page_size: 100}
-      }).done(function(res, status, xhr) {
-        $(".list-group").html("")
-        $(".list-group").append("<button class='list-group-item disabled' type='button' \>应用列表：</button>");
-        if(!res.data.length) {
-          $(".list-group").append("<button class='list-group-item disabled' type='button' \>无数据</button>");
-        }
-        res.data.forEach(function(el) {
-          $(".list-group").append(" \
-            <button class='list-group-item' \
-                    type='button' \
-                    onclick='window.Job.setApp(this);' \
-                    data-id='" + el.id + "' \
-                    data-name='" + el.name + "'> \
-            " + el.name + "</button> \
-          ")
-        })
-      }).fail(function(res, status, xhr) {
-      }).always(function(res, status, xhr) {
-      });
-    },
-    setAppVersion: function(ctl) {
-      $("#job_group_version_id").val($(ctl).data("id"));
-      $("#job_group_verison_name").val($(ctl).data("name"));
-    },
-    listAppVersions: function(page) {
-      var app_id = parseInt($("#job_group_app_id").val());
-      if(isNaN(app_id) || app_id <= 0) {
-        window.Loading.popup("请选择应用")
-        return;
-      }
-      $.ajax({
-        method: 'get',
-        url: '/api/v1/' + app_id + '/versions',
-        contentType: 'application/json',
-        data: {page: page, page_size: 100}
-      }).done(function(res, status, xhr) {
-        $(".list-group").html("")
-        $(".list-group").append("<button class='list-group-item disabled' type='button' \>版本列表：</button>");
-        if(!res.data.length) {
-          $(".list-group").append("<button class='list-group-item disabled' type='button' \>无数据</button>");
-        }
-        res.data.forEach(function(el) {
-          $(".list-group").append(" \
-            <button class='list-group-item' \
-                    type='button' \
-                    onclick='window.Job.setApp(this);' \
-                    data-id='" + el.id + "' \
-                    data-name='" + el.version + "'> \
-            " + el.version + "</button> \
-          ")
-        })
-      }).fail(function(res, status, xhr) {
-      }).always(function(res, status, xhr) {
-      });
-    },
-    cleanCommand: function() {
-      var command = $("#job_group_command").val();
-      if(command.length) {
-        command = command.split("\n").map(function(el) {
-          return $.trim(el);
-        }).join("\n");
-        $("#job_group_command").val(command);
-      }
-    }
+:css
+  .list-group .items {
+    width: 100%;
+    padding-left: 0;
+    max-height: 500px;
+    overflow: scroll;
   }
+#jobForm
+  .col-sm-9
+    - url = url_for(@record ? "/#{@record.id}?page=#{params[:page] || 1}" : "/")
+    - form_for @record, url, method: "post", class: "form-horizontal", id: "recordForm", '@submit' => 'checkForm' do |f|
+      = f.hidden_field :uuid
+      - field_set_tag do
+        .form-group
+          = f.label '任务标题', class: "col-sm-2 control-label"
+          .col-sm-9
+            = f.text_field :title, class: "form-control", placeholder: "任务标题，必填项", ':value' => 'record.title'
+          .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
+            %span{style: "padding-top:10px;"}
+              %a{'@click' => "listJobTemplates(0)"}
+                %span.glyphicon.glyphicon-check
+        .form-group
+          = f.label '设备名称', class: "col-sm-2 control-label"
+          .col-sm-9
+            = f.hidden_field :device_list, ':value' => 'record.device_list'
+            = f.text_area :device_name, class: "form-control", rows: 1, placeholder: "要部署的设备，必填项", ':value' => 'record.device_name'
+          .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
+            %span{style: "padding-top:10px;"}
+              %a{'@click' => "listDevices(0)"}
+                %span.glyphicon.glyphicon-check
+        .form-group
+          = f.label '应用名称', class: "col-sm-2 control-label"
+          .col-sm-9
+            = f.hidden_field :app_id, ':value' => 'record.app_id'
+            = f.text_field :app_name, class: "form-control", placeholder: "要部署的应用", ':value' => 'record.app_name'
+          .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
+            %span{style: "padding-top:10px;"}
+              %a{'@click' => "listApps(0)"}
+                %span.glyphicon.glyphicon-check
+        .form-group
+          = f.label '版本名称', class: "col-sm-2 control-label"
+          .col-sm-9
+            = f.hidden_field :version_id, ':value' => 'record.version_id'
+            = f.text_field :version_name, class: "form-control", placeholder: "要部署的版本", ':value' => 'record.version_name'
+          .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
+            %span{style: "padding-top:10px;"}
+              %a{'@click' => "listVersions(0)"}
+                %span.glyphicon.glyphicon-check
+        .form-group
+          = f.label '部署脚本', class: "col-sm-2 control-label"
+          .col-sm-9
+            = f.text_area :command, class: "form-control", rows: 8, placeholder: "部署脚本，必填项", ':value' => 'record.command'
+          .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
+            %a{'@click' => "renderCommand();"}
+              %span.glyphicon.glyphicon-eye-open
+        .form-group
+          = f.label '执行时间', class: "col-sm-2 control-label"
+          .col-sm-9
+            = f.text_field :executed_at, class: "form-control", placeholder: "执行时间，定时任务功能", ':value' => 'record.executed_at'
+        .form-group
+          = f.label '任务描述', class: "col-sm-2 control-label"
+          .col-sm-9
+            = f.text_area :description, class: "form-control", rows: 2, placeholder: "任务描述", ':value' => 'record.description'
+        .form-group
+          .col-sm-offset-2.col-sm-10
+            = f.submit "提交", class: "btn btn-primary"
+            = link_to "提交", "javascript:void(0);", class: "btn btn-primary hidden", onclick: "window.JobObject.onsubmit();"
+            = button_tag "取消", class: "btn btn-default", onclick: "window.history.go(-1);"
 
-  window.Job.listJobTemplates(0);
-  window.Job.cleanCommand();
+  .col-sm-3
+    .list-group{'v-if' => 'showJobTemplates'}
+      %button.list-group-item.disabled{type: 'button', 'v-text' => '"模板列表：(" + jobTemplates.length + " 个)"'} 
+      %button.list-group-item.disabled{type: 'button', 'v-if' => 'jobTemplates.length == 0'} 无数据
+      %ul.items
+        %li.list-group-item{'v-for' => '(item, index) in jobTemplates'}
+          %input{type: 'radio', name: 'radio-group', '@click' => 'jobTemplateRadioClick(item)'} &nbsp;{{ item.title }}
+    .list-group{'v-if' => 'showDevices'}
+      %button.list-group-item.disabled{type: 'button', 'v-text' => '"设备列表：(" + devices.length + " 台)"'}  
+      %button.list-group-item.disabled{type: 'button', 'v-if' => 'devices.length == 0'} 无数据
+      %ul.items
+        %li.list-group-item{'v-for' => '(item, index) in devices'}
+          %input{type: 'checkbox', name: 'checkbox-group', 'v-model' => 'deviceCheckedList', ':value' => 'item'} &nbsp;{{ item.human_name }}
+    .list-group{'v-if' => 'showApps'}
+      %button.list-group-item.disabled{type: 'button', 'v-text' => '"应用列表：(" + apps.length + " 个)"'}  
+      %button.list-group-item.disabled{type: 'button', 'v-if' => 'apps.length == 0'} 无数据
+      %ul.items
+        %li.list-group-item{'v-for' => '(item, index) in apps'}
+          %input{type: 'radio', name: 'radio-group', '@click' => 'appRadioClick(item)'} &nbsp;{{ item.name }}
+    .list-group{'v-if' => 'showVersions'}
+      %button.list-group-item.disabled{type: 'button', 'v-text' => '"版本列表：(" + versions.length + " 个)"'} 
+      %button.list-group-item.disabled{type: 'button', 'v-if' => 'versions.length == 0'} 无数据 
+      %ul.items
+        %li.list-group-item{'v-for' => '(item, index) in versions'}
+          %input{type: 'radio', name: 'radio-group', '@click' => 'versionRadioClick(item)'} &nbsp;{{ item.version }}
+
+      
+
+= erb :'_form.js'

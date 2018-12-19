@@ -41,7 +41,7 @@ window.Loading = {
         loading_width = $(".loading").width(),
         left_width = (x - loading_width - 50)/2;
 
-    console.log({"x": x, "w": loading_width, "left": left_width, "margin-left": '0px'});
+    // console.log({"x": x, "w": loading_width, "left": left_width, "margin-left": '0px'});
     $(".loading").css({"left": left_width, "margin-left": '0px'});
   }
 }

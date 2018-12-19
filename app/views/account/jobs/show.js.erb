@@ -26,17 +26,23 @@ new Vue({
         url: "<%= url_for('/') %>" + job.uuid
       }).done(function(res, status, xhr) {
         if(res.code === 201) {
-          window.Loading.show("删除成功");
-          let jobIndex = that.jobList.findIndex(function(job) { return job.uuid === that.job.uuid; });
-          that.$nextTick(function() {
-            that.jobList.splice(jobIndex, 1)
-            that.job = that.jobList[0]
-          })
-
           try {
             var objects = {job: { id: job.id, name: job.title }}
             window.OperationLogger.record("job.delete", objects);
           } catch(e) { console.log(e) }
+
+          window.Loading.show("删除成功");
+          if(that.jobList.length == 1) {
+            confirm('该任务关联的设备已被清空，返回任务列表?')
+            window.location.href = "<%= url_for('/') %>"
+            return false
+          } else {
+            let jobIndex = that.jobList.findIndex(function(job) { return job.uuid === that.job.uuid; });
+            that.$nextTick(function() {
+              that.jobList.splice(jobIndex, 1)
+              that.job = that.jobList[0]
+            })
+          }
         } else {
           window.Loading.show("删除失败");
         }
