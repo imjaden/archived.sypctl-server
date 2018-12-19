@@ -86,7 +86,8 @@ module Account
           file_name: res[:file_name],
           file_size: res[:file_size],
           version: increment_version(app.latest_version),
-          build: increment_build(app.latest_build)
+          build: increment_build(app.latest_build),
+          description: res[:version_path]
         })
         app.update_attributes({
           latest_version: version.version,
