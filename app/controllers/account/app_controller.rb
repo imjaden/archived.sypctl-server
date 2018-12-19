@@ -27,7 +27,7 @@ module Account
 
       if record.save(validate: true)
         flash[:success] = '创建成功'
-        redirect to("/#{record.uuid}")
+        redirect to("/") # /#{record.uuid}
       else
         flash[:danger] = record.errors.messages.to_s
         redirect to('/new')
@@ -109,10 +109,19 @@ module Account
     end
 
     post '/:app_uuid/version/:version_uuid' do
-      @version = Version.find_by(uuid: params[:version_uuid])
-      @version.update_attributes(params[:version])
+      version = Version.find_by(uuid: params[:version_uuid])
+      version.update_attributes(params[:version])
 
-      redirect to("/#{params[:app_uuid]}/version/#{params[:version_uuid]}")
+      app = App.find_by(uuid: params[:app_uuid])
+      app.update_attributes({
+        latest_version: version.version,
+        latest_build: version.build,
+        latest_version_id: version.id, 
+        latest_version_uuid: version.uuid, 
+        version_count: app.versions.count
+      })
+
+      redirect to("/") # /#{params[:app_uuid]}/version/#{params[:version_uuid]}
     end
 
     get '/:app_uuid/version/:version_uuid' do
