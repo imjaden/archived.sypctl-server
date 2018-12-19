@@ -8,8 +8,8 @@ require './config/boot.rb'
 use Unicorn::OobGC, 10
 # Max requests per worker(1000 - 1500)
 use Unicorn::WorkerKiller::MaxRequests, 1000, 1500
-# Max memory size (RSS) per worker(192M - 256M)
-use Unicorn::WorkerKiller::Oom, (192*(1024**2)), (256*(1024**2))
+# Max memory size (RSS) per worker(256M - 1024M)
+use Unicorn::WorkerKiller::Oom, (256*(1024**2)), (1024*(1024**2))
 
 {
   '/' => 'ApplicationController',
