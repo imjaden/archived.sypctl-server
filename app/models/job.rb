@@ -10,8 +10,11 @@ class Job < ActiveRecord::Base
   def update_job_group_state
 
     if record = self.job_group
-      is_done = record.jobs.all? { |job| job.state == 'done' }
-      record.update_attributes({state: 'done'}) if is_done
+      if is_done = record.jobs.all? { |job| job.state == 'done' }
+        record.update_attributes({state: 'done'})
+      elsif %w(dealing done).include?(job.state)
+        record.update_attributes({state: 'dealing'})
+      end
     end
   end
 

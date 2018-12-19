@@ -84,7 +84,7 @@ module API
 
       if job = Job.find_by(uuid: params[:job][:uuid])
         job.update_attributes(params[:job])
-        job.update_job_group_state if params[:job][:state] == 'done'
+        job.update_job_group_state if %w(dealing done).include?(params[:job][:state])
       end
 
       respond_with_json({data: job.to_hash, message: '更新任务成功'}, 201)
