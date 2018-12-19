@@ -82,12 +82,13 @@ module Account
           uuid: generate_uuid,
           app_id: params[:app_id],
           app_uuid: params[:app_uuid],
-          md5: res[:version_md5],
+          md5: res[:file_md5],
           file_name: res[:file_name],
+          origin_file_name: res[:origin_file_name],
           file_size: res[:file_size],
+          file_path: res[:file_path],
           version: increment_version(app.latest_version),
           build: increment_build(app.latest_build),
-          description: res[:version_path]
         })
         app.update_attributes({
           latest_version: version.version,
@@ -158,7 +159,8 @@ module Account
         extname = File.extname(form_data[:filename])
         version_path = File.join(version_folder, "#{generate_uuid}#{extname}")
         begin
-          File.open(version_path, "w:utf-8") { |file| file.puts(temp_file.read.force_encoding("UTF-8")) }
+          FileUtils.rm_rf(version_path) if File.exists?(version_path)
+          File.open(version_path, "wb") { |file| file.write(temp_file.read) }
           version_md5 = digest_file_md5(version_path)
         rescue => e
           puts "#{__FILE__}:#{__LINE__} #{e.message}"
@@ -166,11 +168,11 @@ module Account
         
         {
           file_name: File.basename(version_path),
-          origin_name: form_data[:filename],
+          origin_file_name: form_data[:filename],
           file_type: form_data[:type],
           file_size: File.size(version_path),
-          version_path: version_path,
-          version_md5: version_md5
+          file_path: version_path,
+          file_md5: version_md5
         }
       end
     end

@@ -1,0 +1,77 @@
+<script>
+new Vue({
+  el: '#appVersionUpload',
+  data: function() {
+    return { 
+      app: <%= @app.to_hash.to_json %>,
+      action: null,
+      data: {},
+      md5: null
+    }
+  },
+  created() {
+    this.action = '<%= url_for('/') %>' + this.app.uuid + '/version/upload'
+    this.data = {app_id: this.app.id, app_uuid: this.app.uuid}
+    console.log('app:', this.app)
+    console.log('action:', this.action)
+  },
+  methods: {
+    uploadOnError(err, file, fileList) {
+      console.log('uploadOnError', err, file, fileList)
+    },
+    uploadOnSuccess(response, file, fileList) {
+      console.log('uploadOnSuccess', response, file, fileList)
+      console.log(fileList[0].raw)
+      if(response.code == 201) {
+        this.caculateFileMd5(fileList[0].raw, response.data)
+      } else {
+        window.Loading.popup('上传失败，' + response.message)
+      }
+    },
+    uploadOnChange(file, fileList) {
+      console.log('uploadOnChange', file, fileList)
+    },
+    caculateFileMd5(file, redirectUrl) {
+      var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
+          chunkSize = 2097152,                             // Read in chunks of 2MB
+          chunks = Math.ceil(file.size / chunkSize),
+          currentChunk = 0,
+          spark = new SparkMD5.ArrayBuffer(),
+          fileReader = new FileReader(),
+          that = this;
+
+      window.Loading.show('计算文件哈希...')
+      fileReader.onload = function (e) {
+          console.log('read chunk nr', currentChunk + 1, 'of', chunks);
+          spark.append(e.target.result);                   // Append array buffer
+          currentChunk++;
+
+          if (currentChunk < chunks) {
+              loadNext();
+          } else {
+              that.md5 = spark.end()
+              window.Loading.hide()
+              console.log('finished loading');
+              console.info('computed hash', that.md5);  // Compute hash
+
+              let recirectTo = window.location.href.replace(window.location.pathname, redirectUrl + '?origin_md5=' + that.md5)
+              window.location.replace(recirectTo)
+          }
+      };
+
+      fileReader.onerror = function () {
+          console.warn('oops, something went wrong.');
+      };
+
+      function loadNext() {
+        var start = currentChunk * chunkSize,
+            end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+
+        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+      }
+
+      loadNext();
+    }
+  }
+})
+</script>

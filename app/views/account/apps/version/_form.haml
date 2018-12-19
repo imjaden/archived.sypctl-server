@@ -4,11 +4,19 @@
     .form-group
       = f.label '文件名称', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.text_field :file_name, class: "form-control", disabled: 'disabled'
+        = f.text_field :file_name, class: "form-control", readonly: true
     .form-group
-      = f.label '文件哈希', class: "col-sm-2 control-label", disabled: 'disabled'
+      = f.label '文件原始名称', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.text_field :origin_file_name, class: "form-control", readonly: true
+    .form-group
+      = f.label '文件哈希', class: "col-sm-2 control-label", readonly: true
       .col-sm-7
         = f.text_field :md5, class: "form-control", disabled: 'disabled'
+    .form-group
+      = f.label '文件原始哈希', class: "col-sm-2 control-label", readonly: true
+      .col-sm-7
+        = f.text_field :origin_md5, class: "form-control", 'value' => "#{params[:origin_md5]}", readonly: true
     .form-group
       = f.label '文件大小', class: "col-sm-2 control-label"
       .col-sm-7

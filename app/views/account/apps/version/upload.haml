@@ -1,5 +1,6 @@
 = stylesheet_link_tag 'element-ui@2.4.11.css'
 = javascript_include_tag 'element-ui@2.4.11.js'
+= javascript_include_tag 'spark-md5.min.js'
 
 %ol.breadcrumb
   %li 应用中心
@@ -32,43 +33,12 @@
 #appVersionUpload.row
   .col-md-2
   .col-md-8
-    %el-upload.upload-demo{':action' => 'action', ':data' => 'data', drag: true, multiple: false, accept: '.jar,.war', 'auto-upload' => true, ':on-success' => 'uploadOnSuccess', ':on-error' => 'uploadOnError', ':on-change' => 'uploadOnChange'}
+    %el-upload.upload-demo{':action' => 'action', ':data' => 'data', drag: true, multiple: false, ':accept' => '"." + app.file_type', 'auto-upload' => true, ':on-success' => 'uploadOnSuccess', ':on-error' => 'uploadOnError', ':on-change' => 'uploadOnChange'}
       %i.el-icon-upload
       .el-upload__text
         将文件拖到此处，或
         %em 点击上传
         %br
-        （只能上传war/jar文件，且不超过100mb）
+        （只能上传 {{app.file_type}} 文件，且不超过100mb）
 
-:javascript
-  new Vue({
-    el: '#appVersionUpload',
-    data: function() {
-      return { 
-        app: #{@app.to_hash.to_json},
-        action: null,
-        data: {}
-      }
-    },
-    created() {
-      this.action = '#{url_for('/')}' + this.app.uuid + '/version/upload'
-      this.data = {app_id: this.app.id, app_uuid: this.app.uuid}
-      console.log('app:', this.app)
-      console.log('action:', this.action)
-    },
-    methods: {
-      uploadOnError(err, file, fileList) {
-        console.log('uploadOnError', err, file, fileList)
-      },
-      uploadOnSuccess(response, file, fileList) {
-        console.log('uploadOnSuccess', response, file, fileList)
-        if(response.code == 201) {
-          let recirectTo = window.location.href.replace(window.location.pathname, response.data)
-          window.location.replace(recirectTo)
-        }
-      },
-      uploadOnChange(file, fileList) {
-        console.log('uploadOnChange', file, fileList)
-      }
-    }
-  })
+= erb :'version/upload.js'

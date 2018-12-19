@@ -19,7 +19,5 @@ class AddColumnUuid < ActiveRecord::Migration[5.2]
     add_column :sys_job_templates, :user_group_uuid, :string, null: true, comment: '分组 UUID'
     add_column :sys_services, :device_uuid, :string, null: true, comment: '设备 UUID'
     add_column :sys_job_groups, :user_group_uuid, :string, null: true, comment: '分组 UUID'
-
-    add_column :sys_versions, :origin_name, :string, null: true, comment: '文件原名称'
   end
 end

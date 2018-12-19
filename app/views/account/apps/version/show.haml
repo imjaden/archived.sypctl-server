@@ -28,14 +28,23 @@
       %td build 值
       %td= @version.build
     %tr
-      %td 文件名称(版本)
+      %td 文件名称
       %td= @version.file_name
+    %tr
+      %td 文件原始名称
+      %td= @version.origin_file_name
     %tr
       %td 文件大小
       %td= @version.file_size
     %tr
-      %td 文件 MD5
+      %td 文件哈希
       %td= @version.md5
+    %tr
+      %td 文件原始哈希
+      %td= @version.origin_md5
+    %tr
+      %td 文件存储路径
+      %td= @version.file_path.sub(ENV['APP_ROOT_PATH'], '{{project}}')
     %tr
       %td CDN 链接
       %td= @version.cdn_link

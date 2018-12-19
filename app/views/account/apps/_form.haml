@@ -16,7 +16,7 @@
     .form-group
       = f.label '文件类型', class: "col-sm-2 control-label"
       .col-sm-7
-        = f.text_field :file_type, class: "form-control", placeholder: "文件类型, 必填项"
+        = f.select :file_type, options: [['war', 'war'], ['jar', 'jar']], class: "form-control", placeholder: "文件类型, 必填项"
     .form-group
       = f.label '部署路径', class: "col-sm-2 control-label"
       .col-sm-7
