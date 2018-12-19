@@ -12,7 +12,7 @@ class Job < ActiveRecord::Base
     if record = self.job_group
       if is_done = record.jobs.all? { |job| job.state == 'done' }
         record.update_attributes({state: 'done'})
-      elsif %w(dealing done).include?(job.state)
+      elsif %w(dealing done).include?(self.state)
         record.update_attributes({state: 'dealing'})
       end
     end
