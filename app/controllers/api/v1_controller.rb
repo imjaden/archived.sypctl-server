@@ -165,7 +165,8 @@ module API
     get '/download/version' do
       api_authen_params([:app_uuid, :version_file_name])
 
-      version_file_path = app_tmp_join("versions/#{params[:app_uuid]}/#{params[:version_file_name]}")
+
+      version_file_path = File.join(Setting.path.version, params[:app_uuid], params[:version_file_name])
       halt_with_format_json({data: {}, message: '版本文件不存在', code: 403}, 403) unless File.exists?(version_file_path)
 
       send_file(version_file_path, type: 'application/java-archive', filename: File.basename(version_file_path), disposition: 'attachment')
