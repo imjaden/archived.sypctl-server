@@ -12,10 +12,10 @@ new Vue({
       devices: [],
       showApps: false,
       apps: [],
-      app: {},
+      app: null,
       showVersions: false,
       versions: [],
-      version: {},
+      version: null,
       latest_version: null
     }
   },
@@ -66,6 +66,7 @@ new Vue({
 
       this.record.title = item.title
       this.record.command = content
+      this.renderCommand(false)
     },
     listJobTemplates(page) {
       let that = this
@@ -112,6 +113,7 @@ new Vue({
       this.record.app_id = item.id
       this.record.app_name = item.name
       this.record.app_uuid = item.uuid
+      this.renderCommand(false)
     },
     listApps(page) {
       let that = this
@@ -137,6 +139,7 @@ new Vue({
       this.version = item
       this.record.version_id = item.id
       this.record.version_name = item.version
+      this.renderCommand(false)
     },
     listVersions(page) {
       if(!this.record.app_id) {
@@ -184,35 +187,74 @@ new Vue({
         window.Loading.hide()
       });
     },
-    renderCommand() {
+    renderCommand(isPopup) {
       if(!this.record.command) {
-        window.Loading.popup("请选择部署模板")
+        if(isPopup) { window.Loading.popup("请选择部署模板") }
+        console.log('WARNING: 请选择部署模板')
         return false;
       }
 
       let that = this
-      this.getAppLatestVersion(() => {
-        let command = that.record.command,
-            matchDatas = command.match(/\{\{(.*?)\}\}/g),
-            varObjs = {},
-            varText, klass, obj, parts, result;
+      let command = that.record.command,
+          matchDatas = command.match(/\{\{(.*?)\}\}/g) || [],
+          varObjs = {},
+          klassObj = {},
+          varText, klass, obj, parts, result;
 
-        matchDatas.forEach((data) => {
-          varText = data.replace(/\{|\}|\s/g, '')
-          if(!varObjs[varText]) {
-            parts = varText.split('.')
-            klass = parts.splice(0, 1)[0]
-            obj = (klass == 'app' ? this.app : this.version)
-            parts.forEach((part, inx) => {
-              obj = obj[part] 
-            })
-            varObjs[varText] = obj
-            command = command.replace(new RegExp(data, 'g'), JSON.stringify(obj))
+      if(!matchDatas.length) {
+        console.log('INFO:  部署模板脚本中无变量')
+        return false
+      }
+
+      klassObj = matchDatas.reduce((result, data) => {
+        varText = data.replace(/\{|\}|\s/g, '')
+        result[varText] = true
+        result[varText.split('.')[0]] = true
+        if(varText.indexOf('app.latest_version') == 0) { result['app.latest_version'] = true }
+        return result
+      }, {})
+
+      if(klassObj['app'] && !that.app) {
+        if(isPopup) { window.Loading.popup("请选择应用") }
+        console.log('WARNING: 请选择应用')
+        return false;
+      }
+      if(klassObj['version'] && !that.version) {
+        if(isPopup) { window.Loading.popup("请选择应用版本") }
+        console.log('WARNING: 请选择应用版本')
+        return false;
+      }
+
+      try {
+        let callback = () => {
+          matchDatas.forEach((data) => {
+            varText = data.replace(/\{|\}|\s/g, '')
+            if(!varObjs[varText]) {
+              parts = varText.split('.')
+              klass = parts.splice(0, 1)[0]
+              obj = (klass == 'app' ? that.app : that.version)
+              parts.forEach((part, inx) => {
+                obj = obj[part] 
+              })
+              varObjs[varText] = obj
+              command = command.replace(new RegExp(data, 'g'), JSON.stringify(obj))
+            }
+            console.log(varText + ':', varObjs[varText])
+          })
+          that.record.command = command
+        }
+        if(klassObj['app.latest_version']) {
+          if(!that.app.latest_version_uuid) {
+            window.Loading.popup('应用关联的最新版本为空')
+            return false
           }
-          console.log(varText + ':', varObjs[varText])
-        })
-        that.record.command = command
-      })
+          that.getAppLatestVersion(callback)
+        } else {
+          callback()
+        }
+      } catch(e) {
+        console.log('渲染部署脚本异常:', e)
+      }
     }
   }
 })

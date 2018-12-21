@@ -10,6 +10,9 @@
   .list-group-item:hover {
     cursor: pointer;
   }
+
+// = stylesheet_link_tag 'textareafullscreen.css'
+// = javascript_include_tag 'jquery.textareafullscreen.js'
 #JobShow.row
   .col-sm-3
     %button.list-group-item.disabled{type: 'button', 'v-text' => '"设备列表：(" + jobList.length + " 台)"'}
@@ -43,11 +46,11 @@
         %tr
           %td 部署脚本
           %td
-            %pre{'v-text' => 'job.command'}
+            %pre#command{'v-text' => 'job.command', readonly: 'true'}
         %tr
           %td 脚本输出
           %td
-            %pre{'v-text' => 'job.output || "无日志输出"'}
+            %pre#output{'v-text' => 'job.output || "无日志输出"', readonly: 'true'}
         %tr
           %td 创建时间
           %td{'v-text' => 'job.created_at'}

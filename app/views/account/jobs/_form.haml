@@ -51,7 +51,7 @@
           .col-sm-9
             = f.text_area :command, class: "form-control", rows: 8, placeholder: "部署脚本，必填项", ':value' => 'record.command'
           .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
-            %a{'@click' => "renderCommand();"}
+            %a{'@click' => "renderCommand(true);"}
               %span.glyphicon.glyphicon-eye-open
         .form-group
           = f.label '执行时间', class: "col-sm-2 control-label"
