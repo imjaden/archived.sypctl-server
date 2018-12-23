@@ -68,6 +68,10 @@ case "$1" in
         echo "$ git pull origin ${git_current_branch}"
         git pull origin ${git_current_branch}
     ;;
+    git:auto:push|gap)
+        shift
+        bundle exec ruby lib/scripts/git-utils.rb $@
+    ;;
     crontab:update)
         bundle exec whenever --update-crontab
     ;;

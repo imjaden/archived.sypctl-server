@@ -29,16 +29,18 @@ require 'active_support/core_ext/numeric'
 require 'active_support/core_ext/date'
 require 'active_support/core_ext/numeric/time'
 require 'active_support/cache'
-require 'config/asset_handler'
+require 'config/assets_handler'
 require 'lib/utils/boot.rb'
 require 'app/models/setting.rb'
 include Utils::Boot
 
-require 'asset_handler'
+require 'assets_handler'
 Time.zone = 'Beijing'
 
 ENV['CACHE_NAMESPACE']  ||= Setting.app_name
 ENV['REDIS_URL']        ||= Setting.redis_url
+ENV['STARTUP']            = Time.now.to_s
+ENV['STARTUP_TIMESTAMP']  = Time.now.to_i.to_s
 
 traverser_settings_yaml_to_env
 

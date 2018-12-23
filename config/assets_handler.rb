@@ -4,7 +4,7 @@ require 'digest/md5'
 require 'lib/utils/boot.rb'
 
 include Utils::Boot
-class AssetHandler < Sinatra::Base
+class AssetsHandler < Sinatra::Base
   configure do
     enable :logging, :static, :sessions
     enable :method_override
@@ -37,7 +37,7 @@ class AssetHandler < Sinatra::Base
 end
 
 # bug: mysql 中断时有访问，mysql 再连接依然报错@2016-01-04
-class ExceptionHandling
+class ExceptionHandler
   def initialize(app)
     @app = app
   end
@@ -64,3 +64,14 @@ class ExceptionHandling
     [500, { 'Content-Type' => 'application/json' }, [hash.to_json]]
   end
 end
+
+module AssetSprocketsHelpers
+  def asset_path(source)
+    "/assets/" + settings.sprockets.find_asset(source).digest_path
+  rescue => e
+    puts "source: " + source
+    puts e.message
+    source
+  end
+end
+

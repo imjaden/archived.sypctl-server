@@ -8,6 +8,23 @@ require 'will_paginate/active_record'
 require 'lib/sinatra/markup_plugin'
 
 class ApplicationController < Sinatra::Base
+  set :root, ENV['APP_ROOT_PATH']
+  set :views, File.join(ENV['APP_ROOT_PATH'], 'app/views/home')
+  set :rack_env, ENV['RACK_ENV']
+  set :startup_time, Time.now
+  set :logger_level, :info # :fatal or :error, :warn, :info, :debug
+  set :layout, :'../layouts/layout'
+  enable :sessions, :logging, :static, :method_override
+  enable :dump_errors, :raise_errors, :show_exceptions unless ENV['RACK_ENV'].eql?('production')
+  set :protection, :allow_if => lambda { |env|
+    if (env.has_key?('HTTP_REFERER') && env['HTTP_REFERER'] == "https://servicewechat.com/#{ENV['wxmp_app_id']}/devtools/page-frame.html") ||
+       (env['HTTP_ORIGIN'] || env['HTTP_X_ORIGIN']).nil?
+      true
+    else
+      false
+    end
+  }
+
   register Sinatra::Reloader unless ENV['RACK_ENV'].eql?('production')
   register Sinatra::MultiRoute
   register Sinatra::Logger
@@ -19,28 +36,41 @@ class ApplicationController < Sinatra::Base
   helpers ApplicationHelper
   helpers Sinatra::UrlForHelper
 
-  use AssetHandler
-  use ExceptionHandling
+  use AssetsHandler
+  use ExceptionHandler
 
   WillPaginate.per_page = 15
-  
-  set :root, ENV['APP_ROOT_PATH']
-  set :views, File.join(ENV['APP_ROOT_PATH'], 'app/views/home')
-  set :rack_env, ENV['RACK_ENV']
-  set :startup_time, Time.now
-  set :logger_level, :info # :fatal or :error, :warn, :info, :debug
-  set :layout, :'../layouts/layout'
-  enable :sessions, :logging, :static, :method_override
-  enable :dump_errors, :raise_errors, :show_exceptions unless ENV['RACK_ENV'].eql?('production')
 
-  set :protection, :allow_if => lambda { |env|
-    if (env.has_key?('HTTP_REFERER') && env['HTTP_REFERER'] == "https://servicewechat.com/#{ENV['wxmp_app_id']}/devtools/page-frame.html") ||
-       (env['HTTP_ORIGIN'] || env['HTTP_X_ORIGIN']).nil?
-      true
-    else
-      false
+  # rake-mini-profiler
+  use Rack::MiniProfiler
+  Rack::MiniProfiler.config.position = 'top-right'
+  Rack::MiniProfiler.config.start_hidden = false
+  Rack::MiniProfiler.config.disable_caching = false
+  Rack::MiniProfiler.config.storage = Rack::MiniProfiler::FileStore
+  Rack::MiniProfiler.config.storage_options = {path: File.join(ENV['APP_ROOT_PATH'], 'tmp/mini-profiler')}
+
+  # sprockets
+  set :sprockets, Sprockets::Environment.new(root) { |env| env.logger = Logger.new(STDOUT) }
+  # set :precompile, [ /\w+\.(?!js|css).+/, /application.(css|js)$/ ]
+  set :assets_prefix, 'assets'
+  set :assets_path, File.join(root, 'public', assets_prefix)
+  
+  configure do
+    set :digest_assets,   true
+    set :manifest_assets, true
+
+    sprockets.append_path(File.join(root, 'app/assets/stylesheets'))
+    sprockets.append_path(File.join(root, 'app/assets/javascripts'))
+
+    sprockets.context_class.instance_eval do
+      include AssetSprocketsHelpers
     end
-  }
+  end
+  
+  helpers do
+    include AssetSprocketsHelpers
+  end
+
   before do
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Headers'] = 'origin, x-csrftoken, content-type, accept'
@@ -55,12 +85,26 @@ class ApplicationController < Sinatra::Base
 
     print_format_logger
   end
+  
+  not_found do
+    if request.path_info.start_with?('/images/')
+      send_file(app_root_join('/app/assets/images/404-small.png'), type: 'image/png', filename: '404.png', disposition: 'inline')
+    else
+      flash[:warning] = "路由不存在，#{request.request_method} #{request.url}"
+      redirect to('/')
+    end
+  end
 
   get '/', '/login' do
     redirect to('/account/devices') if request.cookies['authen'].present?
     @user = User.new(user_num: request.cookies['authen'] || '')
 
     haml :index, layout: settings.layout
+  end
+
+  get "/assets/*" do
+    env['PATH_INFO'].sub!(%r{^/assets}, '')
+    settings.sprockets.call(env)
   end
 
   post '/login' do

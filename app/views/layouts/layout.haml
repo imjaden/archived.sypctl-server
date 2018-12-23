@@ -10,17 +10,10 @@
     %meta{name: 'renderer', content:'webkit'}/
     %meta{name: 'keywords', content: "#{@meta_keywords}"}/
     %meta{name: 'description', content: "#{@meta_description}"}/
-    %link{href: "/images/favicon.png", rel: 'shortcut icon'}/
-    = stylesheet_link_tag 'bootstrap.min.css'
-    = stylesheet_link_tag 'nprogress.css'
-    = stylesheet_link_tag 'application.css'
-    = javascript_include_tag 'jquery.min.js'
-    = javascript_include_tag 'bootstrap.min.js'
-    = javascript_include_tag 'param.js'
-    = javascript_include_tag 'loading.js'
-    = javascript_include_tag 'operation_logger.templates.js'
-    = javascript_include_tag 'operation_logger.js'
-    = javascript_include_tag 'vue_2.5.17.js'
+    %link{href: "/images/favicon.png?t=#{ENV['STARTUP_TIMESTAMP']}", rel: 'shortcut icon'}/
+    %link{href: asset_path('application.css'), rel:"stylesheet"}
+    %script{src: asset_path('application.js')}
+    
     - if mobile?
       %meta{content: 'no', name: 'apple-mobile-web-app-capable'}/
       %meta{content: 'True', name: 'HandheldFriendly'}/
@@ -45,6 +38,3 @@
     .container#footer
       .row.center
         .footer &copy; loading
-
-    = javascript_include_tag 'nprogress.js'
-    = javascript_include_tag 'application.js'
