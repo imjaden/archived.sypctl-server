@@ -11,8 +11,8 @@
     %meta{name: 'keywords', content: "#{@meta_keywords}"}/
     %meta{name: 'description', content: "#{@meta_description}"}/
     %link{href: "/images/favicon.png?t=#{ENV['STARTUP_TIMESTAMP']}", rel: 'shortcut icon'}/
-    %link{href: asset_path('application.css'), rel:"stylesheet"}
-    %script{src: asset_path('application.js')}
+    %link{href: asset_path('dist.css'), rel:"stylesheet"}
+    %script{src: asset_path('dist.js')}
     
     - if mobile?
       %meta{content: 'no', name: 'apple-mobile-web-app-capable'}/

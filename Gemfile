@@ -30,6 +30,7 @@ gem "sprockets" , '~>3.7.2'
 gem 'coffee-script', '~> 2.4.1'
 gem "uglifier", '~> 4.1.20'
 gem "sass", '~> 3.7.2'
+gem 'yui-compressor', '~> 0.12.0'
 
 # analyse
 gem 'rack-mini-profiler', '~> 0.9.9.2'

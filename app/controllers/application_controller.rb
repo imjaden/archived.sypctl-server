@@ -11,7 +11,6 @@ class ApplicationController < Sinatra::Base
   set :root, ENV['APP_ROOT_PATH']
   set :views, File.join(ENV['APP_ROOT_PATH'], 'app/views/home')
   set :rack_env, ENV['RACK_ENV']
-  set :startup_time, Time.now
   set :logger_level, :info # :fatal or :error, :warn, :info, :debug
   set :layout, :'../layouts/layout'
   enable :sessions, :logging, :static, :method_override
@@ -32,14 +31,14 @@ class ApplicationController < Sinatra::Base
   register Sinatra::MarkupPlugin
   register Sinatra::ActiveRecordExtension
   register WillPaginate::Sinatra
+  WillPaginate.per_page = 15
 
   helpers ApplicationHelper
+  helpers AssetSprocketsHelpers
   helpers Sinatra::UrlForHelper
 
   use AssetsHandler
   use ExceptionHandler
-
-  WillPaginate.per_page = 15
 
   # rake-mini-profiler
   use Rack::MiniProfiler
@@ -51,13 +50,17 @@ class ApplicationController < Sinatra::Base
 
   # sprockets
   set :sprockets, Sprockets::Environment.new(root) { |env| env.logger = Logger.new(STDOUT) }
-  # set :precompile, [ /\w+\.(?!js|css).+/, /application.(css|js)$/ ]
+  set :precompile, [ /\w+\.(?!js|css).+/, /dist.(css|js)$/ ]
   set :assets_prefix, 'assets'
   set :assets_path, File.join(root, 'public', assets_prefix)
-  
   configure do
     set :digest_assets,   true
     set :manifest_assets, true
+
+    sprockets.cache = Sprockets::Cache::FileStore.new('./tmp')
+    sprockets.register_compressor 'application/javascript', :uglify, Sprockets::UglifierCompressor.new(harmony: true)
+    sprockets.js_compressor = :uglify
+    sprockets.css_compressor = YUI::CssCompressor.new
 
     sprockets.append_path(File.join(root, 'app/assets/stylesheets'))
     sprockets.append_path(File.join(root, 'app/assets/javascripts'))
@@ -65,10 +68,6 @@ class ApplicationController < Sinatra::Base
     sprockets.context_class.instance_eval do
       include AssetSprocketsHelpers
     end
-  end
-  
-  helpers do
-    include AssetSprocketsHelpers
   end
 
   before do
@@ -240,7 +239,7 @@ class ApplicationController < Sinatra::Base
     return if ENV['RACK_ENV'] == 'development'
 
     timestamp = timestamps.compact.max
-    timestamp ||= (settings.startup_time || Time.now)
+    timestamp ||= (ENV['STARTUP'] || Time.now)
 
     last_modified timestamp
     etag md5(etag_content || timestamp)
