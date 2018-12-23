@@ -12,6 +12,7 @@ def run_command(command)
   puts '$ '.colorize(:gray) + command.colorize(:yellow)
   puts ''
   system(command)
+  puts ''
 end
 
 if ARGV.length < 3
