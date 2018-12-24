@@ -11,6 +11,10 @@
       .col-sm-7
         = f.text_area :description, class: "form-control", rows: 1, placeholder: "功能描述"
     .form-group
+      = f.label '模板类型', class: "col-sm-2 control-label"
+      .col-sm-7
+        = f.select :template_type, options: [['script', 'script'], ['war', 'war'], ['jar', 'jar']], class: "form-control", placeholder: "模板类型，对应用文档类型匹配"
+    .form-group
       = f.label '部署脚本', class: "col-sm-2 control-label"
       .col-sm-7
         = f.text_area :content, class: "form-control", rows: 10, placeholder: "bash 部署脚本"

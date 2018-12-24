@@ -100,11 +100,15 @@ module Sinatra
     # select_tag(:country, :collection => @countries, :fields => [:name, :code])
     def select_tag(name, options={})
       options.reverse_merge!(:name => name)
-      collection, fields = options.delete(:collection), options.delete(:fields)
-      options[:options] = options_from_collection(collection, fields) if collection
-      options[:options].unshift('') if options.delete(:include_blank)
-      select_options_html = options_for_select(options.delete(:options), options.delete(:selected))
-      options.merge!(:name => "#{options[:name]}[]") if options[:multiple]
+      if vue_html = options.delete('vue-html')
+        select_options_html = vue_html
+      else
+        collection, fields = options.delete(:collection), options.delete(:fields)
+        options[:options] = options_from_collection(collection, fields) if collection
+        options[:options].unshift('') if options.delete(:include_blank)
+        select_options_html = options_for_select(options.delete(:options), options.delete(:selected))
+        options.merge!(:name => "#{options[:name]}[]") if options[:multiple]
+      end
       content_tag(:select, select_options_html, options)
     end
 

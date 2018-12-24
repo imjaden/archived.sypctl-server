@@ -1,7 +1,9 @@
 # encoding: utf-8
 require 'rubygems'
+require 'json'
 
-ENV['APP_VERSION']   = File.read("version") rescue "unknown"
+version = JSON.parse(File.read("version.json"))
+ENV['APP_VERSION']   = [version['major'], version['minor'], version['commit']].join('.')
 ENV['APP_ROOT_PATH'] = File.dirname(File.dirname(__FILE__))
 ENV['RACK_ENV']    ||= 'development'
 ENV['VIEW_PATH']     = File.join(ENV['APP_ROOT_PATH'], 'app/views')

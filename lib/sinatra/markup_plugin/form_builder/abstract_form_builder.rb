@@ -53,6 +53,7 @@ class AbstractFormBuilder
   # f.select :color, :collection => @colors, :fields => [:name, :id]
   def select(field, options={})
     options.reverse_merge!(:id => field_id(field), :selected => field_value(field))
+    puts "options" + options.to_json
     @template.select_tag field_name(field), options
   end
 

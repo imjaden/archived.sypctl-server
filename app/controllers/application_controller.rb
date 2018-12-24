@@ -83,6 +83,8 @@ class ApplicationController < Sinatra::Base
     @params.deep_symbolize_keys!
 
     print_format_logger
+    
+    Rack::MiniProfiler.authorize_request if @current_user
   end
   
   not_found do

@@ -74,6 +74,7 @@
       %ul.items
         %li.list-group-item{'v-for' => '(item, index) in jobTemplates'}
           %input{type: 'radio', name: 'radio-group', '@click' => 'jobTemplateRadioClick(item)'} &nbsp;{{ item.title }}
+          %span.label.label-info {{ item.template_type }}
     .list-group{'v-if' => 'showDevices'}
       %button.list-group-item.disabled{type: 'button', 'v-text' => '"设备列表：(" + devices.length + " 台)"'}  
       %button.list-group-item.disabled{type: 'button', 'v-if' => 'devices.length == 0'} 无数据
@@ -86,6 +87,7 @@
       %ul.items
         %li.list-group-item{'v-for' => '(item, index) in apps'}
           %input{type: 'radio', name: 'radio-group', '@click' => 'appRadioClick(item)'} &nbsp;{{ item.name }}
+          %span.label.label-info {{ item.file_type }}
     .list-group{'v-if' => 'showVersions'}
       %button.list-group-item.disabled{type: 'button', 'v-text' => '"版本列表：(" + versions.length + " 个)"'} 
       %button.list-group-item.disabled{type: 'button', 'v-if' => 'versions.length == 0'} 无数据 

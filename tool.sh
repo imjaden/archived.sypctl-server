@@ -115,6 +115,10 @@ case "$1" in
                 || process_stop "${!var_pid}" "${service}"
         fi
     ;;
+    snapshot:*)
+        operate=${1#*:}
+        bundle exec rake mysql:snapshot:${operate} RACK_ENV=production
+    ;;
     *)
         echo "warning: unkown params - $@"
     ;;

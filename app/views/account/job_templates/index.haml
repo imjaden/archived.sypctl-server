@@ -8,14 +8,16 @@
 :css   
   .job-templates th:nth-child(n+1), .job-templates td:nth-child(n+1) { text-align: center; width: 5%; }
   .job-templates th:nth-child(1), .job-templates td:nth-child(1) { text-align: left; width: 50%; }
-  .job-templates th:nth-child(2), .job-templates td:nth-child(2) { text-align: left; width: 25%; }
-  .job-templates th:nth-child(3), .job-templates td:nth-child(3) { text-align: center; width: 5%; }
+  .job-templates th:nth-child(2), .job-templates td:nth-child(2) { text-align: center; width: 8%; }
+  .job-templates th:nth-child(3), .job-templates td:nth-child(3) { text-align: left; width: 17%; }
   .job-templates th:nth-child(4), .job-templates td:nth-child(4) { text-align: center; width: 5%; }
   .job-templates th:nth-child(5), .job-templates td:nth-child(5) { text-align: center; width: 5%; }
+  .job-templates th:nth-child(6), .job-templates td:nth-child(6) { text-align: center; width: 5%; }
   .job-templates th:nth-last-child(1), .job-templates td:nth-last-child(1) { text-align: center; width: 10%; }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.job-templates
   %thead
     %th 模板名称
+    %th 模板类型
     %th 功能描述
     %th 编辑
     %th 拷贝
@@ -25,6 +27,8 @@
     - @records.each do |record|
       %tr{id: "dom_#{record.id}"}
         %td.name= link_to record.title, url_for("/#{record.id}")
+        %td
+          %span.label.label-info= record.template_type
         %td= record.description
         %td
           %a{href: url_for("/#{record.id}/edit"), style: "color: black;"}

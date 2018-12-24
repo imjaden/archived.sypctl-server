@@ -21,6 +21,11 @@
       %td 模板 UUID
       %td= @record.uuid
     %tr
+      %td 模板类型
+      %td
+        %span.label.label-info= @record.template_type
+        %small (与应用文档类型匹配)
+    %tr
       %td 部署脚本
       %td
         %pre= @record.content

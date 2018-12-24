@@ -58,7 +58,7 @@ window.Loading = {
     window.Loading.makeSureCenterHorizontal();
     window.Loading.setState('show');
     $(".loading").slideDown(1000, function() {
-      $(this).slideUp(1500);
+      $(this).slideUp(2500);
     })
   },
   makeSureCenterHorizontal: function() {
