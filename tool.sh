@@ -16,6 +16,10 @@ test -f .services && source .services
 
 cd "${app_root_path}" || exit 1
 case "$1" in
+    bundle)
+        bundle install --local > /dev/null 2>&1
+        [[ $? -eq 0 ]] && echo -e "启动预检: bundle install --local successfully" || bundle install
+    ;;
     config)
         mkdir -p db/{backups,snapshots}
         mkdir -p logs/{crontab,archived}
@@ -28,6 +32,8 @@ case "$1" in
             echo "Warning: config/services.json 不存在请配置，具有可参考: config/services.json.example"
             exit 2
         fi
+        
+        bash $0 bundle
     ;;
     upgrade)
         echo -e "## 下拉最新代码\n"
