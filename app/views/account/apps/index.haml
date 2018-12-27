@@ -34,7 +34,7 @@
         %td
           %span.label.label-success{'v-text' => 'app.file_type'}
         %td
-          %a{'v-text' => 'app.latest_version', ':href' => "'#{url_for('/')}' + app.uuid + '/version/' + app.latest_version_uuid"}
+          %a{'v-text' => 'app.latest_version', ':href' => "'#{url_for('/')}' + app.uuid + '/version'"}
         %td
           %a{':href' => "'#{url_for('/')}' + app.uuid + '/version/upload'"}
             %span.glyphicon.glyphicon-upload

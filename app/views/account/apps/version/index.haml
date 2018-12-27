@@ -4,10 +4,6 @@
   %li= link_to @app.name, url_for("/#{@app.uuid}")
   %li 
     版本列表
-    &nbsp;|&nbsp;
-    %a{href: url_for("/#{@app.id}/version/new") + "?page=#{params[:page] || 1}"}
-      上传版本
-      %span.glyphicon.glyphicon-upload
 :css   
   .apps th:nth-child(n+1), .apps td:nth-child(n+1) { text-align: center; width: 5%; }
   .apps th:nth-child(1), .apps td:nth-child(1) { width: 5%; }
@@ -27,7 +23,7 @@
   %tbody
     - @versions.each do |record|
       %tr{id: "dom_#{record.uuid}"}
-        %td= link_to record.version, url_for("/#{@app.id}/version/#{record.uuid}")
+        %td= link_to record.version, url_for("/#{@app.uuid}/version/#{record.uuid}")
         %td= record.build
         %td= record.file_name
         %td= record.md5

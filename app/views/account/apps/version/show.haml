@@ -2,6 +2,7 @@
   %li 应用中心
   %li= link_to "应用管理", url_for("/")
   %li= link_to @app.name, url_for("/#{@app.uuid}")
+  %li= link_to '版本列表', url_for("/#{@app.uuid}/version")
   %li= "#{@version.version}/#{@version.build}"
 
 :css   

@@ -122,6 +122,14 @@ module Account
         latest_version_uuid: version.uuid, 
         version_count: app.versions.count
       })
+      puts Version.where("app_uuid = ? and version = ? and uuid != ?", app.uuid, version.version, version.uuid).to_sql
+      Version.where("app_uuid = ? and version = ? and uuid != ?", app.uuid, version.version, version.uuid).each do |record|
+        puts "删除如下重复应用版本:"
+        puts "- 应用名称: #{app.name}(#{app.uuid})"
+        puts "- 版本名称: #{record.version}(#{record.uuid})"
+        puts "- 创建时间: #{record.created_at}"
+        record.destroy
+      end
 
       redirect to("/") # /#{params[:app_uuid]}/version/#{params[:version_uuid]}
     end
