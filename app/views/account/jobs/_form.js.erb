@@ -53,6 +53,37 @@ new Vue({
       }
 
       if(isOk) {
+        /*
+         * 记录模板、设备信息至浏览器缓存, 根据历史操作权重调整列表排序
+         * 以此改善用户使用体验
+         */
+        try {
+          let ue = window.localStorage.getItem('_ue_create_job'),
+              ueObj = {},
+              tmp;
+          if(ue) { ueObj = JSON.parse(ue) }
+
+          ueObj['devices'] = ueObj['devices'] || {}
+          JSON.parse(this.record.device_list).forEach(function(device) {
+            if(ueObj['devices'][device.uuid]) {
+              ueObj['devices'][device.uuid] = parseInt(ueObj['devices'][device.uuid]) + 1
+            } else {
+              ueObj['devices'][device.uuid] = 1
+            }
+          })
+
+          ueObj['job_templates'] = ueObj['job_templates'] || {}
+          if(ueObj['job_templates'][this.jobTemplate.uuid]) {
+            ueObj['job_templates'][this.jobTemplate.uuid] = parseInt(ueObj['job_templates'][this.jobTemplate.uuid]) + 1
+          } else {
+            ueObj['job_templates'][this.jobTemplate.uuid] = 1
+          }
+
+          window.localStorage.setItem('_ue_create_job', JSON.stringify(ueObj))
+        } catch(e) {
+          console.log(e)
+        }
+        
         return true
       } else {
         el.preventDefault();
@@ -88,8 +119,18 @@ new Vue({
         contentType: 'application/json',
         data: {page: page, page_size: 100}
       }).done(function(res, status, xhr) {
-        that.jobTemplates = res.data
-        that.record.jobTemplates = res.data.map(function(item) { return {value: item.uuid, label: item.title }; })
+        let ue = window.localStorage.getItem('_ue_create_job'),
+            ueObj = {};
+        if(ue) { ueObj = JSON.parse(ue) }
+        ueObj['job_templates'] = ueObj['job_templates'] || {}
+
+        that.jobTemplates = res.data.map((item) => {
+            item.__ue_weight = ueObj['job_templates'][item.uuid] || 0
+            return item
+          }).sort((a, b) => {
+            return b.__ue_weight - a.__ue_weight
+          })
+
       }).fail(function(res, status, xhr) {
       }).always(function(res, status, xhr) {
         window.Loading.hide()
@@ -109,7 +150,17 @@ new Vue({
         contentType: 'application/json',
         data: {page: page, page_size: 100}
       }).done(function(res, status, xhr) {
-        that.devices = res.data
+        let ue = window.localStorage.getItem('_ue_create_job'),
+            ueObj = {};
+        if(ue) { ueObj = JSON.parse(ue) }
+        ueObj['devices'] = ueObj['devices'] || {}
+
+        that.devices = res.data.map((item) => {
+            item.__ue_weight = ueObj['devices'][item.uuid] || 0
+            return item
+          }).sort((a, b) => {
+            return b.__ue_weight - a.__ue_weight
+          })
       }).fail(function(res, status, xhr) {
       }).always(function(res, status, xhr) {
         window.Loading.hide()

@@ -58,6 +58,9 @@
             %li= link_to '基本资料', '#', 'data-toggle' => 'modal', 'data-target' => '#modalCurrentUserInfo'
             %li.divider{role: 'seperator'}
             %li= link_to '登出', '/logout'
+        %li
+          %a{href: 'javascript:void(0);', onclick: 'window.App.toggleDisplayVisitMenus()'}
+            %span.glyphicon.glyphicon-hourglass
 
 :css
   .pagination { display: block; text-align: center;margin-bottom: 15px;}

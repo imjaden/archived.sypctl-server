@@ -1,18 +1,10 @@
 # encoding: utf-8
 require 'active_support/core_ext/numeric'
 module ApplicationHelper
+  
   def flash_message
     return if !defined?(flash) || flash.empty?
-
-    # hash key must be string
-    hash = flash.each_with_object({}) do |(k, v), h|
-      h[k.to_s] = v
-    end
-    # bootstrap#v3 [alert] javascript plugin
-    flash.keys.map(&:to_s).grep(/warning|danger|success/).map do |key|
-      close = link_to('&times;', '#', class: 'close', 'data-dismiss' => 'alert')
-      tag(:div, content: %(#{close}#{hash[key]}), class: %(alert alert-#{key}), role: 'alert')
-    end.join
+    return flash.to_json
   end
 
   MOBILE_USER_AGENTS = 'palm|blackberry|nokia|phone|midp|mobi|symbian|chtml|ericsson|minimo|' \

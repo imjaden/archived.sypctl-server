@@ -97,8 +97,8 @@ class ApplicationController < Sinatra::Base
   end
 
   get '/', '/login' do
-    redirect to('/account/devices') if request.cookies['authen'].present?
-    @user = User.new(user_num: request.cookies['authen'] || '')
+    redirect to('/account/devices') if request.cookies[cookie_name].present?
+    @user = User.new(user_num: request.cookies[cookie_name] || '')
 
     haml :index, layout: settings.layout
   end
@@ -113,7 +113,7 @@ class ApplicationController < Sinatra::Base
 
     if user
       flash[:success] = message
-      set_login_cookie('authen', params[:user][:user_num])
+      set_login_cookie(cookie_name, params[:user][:user_num])
 
       redirect to("/account/jobs?#{append_params_when_login(user)}")
     else
@@ -174,7 +174,7 @@ class ApplicationController < Sinatra::Base
   end
 
   def current_user
-    @current_user ||= User.find_by(user_num: request.cookies['authen'] || '')
+    @current_user ||= User.find_by(user_num: request.cookies[cookie_name] || '')
   end
 
   def request_params(raw_body = request.body)
@@ -210,7 +210,7 @@ class ApplicationController < Sinatra::Base
   end
 
   def authenticate!
-    return if request.cookies['authen']
+    return if request.cookies[cookie_name]
 
     response.set_cookie 'path', value: request.url, path: '/', max_age: '6000'
     flash[:danger] = '继续操作前请登录.'
@@ -316,5 +316,12 @@ class ApplicationController < Sinatra::Base
 
   def append_params_when_logout
     "user_num=#{current_user.user_num}&user_name=#{URI.encode(current_user.user_name)}&logout_authen_to_redirect=true"
+  end
+
+  def cookie_name
+    @cookie_name ||= begin
+      version_major = ENV['APP_VERSION'].split('.').first(2).join('.')
+      "authen-#{Setting.app_name}-#{ENV['RACK_ENV']}-#{version_major}"
+    end
   end
 end

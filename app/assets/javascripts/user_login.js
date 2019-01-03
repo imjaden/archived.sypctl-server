@@ -1,4 +1,6 @@
 $(function() {
+    window.App.addWarningNotify('本系统为内部服务，请使用生意+ App 账号登录')
+
     function smartLoginForm() {
         var w = window,
             d = document,

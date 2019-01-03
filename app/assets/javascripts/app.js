@@ -1,4 +1,25 @@
 window.App = {
+  addNotify: function(message, type) {
+    let html = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">' +
+      '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' + 
+      message +
+      '<br><small>' + new Date().toISOString().replace('T', ' ').split('.')[0] + '</small>' +
+    '</div>';
+
+    $(".system-notify").prepend(html)
+  },
+  addSuccessNotify: function(message) {
+    window.App.addNotify(message, 'success')
+  },
+  addWarningNotify: function(message) {
+    window.App.addNotify(message, 'warning')
+  }, 
+  addInfoNotify: function(message) {
+    window.App.addNotify(message, 'info')
+  }, 
+  addDangerNotify: function(message) {
+    window.App.addNotify(message, 'danger')
+  }, 
   showLoading: function() {
     return $(".loading").removeClass("hidden");
   },
@@ -78,7 +99,33 @@ window.App = {
     $(".navbar-nav li").removeClass("active");
     $(".navbar-nav .menu-" + parts[1]).addClass("active");
     $(".navbar-nav a").filter(function(inx) {
-      if(pathname === ($(this).attr("href") || "").split("?")[0]) { $(this).closest("li").addClass("active"); }
+      if(pathname === ($(this).attr("href") || "").split("?")[0]) { 
+        $(this).closest("li").addClass("active");
+
+        /*
+         * 记录菜单使用频率至浏览器缓存, 提供最近访问菜单功能
+         * 以此改善用户使用体验
+         */
+        try {
+          let ue = window.localStorage.getItem('_ue_visit_menu'),
+              ueObj = {},
+              tmp;
+          if(ue) { ueObj = JSON.parse(ue) }
+
+          if(!ueObj[pathname]) { 
+            ueObj[pathname] = {
+              weight: 0,
+              path: pathname
+            }
+          }
+          ueObj[pathname]['title'] = $(this).text().replace(/\n|\s/g, '')
+          ueObj[pathname]['weight'] = ueObj[pathname]['weight'] + 1
+          ueObj[pathname]['timestamp'] = new Date().valueOf()
+          window.localStorage.setItem('_ue_visit_menu', JSON.stringify(ueObj))
+        } catch(e) {
+          console.log(e)
+        }
+      }
     })
   },
   resizeWindow: function() {
@@ -99,15 +146,15 @@ window.App = {
     }
   },
   initBootstrapNavbarLi: function() {
-    var navbar_lis = $(".navbar-nav:first li, .navbar-right li:lt(" + navbar_right_lis + ")"),
-      navbar_right_lis = $("#navbar_right_lis").val() || 1
-      path_name = window.location.pathname,
-      navbar_match_index = -1,
-      navbar_hrefs = navbar_lis.map(function() { return $(this).children("a:first").attr("href"); }),
-      paths = path_name.split('/');
+    let navbar_right_lis = $("#navbar_right_lis").val() || 1,
+        navbar_lis = $(".navbar-nav:first li, .navbar-right li:lt(" + navbar_right_lis + ")"),
+        path_name = window.location.pathname,
+        navbar_match_index = -1,
+        navbar_hrefs = navbar_lis.map(function() { return $(this).children("a:first").attr("href"); }),
+        paths = path_name.split('/');
 
     while(paths.length > 0 && navbar_match_index === -1) {
-      var temp_path = paths.join('/');
+      let temp_path = paths.join('/');
       for(var i = 0, len = navbar_hrefs.length; i < len; i++) {
         if(navbar_hrefs[i] === temp_path) {
           navbar_match_index = i;
@@ -117,7 +164,11 @@ window.App = {
       paths.pop();
     }
     navbar_lis.each(function(index) {
-      navbar_match_index === index ? $(this).addClass("active") : $(this).removeClass("active");
+      if(navbar_match_index === index) {
+        $(this).addClass("active")
+      } else {
+        $(this).removeClass("active");
+      }
     });
   },
   initBootstrapPopover: function() {
@@ -162,5 +213,36 @@ window.App = {
       delete params.user_name;
       window.Param.redirectTo(params);
     }
+  },
+  toggleDisplayVisitMenus: function() {
+    if($('.visit-menus').hasClass('hidden')) {
+      let ue = window.localStorage.getItem('_ue_visit_menu'),
+          ueObj = {},
+          menus = [],
+          lis, ul;
+      if(ue) { ueObj = JSON.parse(ue) }
+      menus = Object.values(ueObj).sort((a, b) => { return b.timestamp - a.timestamp; })
+      lis = menus.map((menu) => {
+        return '' + 
+          '<li class="list-group-item">' + 
+            '<span class="badge">' + menu.weight + '</span>' + 
+             '<a href="' + menu.path + '">' + menu.title + '</a>' +
+          '</li>';
+      })
+      lis.unshift(
+        '<li class="list-group-item active">' + 
+           '最近访问:' +
+        '</li>'
+      )
+      ul = '<ul class="list-group">' + lis.join('') + '</ul>'
+      $('.visit-menus').html(ul);
+
+      $('.visit-menus').removeClass('hidden')
+      $('.system-notify').addClass('hidden')
+    } else {
+      $('.visit-menus').addClass('hidden')
+      $('.system-notify').removeClass('hidden')
+    }
   }
+
 };

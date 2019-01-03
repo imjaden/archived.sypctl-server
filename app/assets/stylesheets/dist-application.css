@@ -5,6 +5,30 @@
 */
 
 @charset "UTF-8";
+
+html, body {
+  background: #f0f0f0;
+}
+.system-notify,
+.visit-menus {
+  z-index: 9999;
+  font-size: 14px;
+  position: fixed;
+}
+.visit-menus {
+  width: 350px;
+  min-height: 400px;
+}
+.top-right {
+  right: 0px;
+  top: 50px;
+}
+.system-notify .alert { 
+  width: 350px;
+}
+.system-notify .alert small { 
+  color: darkgray;
+}
 .center {
   width: 100%;
   margin: 0 auto;

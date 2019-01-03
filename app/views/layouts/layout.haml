@@ -21,16 +21,10 @@
       :css
         body { max-width: 1000px; min-width:300px; }
         .bs-docs-header h1 { text-align: left; padding-left: 10px;}
-    :css
-      #footer {margin-top:20px;}
 
-  %body{style: 'background:#f0f0f0;'}
+  %body
     = render_page_header
     .container#main
-      .row
-        .col-sm-12{style: 'text-align:center;'}
-          .loading.hidden 加载中...
-          .flash_area= flash_message
       .row
         .col-sm-12
           = yield
@@ -41,3 +35,22 @@
           %a{href: 'http://www.miibeian.gov.cn', target: '_blank'}
             %i
             沪ICP备11033154号
+
+    .system-notify.top-right
+    :javascript
+      let flashString = '#{flash_message}',
+          flash = {}
+      if(flashString.length) {
+        try {
+          flash = JSON.parse(flashString)
+          Object.keys(flash).forEach(function(key) { 
+            window.App.addNotify(flash[key], key)
+          })
+        } catch(e) {
+          console.log(e)
+          window.App.addInfoNotify(flashString)
+        }
+      }
+    .visit-menus.top-right.hidden
+
+    = javascript_include_tag 'app-loader'
