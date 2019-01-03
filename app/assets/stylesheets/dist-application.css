@@ -60,6 +60,18 @@ a:hover {
   bottom: 0px;
   top: expression(document.body.clientHeight-this.style.pixelHeight+document.body.scrollTop); 
 }
+.footer a:hover {
+  text-decoration: underline;
+}
+.footer a i {
+  display: inline-block;
+  width: 14px;
+  height: 16px;
+  margin-right: 6px;
+  background: url(/images/icon-police.png?v=md5) 0 0 no-repeat;
+  vertical-align: middle;
+  margin-top: -4px
+}
 
 /*加载中...样式*/
 .loading {

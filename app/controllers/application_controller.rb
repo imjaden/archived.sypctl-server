@@ -115,7 +115,7 @@ class ApplicationController < Sinatra::Base
       flash[:success] = message
       set_login_cookie('authen', params[:user][:user_num])
 
-      redirect to("/account/devices?#{append_params_when_login(user)}")
+      redirect to("/account/jobs?#{append_params_when_login(user)}")
     else
       flash[:waning] = message
       redirect to('/login')

@@ -2,7 +2,7 @@
 !!! Strict
 %html
   %head
-    %title 生意+ 版本管理系统
+    %title 运筹在握 | 生意+ 版本管理系统
     %meta{'http-equiv' => 'refresh', content: '900'}/
     %meta{'http-equiv' => 'content-type', content: 'text/html', charset: 'UTF-8'}/
     %meta{'http-equiv' => 'X-UA-Compatible', content: 'IE=edge'}/
@@ -11,8 +11,8 @@
     %meta{name: 'keywords', content: "#{@meta_keywords}"}/
     %meta{name: 'description', content: "#{@meta_description}"}/
     %link{href: "/images/favicon.png?t=#{ENV['STARTUP_TIMESTAMP']}", rel: 'shortcut icon'}/
-    %link{href: asset_path('dist.css'), rel:"stylesheet"}
-    %script{src: asset_path('dist.js')}
+    %link{href: asset_path('dist-application.css'), rel:"stylesheet"}
+    %script{src: asset_path('dist-application.js')}
     
     - if mobile?
       %meta{content: 'no', name: 'apple-mobile-web-app-capable'}/
@@ -37,4 +37,7 @@
 
     .container#footer
       .row.center
-        .footer &copy; loading
+        .footer
+          %a{href: 'http://www.miibeian.gov.cn', target: '_blank'}
+            %i
+            沪ICP备11033154号

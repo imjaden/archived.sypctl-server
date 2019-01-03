@@ -24,11 +24,10 @@
     App.activeMenu();
     NProgress.done(true);
     
-    var copyInfo, currentDate;
+    let copyInfo, currentDate;
     currentDate = new Date();
-    copyInfo = "&copy; 2016-" + currentDate.getFullYear() + " " + window.location.host;
-    $("#footer .footer").html(copyInfo);
-    // $(".flash_area .alert").slideUp(15000);
+    copyInfo = "&copy;" + currentDate.getFullYear() + "&nbsp;<a href='http://www.miibeian.gov.cn' target='_blank'><i></i>沪ICP备11033154号</a>";
+    // $("#footer .footer").html(copyInfo);
 
     // 图片懒加载
     $("img.img-lazy-load").lazyload({ 
