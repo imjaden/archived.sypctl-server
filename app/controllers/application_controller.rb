@@ -1,8 +1,10 @@
 # encoding: utf-8
 require 'geetest'
 require 'digest/md5'
-require 'sinatra/multi_route'
+require 'sinatra/base'
+require "sinatra/cookies"
 require 'sinatra/url_for'
+require 'sinatra/multi_route'
 require 'will_paginate'
 require 'will_paginate/active_record'
 require 'lib/sinatra/markup_plugin'
@@ -33,9 +35,10 @@ class ApplicationController < Sinatra::Base
   register WillPaginate::Sinatra
   WillPaginate.per_page = 15
 
+  helpers Sinatra::Cookies
+  helpers Sinatra::UrlForHelper
   helpers ApplicationHelper
   helpers AssetSprocketsHelpers
-  helpers Sinatra::UrlForHelper
 
   use AssetsHandler
   use ExceptionHandler
@@ -97,8 +100,8 @@ class ApplicationController < Sinatra::Base
   end
 
   get '/', '/login' do
-    redirect to('/account/devices') if request.cookies[cookie_name].present?
-    @user = User.new(user_num: request.cookies[cookie_name] || '')
+    # redirect to('/account/jobs') if cookies[cookie_name].present?
+    @user = User.new(user_num: cookies[cookie_name] || '')
 
     haml :index, layout: settings.layout
   end
@@ -113,7 +116,7 @@ class ApplicationController < Sinatra::Base
 
     if user
       flash[:success] = message
-      set_login_cookie(cookie_name, params[:user][:user_num])
+      set_login_cookie(params[:user][:user_num])
 
       redirect to("/account/jobs?#{append_params_when_login(user)}")
     else
@@ -168,13 +171,28 @@ class ApplicationController < Sinatra::Base
 
   # GET /logout
   get '/logout' do
-    set_login_cookie
+    url = "/login?#{append_params_when_logout}"
+    set_login_cookie(nil)
 
-    redirect to("/login?#{append_params_when_logout}")
+    flash[:success] = '登出成功'
+    redirect to(url)
+  end
+
+  def authenticate!
+    return if cookies[cookie_name].present? && current_user
+
+    cookies['path_before_login']= request.url
+    flash[:danger] = '继续操作前请登录.'
+    redirect '/login', 302
   end
 
   def current_user
-    @current_user ||= User.find_by(user_num: request.cookies[cookie_name] || '')
+    @current_user ||= begin
+      user = User.find_by(user_num: cookies[cookie_name])
+      set_login_cookie(nil) if !user
+      puts user.inspect
+      user
+    end
   end
 
   def request_params(raw_body = request.body)
@@ -207,14 +225,6 @@ class ApplicationController < Sinatra::Base
       Parameters:
         #{@params}
     EOF
-  end
-
-  def authenticate!
-    return if request.cookies[cookie_name]
-
-    response.set_cookie 'path', value: request.url, path: '/', max_age: '6000'
-    flash[:danger] = '继续操作前请登录.'
-    redirect '/login', 302
   end
 
   def generate_uuid
@@ -306,16 +316,22 @@ class ApplicationController < Sinatra::Base
 
   private
 
-  def set_login_cookie(cookie_name = 'authen', cookie_value = '')
-    response.set_cookie cookie_name, value: cookie_value, path: '/', max_age: '2880000'
+  def set_login_cookie(_cookie_value = '')
+    if _cookie_value
+      cookies[cookie_name] = _cookie_value
+    else
+      cookies.delete(cookie_name)
+    end
   end
 
   def append_params_when_login(user)
-    "user_num=#{user.user_num}&user_name=#{URI.encode(user.user_name)}&login_authen_to_redirect=true"
+    bsession = ((0..100).to_a + ('a'..'z').to_a).sample(128).join
+    "bsession=#{bsession}&user_num=#{user.user_num}&user_name=#{URI.encode(user.user_name)}&login_authen_to_redirect=true"
   end
 
   def append_params_when_logout
-    "user_num=#{current_user.user_num}&user_name=#{URI.encode(current_user.user_name)}&logout_authen_to_redirect=true"
+    bsession = ((0..100).to_a + ('a'..'z').to_a).sample(128).join
+    "bsession=#{bsession}&user_num=#{current_user.user_num}&user_name=#{URI.encode(current_user.user_name)}&logout_authen_to_redirect=true"
   end
 
   def cookie_name

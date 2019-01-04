@@ -36,6 +36,7 @@
             %i
             沪ICP备11033154号
 
+    .visit-menus.top-right.hidden
     .system-notify.top-right
     :javascript
       let flashString = '#{flash_message}',
@@ -51,6 +52,5 @@
           window.App.addInfoNotify(flashString)
         }
       }
-    .visit-menus.top-right.hidden
 
     = javascript_include_tag 'app-loader'

@@ -244,5 +244,4 @@ window.App = {
       $('.system-notify').removeClass('hidden')
     }
   }
-
 };

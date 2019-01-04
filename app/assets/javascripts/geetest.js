@@ -19,6 +19,7 @@
         return window.Geetest || document.getElementById("gt_lib");
     };
     var down = function (config) {
+        console.log(config)
         var s = document.createElement("script");
         s.charset = "UTF-8";
         s.type = "text/javascript";
@@ -32,6 +33,7 @@
                     if (typeof config.onError === 'function') {
                         config.onError();
                     } else {
+                        window.App.addDangerNotify('网络环境异常，渲染验证控件失败')
                         throw new Error("网络错误");
                     }
                 }
@@ -45,11 +47,13 @@
             if (typeof config.onError === 'function') {
                 config.onError();
             } else {
+                window.App.addDangerNotify('网络环境异常，渲染验证控件失败')
                 throw new Error("网络错误");
             }
         };
         var staticServer = (config.staticservers && config.staticservers[0]) || "static.geetest.com/";
-        s.src = protocol + staticServer + "static/js/geetest.0.0.0.js";
+        // s.src = protocol + staticServer + "static/js/geetest.0.0.0.js";
+        s.src = "/javascripts/geetest.0.0.0.js";
         head.appendChild(s);
     };
 
@@ -103,6 +107,7 @@
             if (typeof config.onError === 'function') {
                 config.onError();
             } else {
+                window.App.addDangerNotify('网络环境异常，渲染验证控件失败')
                 throw new Error("网络错误");
             }
         } else if (status === "loading") {

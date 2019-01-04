@@ -1,5 +1,5 @@
 $(function() {
-    window.App.addWarningNotify('本系统为内部服务，请使用生意+ App 账号登录')
+    window.App.addWarningNotify('本系统为内部服务，请使用生意+ 账号登录')
 
     function smartLoginForm() {
         var w = window,
@@ -8,8 +8,7 @@ $(function() {
             g = d.getElementsByTagName('body')[0],
             x = w.innerWidth || e.clientWidth || g.clientWidth,
             y = w.innerHeight|| e.clientHeight || g.clientHeight,
-            alertHeight = $(".alert").height() || 0,
-            restHeight = (y - 52 - 402 - alertHeight)/4 - 52;
+            restHeight = (y - 52 - 402)/4 - 52;
         if(restHeight >= 0) {
           $(".bs-docs-masthead .bs-docs-booticon").css({opacity: 0, display: 'block'});
           $(".bs-docs-masthead .bs-docs-booticon").animate({'margin-top': restHeight + 'px', opacity: 1}, 'slow');
