@@ -7,14 +7,14 @@
   }
 #jobForm
   .col-sm-9
-    - url = url_for(@record ? "/#{@record.id}?page=#{params[:page] || 1}" : "/")
+    - url = url_for(@record ? "/#{@record.id}" : "/")
     - form_for @record, url, method: "post", class: "form-horizontal", id: "recordForm", '@submit' => 'checkForm' do |f|
       = f.hidden_field :uuid
       - field_set_tag do
         .form-group
           = f.label '任务标题', class: "col-sm-2 control-label"
           .col-sm-9
-            = f.text_field :title, class: "form-control", placeholder: "任务标题，必填项", ':value' => 'record.title'
+            = f.text_field :title, class: "form-control", placeholder: "任务标题，必填项", 'v-model.trim' => 'record.title'
           .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
             %span{style: "padding-top:10px;"}
               %a{'@click' => "listJobTemplates(0)"}
@@ -23,7 +23,7 @@
           = f.label '设备名称', class: "col-sm-2 control-label"
           .col-sm-9
             = f.hidden_field :device_list, ':value' => 'record.device_list'
-            = f.text_area :device_name, class: "form-control", rows: 1, placeholder: "要部署的设备，必填项", ':value' => 'record.device_name'
+            = f.text_area :device_name, class: "form-control", rows: 1, placeholder: "要部署的设备，必填项", 'v-model.trim' => 'record.device_name'
           .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
             %span{style: "padding-top:10px;"}
               %a{'@click' => "listDevices(0)"}
@@ -32,7 +32,7 @@
           = f.label '应用名称', class: "col-sm-2 control-label"
           .col-sm-9
             = f.hidden_field :app_id, ':value' => 'record.app_id'
-            = f.text_field :app_name, class: "form-control", placeholder: "要部署的应用", ':value' => 'record.app_name'
+            = f.text_field :app_name, class: "form-control", placeholder: "要部署的应用", 'v-model.trim' => 'record.app_name'
           .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
             %span{style: "padding-top:10px;"}
               %a{'@click' => "listApps(0)"}
@@ -41,7 +41,7 @@
           = f.label '版本名称', class: "col-sm-2 control-label"
           .col-sm-9
             = f.hidden_field :version_id, ':value' => 'record.version_id'
-            = f.text_field :version_name, class: "form-control", placeholder: "要部署的版本", ':value' => 'record.version_name'
+            = f.text_field :version_name, class: "form-control", placeholder: "要部署的版本", 'v-model.trim' => 'record.version_name'
           .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
             %span{style: "padding-top:10px;"}
               %a{'@click' => "listVersions(0)"}
@@ -49,18 +49,18 @@
         .form-group
           = f.label '部署脚本', class: "col-sm-2 control-label"
           .col-sm-9
-            = f.text_area :command, class: "form-control", rows: 8, placeholder: "部署脚本，必填项", ':value' => 'record.command'
+            = f.text_area :command, class: "form-control", rows: 8, placeholder: "部署脚本，必填项", 'v-model.trim' => 'record.command'
           .col-sm-1{style: "margin-left:-20px;padding-top:10px;"}
             %a{'@click' => "renderCommand(true);"}
               %span.glyphicon.glyphicon-eye-open
         .form-group
           = f.label '执行时间', class: "col-sm-2 control-label"
           .col-sm-9
-            = f.text_field :executed_at, class: "form-control", placeholder: "执行时间，定时任务功能", ':value' => 'record.executed_at'
+            = f.text_field :executed_at, class: "form-control", placeholder: "执行时间，定时任务功能", 'v-model.trim' => 'record.executed_at'
         .form-group
           = f.label '任务描述', class: "col-sm-2 control-label"
           .col-sm-9
-            = f.text_area :description, class: "form-control", rows: 2, placeholder: "任务描述", ':value' => 'record.description'
+            = f.text_area :description, class: "form-control", rows: 2, placeholder: "任务描述", 'v-model.trim' => 'record.description'
         .form-group
           .col-sm-offset-2.col-sm-10
             = f.submit "提交", class: "btn btn-primary"
@@ -97,4 +97,4 @@
 
       
 
-= erb :'_form.js'
+= javascript_include_tag 'account/jobs/form.js'

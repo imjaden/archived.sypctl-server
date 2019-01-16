@@ -211,6 +211,7 @@ window.App = {
       delete params.logout_authen_to_redirect;
       delete params.user_num;
       delete params.user_name;
+      delete params.bsession;
       window.Param.redirectTo(params);
     }
   },

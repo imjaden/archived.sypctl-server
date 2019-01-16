@@ -1,7 +1,6 @@
 require 'active_record'
 require 'fileutils'
 
-
 namespace :mysql do
   def exec_sql(sql)
     ActiveRecord::Base.connection.execute(sql)

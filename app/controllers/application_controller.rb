@@ -190,7 +190,6 @@ class ApplicationController < Sinatra::Base
     @current_user ||= begin
       user = User.find_by(user_num: cookies[cookie_name])
       set_login_cookie(nil) if !user
-      puts user.inspect
       user
     end
   end

@@ -9,8 +9,6 @@ module Account
     end
 
     get '/' do
-      @records = JobGroup.paginate(page: params[:page], per_page: 15).order(id: :desc)
-
       haml :index, layout: settings.layout
     end
 

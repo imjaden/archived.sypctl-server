@@ -1,25 +1,30 @@
-%ol.breadcrumb
-  %li 部署中心
-  %li 任务管理
-  %li
-    %a{href: "#{url_for('/new')}?page=#{params[:page] || 1}"}
-      新建任务
-      %span.glyphicon.glyphicon-plus
 :css   
-  .jobs th:nth-child(1), .jobs td:nth-child(1) { text-align: left; width: 15%; }
-  .jobs th:nth-child(2), .jobs td:nth-child(2) { text-align: left; width: 50%; }
+  .jobs th:nth-child(n+1), .jobs td:nth-child(n+1) { text-align: center; width: 5%; }
+  .jobs th:nth-child(1), .jobs td:nth-child(1) { width: 15%; }
+  .jobs th:nth-child(2), .jobs td:nth-child(2) { text-align: left; width: 45%; }
   .jobs th:nth-child(3), .jobs td:nth-child(3) { text-align: center; width: 10%; }
-  .jobs th:nth-child(4), .jobs td:nth-child(4) { text-align: center; width: 10%; }
+  .jobs th:nth-child(4), .jobs td:nth-child(4) { text-align: center; width: 5%; }
   .jobs th:nth-last-child(1), .jobs td:nth-last-child(1) { text-align: center; width:15%; }
 #JobIndex
+
+  %ol.breadcrumb
+    %li 部署中心
+    %li 任务管理
+    %li
+      %a{href: "#{url_for('/new')}?page=#{params[:page] || 1}"}
+        新建任务
+        %span.glyphicon.glyphicon-plus
+
   %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.jobs
     %thead
       %th 创建时间
       %th 任务标题
       %th 部署进度
       %th 设备数量
+      %th 拷贝
+      %th 删除
       %th 更新时间
-    %tbody{'v-for' => 'record in groupList'}
+    %tbody{'v-for' => '(record, index) in jobGroups'}
       %tr{':id' => "'dom_'+record.id"}
         %td{'v-text' => 'record.created_at.replace(/:|\/|\s/g, "")'}
         %td.name
@@ -27,47 +32,12 @@
         %td
           %span.label{'v-text' => 'record.state', ':class' => "{'label-primary': record.state == 'waiting', 'label-default': record.state != 'waiting'}"}
         %td{'v-text' => 'record.device_count'}
+        %td
+          %a.btn.btn-success.btn-xs{':href' => '"/account/jobs/new?copy_from=" + record.uuid'}
+            %span.glyphicon.glyphicon-copy
+        %td
+          %a.btn.btn-danger.btn-xs{'@click' => 'deleteClick(record)'}
+            %span.glyphicon.glyphicon-trash
         %td{'v-text' => 'record.updated_at'}
 
-  = will_paginater @records
-
-:javascript
-  new Vue({
-    el: '#JobIndex',
-    data: function() {
-      return { 
-        groupList: #{@records.map(&:to_hash).map(&:to_json) }.map(function(record) { return JSON.parse(record); })
-      }
-    },
-    created() {
-      console.log('grouplist:', this.groupList)
-    },
-    methods: {
-      removeGroup(group) {
-        if(!confirm('确定删除「' + group.title + '」?')) {
-          return false;
-        }
-
-        let that = this;
-        window.Loading.show("删除中...");
-        $.ajax({
-          type: 'delete',
-          url: "#{url_for('/group/')}" + group.uuid
-        }).done(function(res, status, xhr) {
-          if(res.code === 201) {
-            window.Loading.show("删除成功");
-            let groupIndex = that.groupList.findIndex(function(ele) { return ele.uuid === group.uuid; });
-            that.$nextTick(function() {
-              that.groupList.splice(groupIndex, 1)
-            })
-          } else {
-            window.Loading.show("删除失败");
-          }
-        }).fail(function(xhr, status, error) {
-            window.Loading.show("删除失败");
-        }).always(function(res, status, xhr) {
-            window.Loading.hide();
-        });
-      }
-    }
-  })
+= javascript_include_tag 'account/jobs/index.js'

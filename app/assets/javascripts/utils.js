@@ -24,7 +24,12 @@ window.Param = {
     return href;
   },
   redirectTo: function(paramsHash) {
-    window.location.href = window.Param.toString(paramsHash);
+    let url = window.Param.toString(paramsHash);
+    if(window.history.pushState) {
+      window.history.pushState(null, null, url);
+    } else {
+      window.location.href = url
+    }
   }
 }
 

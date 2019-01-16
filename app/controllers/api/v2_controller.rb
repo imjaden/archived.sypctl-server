@@ -55,6 +55,48 @@ module API
       respond_with_formt_json({data: {items: records.map(&:to_hash), total: Device.count}, message: '接收成功'}, 201)
     end
 
+    get '/account/job_group/new' do
+      record = JobGroup.new
+      record.uuid = generate_uuid
+      record.executed_at = Time.now.strftime("%Y-%m-%d %H:%M:%S")
+
+      respond_with_json({data: record.to_hash, message: '成功初始化任务分组', code: 200}, 200)
+    end
+
+    get '/account/job_group/copy' do
+      authen_api_token([:uuid])
+
+      record = JobGroup.find_by(uuid: params[:uuid])
+      options = record.to_hash
+      options[:uuid] = generate_uuid
+      options[:executed_at] = Time.now.strftime("%Y-%m-%d %H:%M:%S")
+
+      jobs = record.jobs
+      options[:device_name] = jobs.map { |job| "<#{job.device_name}>" }.join
+      options[:device_list] = jobs.map { |job| {name: job.device_name, uuid: job.device_uuid} }.to_json
+
+      respond_with_json({data: options, message: '成功初始化任务分组', code: 200}, 200)
+    end
+
+    get '/account/job_group/list' do
+      records = JobGroup.order(id: :desc).limit(30).map(&:to_hash)
+
+      respond_with_formt_json({data: records, message: "成功获取#{records.length}条数据"}, 200)
+    end
+
+    post '/account/job_group/delete' do
+      authen_api_token([:uuid])
+
+      record = JobGroup.find_by(uuid: params[:uuid])
+      halt_with_format_json({data: params[:uuid], message: "查询任务分组失败，#{params[:uuid]}", code: 200}, 200) unless record
+
+      count = record.jobs.count
+      halt_with_format_json({data: params[:uuid], message: "删除任务分组失败，请手工删除分组下的#{count}个任务", code: 200}, 200) unless count.zero?
+
+      record.destroy
+      respond_with_json({message: "成功删除任务分组「#{record.title}」", code: 201}, 201)
+    end
+
     protected
 
     def authen_api_token(api_token)
