@@ -3,12 +3,14 @@
   .container
     / Brand and toggle get grouped for better mobile display
     .navbar-header
+      = link_to 'SYPCTL', 'javascript:void(0);', class: 'navbar-brand hidden'
+      .navbar-brand{href: "#"}
+        %img.img-lazy-load{style: 'max-width:25px;', alt: "生意+ 系统", src: '/images/favicon.png', 'data-original' => '/images/favicon.png'}
       %button.navbar-toggle{'data-target' => '#navbar-collapse', 'data-toggle' => 'collapse', :type => 'button'}
         %span.sr-only Toggle navigation
         %span.icon-bar
         %span.icon-bar
         %span.icon-bar
-      = link_to 'SYPCTL', 'javascript:void(0);', class: 'navbar-brand'
     / Collect the nav links, forms, and other content for toggling
     .collapse.navbar-collapse{role: 'navigation', id:'navbar-collapse'}
       %ul.nav.navbar-nav

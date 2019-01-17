@@ -6,7 +6,7 @@
     overflow: scroll;
   }
 #jobForm
-  .col-sm-9
+  .col-sm-8
     - url = url_for(@record ? "/#{@record.id}" : "/")
     - form_for @record, url, method: "post", class: "form-horizontal", id: "recordForm", '@submit' => 'checkForm' do |f|
       = f.hidden_field :uuid
@@ -67,7 +67,7 @@
             = link_to "提交", "javascript:void(0);", class: "btn btn-primary hidden", onclick: "window.JobObject.onsubmit();"
             = button_tag "取消", class: "btn btn-default", onclick: "window.history.go(-1);"
 
-  .col-sm-3
+  .col-sm-4
     .list-group{'v-if' => 'showJobTemplates'}
       %button.list-group-item.disabled{type: 'button', 'v-text' => '"模板列表：(" + jobTemplates.length + " 个)"'} 
       %button.list-group-item.disabled{type: 'button', 'v-if' => 'jobTemplates.length == 0'} 无数据

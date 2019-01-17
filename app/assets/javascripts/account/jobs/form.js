@@ -76,8 +76,8 @@ new Vue({
       });
     },
     checkForm(el) {
-      console.log(el)
-      let isOk = false
+      let isOk = false,
+          matchDatas = [];
       if(!this.record.title) {
         window.Loading.popup('请选择模板')
       } else if(!this.record.device_list) {
@@ -85,7 +85,12 @@ new Vue({
       } else if(!this.record.command) {
         window.Loading.popup('请选择有效模板')
       } else {
-        isOk = true
+        matchDatas = this.record.command.match(/\{\{(.*?)\}\}/g) || []
+        if(matchDatas.length) {
+          window.Loading.popup('部署脚本未渲染的变量')
+        } else {
+          isOk = true
+        }
       }
 
       if(isOk) {
@@ -121,9 +126,9 @@ new Vue({
         }
         
         return true
-      } else {
-        el.preventDefault();
-      }
+      } 
+      console.log(el)
+      el.preventDefault();
     },
     jobTemplateRadioClick(item) {
       this.jobTemplate = item

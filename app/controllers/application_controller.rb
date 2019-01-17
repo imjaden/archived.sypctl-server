@@ -43,13 +43,13 @@ class ApplicationController < Sinatra::Base
   use AssetsHandler
   use ExceptionHandler
 
-  # rake-mini-profiler
   use Rack::MiniProfiler
   Rack::MiniProfiler.config.position = 'top-right'
   Rack::MiniProfiler.config.start_hidden = false
   Rack::MiniProfiler.config.disable_caching = false
   Rack::MiniProfiler.config.storage = Rack::MiniProfiler::FileStore
   Rack::MiniProfiler.config.storage_options = {path: File.join(ENV['APP_ROOT_PATH'], 'tmp/mini-profiler')}
+  Rack::MiniProfiler.config.skip_paths = ['/login', '/images/', '/stylesheets/', '/javascripts/', '/api/']
 
   # sprockets
   set :sprockets, Sprockets::Environment.new(root) { |env| env.logger = Logger.new(STDOUT) }
@@ -86,8 +86,6 @@ class ApplicationController < Sinatra::Base
     @params.deep_symbolize_keys!
 
     print_format_logger
-    
-    Rack::MiniProfiler.authorize_request if @current_user
   end
   
   not_found do
@@ -99,8 +97,12 @@ class ApplicationController < Sinatra::Base
     end
   end
 
-  get '/', '/login' do
-    # redirect to('/account/jobs') if cookies[cookie_name].present?
+  get '/' do
+    redirect to('/login')
+  end
+
+  get '/login' do
+    redirect to('/account/jobs') if cookies[cookie_name].present? && current_user
     @user = User.new(user_num: cookies[cookie_name] || '')
 
     haml :index, layout: settings.layout
@@ -119,10 +121,10 @@ class ApplicationController < Sinatra::Base
       set_login_cookie(params[:user][:user_num])
 
       redirect to("/account/jobs?#{append_params_when_login(user)}")
-    else
-      flash[:waning] = message
-      redirect to('/login')
     end
+    
+    flash[:waning] = message
+    redirect to('/login')
   end
 
   # geetest3 captcha

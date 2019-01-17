@@ -91,11 +91,16 @@ module API
     end
 
     post '/operation/logger' do
-      params[:operation_log][:ip] = request.ip
-      params[:operation_log][:browser] = request.user_agent
-      OperationLog.create(params[:operation_log])
+      message = '接收成功'
+      begin
+        params[:operation_log][:ip] = request.ip
+        params[:operation_log][:browser] = request.user_agent
+        OperationLog.create(params[:operation_log])
+      rescue => e
+        message = "接收异常，#{e.message}"
+      end
 
-      respond_with_formt_json({message: '接收成功'}, 201)
+      respond_with_formt_json({message: message}, 201)
     end
 
     get '/job_templates' do
