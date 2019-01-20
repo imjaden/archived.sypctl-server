@@ -5,7 +5,7 @@
     max-height: 500px;
     overflow: scroll;
   }
-#jobForm
+#appVue
   .col-sm-8
     - url = url_for(@record ? "/#{@record.id}" : "/")
     - form_for @record, url, method: "post", class: "form-horizontal", id: "recordForm", '@submit' => 'checkForm' do |f|
