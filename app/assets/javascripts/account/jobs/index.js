@@ -1,5 +1,5 @@
 new Vue({
-  el: '#JobIndex',
+  el: '#appVue',
   data: function() {
     return { 
       jobGroups: []

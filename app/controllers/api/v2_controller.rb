@@ -97,6 +97,19 @@ module API
       respond_with_json({message: "成功删除任务分组「#{record.title}」", code: 201}, 201)
     end
 
+    post '/account/file_backup/create' do
+      params[:file][:uuid] ||= generate_uuid
+      record = FileBackup.create(params[:file])
+
+      respond_with_formt_json({data: record.to_hash, message: "成功创建文件备份", code: 201}, 201)
+    end
+
+    get '/account/file_backup/list' do
+      records = FileBackup.all.order(id: :desc).map(&:to_hash)
+
+      respond_with_formt_json({data: records, message: "成功获取#{records.length}条数据"}, 200)
+    end
+
     protected
 
     def authen_api_token(api_token)

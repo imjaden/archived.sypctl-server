@@ -1,5 +1,5 @@
 new Vue({
-  el: '#jobForm',
+  el: '#appVue',
   data: function() {
     return { 
       record: {},

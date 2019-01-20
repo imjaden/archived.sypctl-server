@@ -36,6 +36,7 @@ class CreateDevice < ActiveRecord::Migration[5.2]
       t.text     :description, comment: '设备服务器描述'
       t.integer  :order_index, default: 0, comment: '排序序号'
       t.boolean  :monitor_state, default: false, comment: '是否监控'
+      t.text     :file_backup_list, comment: '文件备份列表，JSON 格式'
 
       t.timestamps null: false
     end

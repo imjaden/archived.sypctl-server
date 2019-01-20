@@ -22,6 +22,7 @@ use Unicorn::WorkerKiller::Oom, (256*(1024**2)), (1024*(1024**2))
   '/account/jobs' => 'Account::JobController',
   '/account/job_templates' => 'Account::JobTemplateController',
   '/account/operation_logs' => 'Account::OperationLogController',
+  '/account/file_backups' => 'Account::FileBackupController',
   '/api' => 'API::ApplicationController',
   '/api/v1' => 'API::V1Controller',
   '/api/v2' => 'API::V2Controller',

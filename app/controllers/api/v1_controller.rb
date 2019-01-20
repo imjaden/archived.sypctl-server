@@ -66,16 +66,18 @@ module API
       params[:device][:request_ip] = request.ip
       params[:device][:request_agent] = request.user_agent
 
-      jobs = []
+      jobs, file_backups = [], []
       record = Record.create(params[:device])
       if device = Device.find_by(uuid: params[:device][:uuid])
-        device.update_attributes({
-          record_count: device.record_count + 1
-        })
+        device.update_attributes({record_count: device.record_count + 1})
         jobs = Job.where(device_uuid: device.uuid, state: 'waiting').map(&:to_hash)
       end
 
-      respond_with_json({id: record.id, jobs: jobs}, 201)
+      if params[:file_backup_db_hash].present? &&  params[:file_backup_db_hash] != FileBackup.db_hash
+        file_backups = FileBackup.db_json
+      end
+
+      respond_with_json({id: record.id, jobs: jobs, file_backups: file_backups}, 201)
     end
 
     # post /api/v1/job

@@ -318,7 +318,7 @@ class ApplicationController < Sinatra::Base
   private
 
   def set_login_cookie(_cookie_value = '')
-    if _cookie_value
+    if _cookie_value.present?
       cookies[cookie_name] = _cookie_value
     else
       cookies.delete(cookie_name)

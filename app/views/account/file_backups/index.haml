@@ -1,0 +1,48 @@
+:css   
+  .jobs th:nth-child(n+1), .jobs td:nth-child(n+1) { text-align: left; width: 5%; }
+  .jobs th:nth-child(1), .jobs td:nth-child(1) { width: 50%; }
+  .jobs th:nth-child(2), .jobs td:nth-child(2) { width: 30%; }
+  .jobs th:nth-child(3), .jobs td:nth-child(3) { text-align: center; width: 20%; }
+#appVue
+  %ol.breadcrumb
+    %li 设备中心
+    %li 文件备份
+    %li
+      %a{'data-toggle' => 'modal', 'data-target' => '#newModal'} 
+        新建文件
+        %span.glyphicon.glyphicon-plus
+
+  %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.jobs
+    %thead
+      %th 文件路径
+      %th 文件描述
+      %th 更新时间
+    %tbody{'v-for' => '(record, index) in records'}
+      %tr
+        %td{'v-text' => 'record.file_path'}
+        %td{'v-text' => 'record.description'}
+        %td{'v-text' => 'record.updated_at'}
+
+  .modal.fade#newModal
+    .modal-dialog{style: 'width: 500px;'}
+      .modal-content
+        .modal-header
+          %button.close{'type' => 'button', 'data-dismiss' => 'modal', 'aria-label' => 'Close'}
+            %span{'aria-hidden' => 'true'} &times;
+          %h4.modal-title 新建文件
+        .modal-body{style: 'width: 500px;'}
+          %form{'@submit' => 'createSubmit', method: "post", role: "form", style: 'width: 450px;'}
+            .input-group
+              .input-group-addon
+                %span 文件路径
+              %input.form-control{name: "file_path", type: "text", 'v-model.trim' => 'file.file_path'}/
+            .input-group{style: 'margin-bottom: 10px;'}
+              .input-group-addon
+                %span 文件描述
+              %textarea.form-control{name: "description", type: "text", 'v-model.trim' => 'file.description'}
+            .form-group{style: 'margin-bottom: 10px;'}
+              %input.btn.btn-primary{:type => "submit", :value => "创建", style: 'width: 100%;'}/
+            .form-group{style: 'margin-bottom: 10px;text-align: center;'}
+              %p.text-danger{'v-text' => 'file.message'}
+
+= javascript_include_tag 'account/file_backups/index.js'
