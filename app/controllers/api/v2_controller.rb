@@ -110,6 +110,13 @@ module API
       respond_with_formt_json({data: records, message: "成功获取#{records.length}条数据"}, 200)
     end
 
+    get '/account/device/query' do
+      authen_api_token([:uuid])
+      record = Device.find_by(uuid: params[:uuid])
+
+      respond_with_formt_json({data: record ? record.to_hash : {human_name: '不存在'}, message: "查询成功"}, 200)
+    end
+
     protected
 
     def authen_api_token(api_token)

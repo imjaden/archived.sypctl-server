@@ -36,7 +36,15 @@ class CreateDevice < ActiveRecord::Migration[5.2]
       t.text     :description, comment: '设备服务器描述'
       t.integer  :order_index, default: 0, comment: '排序序号'
       t.boolean  :monitor_state, default: false, comment: '是否监控'
-      t.text     :file_backup_list, comment: '文件备份列表，JSON 格式'
+      t.text     :file_backup_config, comment: '文件备份列表，JSON 格式'
+      t.text     :file_backup_monitor, comment: '文件备份列表执行结果'
+      t.string   :file_backup_updated_at, comment: '提交更新时间'
+      t.text     :service_config, comment: '服务配置，JSON 格式'
+      t.text     :service_monitor, comment: '服务运行状态'
+      t.boolean  :service_state, default: false, comment: '服务列表配置状态'
+      t.integer  :service_count, default: 0, comment: '服务列表数量'
+      t.integer  :service_stopped_count, default: 0, comment: '服务未运行数量'
+      t.string   :service_updated_at, comment: '提交更新时间'
 
       t.timestamps null: false
     end

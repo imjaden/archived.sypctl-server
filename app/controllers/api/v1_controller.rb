@@ -73,7 +73,7 @@ module API
         jobs = Job.where(device_uuid: device.uuid, state: 'waiting').map(&:to_hash)
       end
 
-      if params[:file_backup_db_hash].present? &&  params[:file_backup_db_hash] != FileBackup.db_hash
+      if params[:file_backup_db_hash].present? && params[:file_backup_db_hash] != FileBackup.db_hash
         file_backups = FileBackup.db_json
       end
 
@@ -172,11 +172,38 @@ module API
     get '/download/version' do
       api_authen_params([:app_uuid, :version_file_name])
 
-
       version_file_path = File.join(Setting.path.version, params[:app_uuid], params[:version_file_name])
       halt_with_format_json({data: {}, message: '版本文件不存在', code: 403}, 403) unless File.exists?(version_file_path)
 
       send_file(version_file_path, type: 'application/java-archive', filename: File.basename(version_file_path), disposition: 'attachment')
+    end
+
+    post '/upload/file_backup' do
+      api_authen_params([:device_uuid, :file_uuid, :archive_file_name, :backup_file])
+
+      message = upload_file_backup(params)
+      respond_with_formt_json({message: message, code: 201}, 201)
+    end
+
+    post '/upload/file_backup' do
+      api_authen_params([:device_uuid, :file_uuid, :archive_file_name, :backup_file])
+
+      message = upload_file_backup(params)
+      respond_with_formt_json({message: message, code: 201}, 201)
+    end
+    
+    post '/update/file_backup' do
+      api_authen_params([:device_uuid, :file_backup_config, :file_backup_monitor])
+
+      record = Device.find_by(uuid: params[:device_uuid])
+      halt_with_format_json({message: "查询设备失败,#{params[:device_uuid]}"}, 200) unless record
+
+      record.update_attributes({
+        file_backup_config: params[:file_backup_config],
+        file_backup_monitor: params[:file_backup_monitor],
+        file_backup_updated_at: Time.now.strftime('%Y/%m/%d %H:%M:%S')
+      })
+      respond_with_formt_json({message: '更新成功', code: 201}, 201)
     end
 
     get '/ifconfig.me' do
@@ -199,9 +226,11 @@ module API
       device = Device.find_by(uuid: params[:uuid])
       device.update_attributes({
         service_state: true,
+        service_config: params[:service][:config],
         service_monitor: params[:service][:monitor],
         service_count: params[:service][:total_count],
-        service_stopped_count: params[:service][:stopped_count]
+        service_stopped_count: params[:service][:stopped_count],
+        service_updated_at: Time.now.strftime('%Y/%m/%d %H:%M:%S')
       }) if device
 
       respond_with_formt_json({message: '接收成功'}, 201)
@@ -211,6 +240,19 @@ module API
 
     def authen_api_token(api_token)
       Setting.api_keys.any? { |key| md5("#{key}#{request.path}#{key}") == api_token }
+    end
+
+    def upload_file_backup(params)
+      device_path = File.join(Setting.path.file_backup, params[:device_uuid], params[:file_uuid])
+      FileUtils.mkdir_p(device_path) unless File.exists?(device_path)
+      backup_path = File.join(device_path, params[:archive_file_name])
+
+      temp_file = params[:backup_file][:tempfile]
+      File.open(backup_path, "wb") { |file| file.write(temp_file.read) }
+      "上传成功"
+    rescue => e
+      puts e.backtrace.select { |line| line.include?(ENV['APP_ROOT_PATH']) }
+      "上传失败, #{__FILE__}@#{__LINE__} - #{e.message}"
     end
   end
 end

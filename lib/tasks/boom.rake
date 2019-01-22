@@ -72,7 +72,8 @@ namespace :boom do
       '极验验证' => ['geetest.captcha_id', 'geetest.private_key'],
       '进程管理' => ['unicorn.timeout', 'unicorn.worker_processes'],
       'API 验证' => ['api_keys'],
-      '微信小程序' => ['wxmp.app_id', 'wxmp.app_secret']
+      '微信小程序' => ['wxmp.app_id', 'wxmp.app_secret'],
+      '路径管理' => ['path.file_backup', 'path.version']
     }.each_pair do |key, array|
       not_exist_keys = array.find_all { |key_string| !check_setting_has_key?(key_string) }
       puts %(【#{key}】缺失下述字段:\n#{not_exist_keys.join("\n")}) unless not_exist_keys.empty?

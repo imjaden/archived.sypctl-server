@@ -26,14 +26,14 @@ class FileBackup < ActiveRecord::Base
     hash_path = File.join(cache_path, 'db.hash')
     json_path = File.join(cache_path, 'db.json')
     
-    File.open(hash_path, 'w:utf-8') { |file| file.puts(Digest::MD5.hexdigest(records)) }
     File.open(json_path, 'w:utf-8') { |file| file.puts(records) }
+    File.open(hash_path, 'w:utf-8') { |file| file.puts(Digest::MD5.hexdigest(records)) }
   end
 
   def self.db_hash
     cache_path = File.join(ENV['APP_ROOT_PATH'], 'tmp/file-backups')
     hash_path = File.join(cache_path, 'db.hash')
-    File.read(hash_path).strip
+    File.read(hash_path)
   rescue => e
     puts e.message
   end

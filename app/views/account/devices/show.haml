@@ -1,175 +1,155 @@
-%ol.breadcrumb
-  %li 设备中心
-  %li
-    %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 主机管理
-  %li= "「#{@record.human_name || @record.hostname}」"
-
 :css   
-  .devices th:nth-child(1), .devices td:nth-child(1) { width: 10%; }
+  .devices th:nth-child(1), .devices td:nth-child(1) { width: 20%; }
   .devices th:nth-child(2), .devices td:nth-child(2) { width: 80%; }
-%table.table.table-hover.table-condensed.table-strip.table-bordered.devices
-  %thead
-    %th 键值
-    %th 内容
-  %tbody
-    %tr
-      %td UUID
-      %td.name= @record.uuid
-    %tr
-      %td 业务名称
-      %td.name= @record.human_name
-    %tr
-      %td API Token
-      %td= @record.api_token
-    %tr
-      %td SSH 状态
-      %td
-        %span.label{class: "label-#{@record.ssh_state ? 'success' : 'warning'}"}
-          = @record.ssh_state ? '启用' : '关闭'
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        %a{onclick: "window.Device.toggleShowSSHInfo(this);"}
-          %span.glyphicon.glyphicon-eye-open
-            
-    %tr.ssh-info.hidden
-      %td SSH 服务器
-      %td= @record.ssh_ip
-    %tr.ssh-info.hidden
-      %td SSH 端口
-      %td= @record.ssh_port
-    %tr.ssh-info.hidden
-      %td SSH 账号
-      %td= @record.ssh_username
-    %tr.ssh-info.hidden
-      %td SSH 密码
-      %td= @record.ssh_password
-    %tr
-      %td 系统类型
-      %td
-        %span.label.label-info= "#{@record.os_type}#{@record.os_version}"
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        %a{onclick: "window.Device.toggleShowDeviceInfo(this);"}
-          %span.glyphicon.glyphicon-eye-open
-    %tr.device-info.hidden
-      %td UUID
-      %td= @record.uuid
-    %tr
-      %td Host 名称
-      %td= @record.hostname
-    %tr
-      %td 内存
-      %td= @record.memory
-    %tr
-      %td CPU
-      %td= @record.cpu
-    %tr
-      %td 磁盘
-      %td= @record.disk
-    %tr
-      %td 服务监控状态
-      %td= @record.service_state
-    %tr
-      %td 服务监控数量
-      %td= @record.service_count
-    %tr
-      %td 服务未运行数量
-      %td= @record.service_stopped_count
-    %tr.device-info.hidden
-      %td LanIP
-      %td= @record.lan_ip
-    %tr.device-info.hidden
-      %td WanIP
-      %td= @record.wan_ip
-    %tr.device-info.hidden
-      %td 代理账号
-      %td= @record.username
-    %tr.device-info.hidden
-      %td 代理密码
-      %td= @record.password
-    %tr.device-info.hidden
-      %td 代理 IP
-      %td= @record.request_ip
-    %tr.device-info.hidden
-      %td 代理版本
-      %td= @record.request_agent
-    %tr.device-info.hidden
-      %td 提交记录
-      %td
-        %a{href: url_for("/#{params[:id]}/records")}
-          %span.badge= @record.record_count
-    %tr
-      %td 更新时间
-      %td= @record.updated_at.strftime('%y/%m/%d %H:%M:%S')
-    %tr
-      %td 创建时间
-      %td= @record.created_at.strftime('%y/%m/%d %H:%M:%S')
-    %tr
-      %td 编辑
-      %td
-        %a{href: url_for("/#{@record.id}/edit"), class: 'btn btn-xs btn-link'}
-          %span.glyphicon.glyphicon-edit
-    %tr
-      %td 删除
-      %td
-        %a.btn.btn-xs.btn-link{style: "color: red;", onclick: "window.Device.remove(#{@record.id});"}
-          .span.glyphicon.glyphicon-trash
+  .list-group li:hover {cursor: pointer;}
+.row#appVue
+  %ol.breadcrumb
+    %li 设备中心
+    %li
+      %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 主机管理
+    %li= "「#{@record.human_name || @record.hostname}」"
 
-:javascript
-  (function() {
-      window.Device = {
-        remove: function(id) {
-          var name = $(".name").text();
+  .col-sm-3
+    %ol.list-group
+      %li.list-group-item.disabled 信息分类：
+      %li.list-group-item{'v-for' => '(sideMenu, index) in sideMenus', ':class' => '{active: sideMenu === currentSideMenu}', ':key' => 'sideMenu.id', '@click' => 'clickSideMenu(sideMenu)'}
+        {{ sideMenu.label }}
+        %span.badge {{ sideMenu.badge }}
+  .col-sm-9{style: 'max-height:600px;overflow:scroll;'}
+    %table.table.table-hover.table-condensed.table-strip.table-bordered.devices{'v-if' => 'currentSideMenu.id == "basic"'}
+      %thead
+        %th 键值
+        %th 内容
+      %tbody
+        %tr
+          %td UUID
+          %td.name{'v-text' => 'record.uuid'}
+        %tr
+          %td 业务名称
+          %td.name{'v-text' => 'record.human_name'}
+        %tr
+          %td API Token
+          %td{'v-text' => 'record.api_token'}
+        %tr.device-info
+          %td 代理版本
+          %td{'v-text' => 'record.request_agent'}
+        %tr.device-info
+          %td 提交记录
+          %td
+            %a{':href' => '"/account/devices/" + record.uuid + "/records"'}
+              %span.badge{'v-text' => 'record.record_count'}
+        %tr
+          %td 更新时间
+          %td{'v-text' => 'record.updated_at'}
+        %tr
+          %td 创建时间
+          %td{'v-text' => 'record.created_at'}
+        %tr
+          %td 编辑
+          %td
+            %a{':href' => '"/account/devices/" + record.uuid + "/edit"', class: 'btn btn-xs btn-link'}
+              %span.glyphicon.glyphicon-edit
+        %tr
+          %td 删除
+          %td
+            %a.btn.btn-xs.btn-link{style: "color: red;", '@click' => 'deleteClick'}
+              .span.glyphicon.glyphicon-trash
+    %table.table.table-hover.table-condensed.table-strip.table-bordered.devices{'v-if' => 'currentSideMenu.id == "ssh"'}
+      %thead
+        %th 键值
+        %th 内容
+      %tbody
+        %tr
+          %td SSH 状态
+          %td
+            %span.label{':class' => '{"label-success": record.ssh_state, "label-default": !record.ssh_state}', 'v-text' => 'record.ssh_state'}}
+            &nbsp;&nbsp;&nbsp;&nbsp;
+        %tr.ssh-info
+          %td SSH 服务器
+          %td{'v-text' => 'record.ssh_ip'}
+        %tr.ssh-info
+          %td SSH 端口
+          %td{'v-text' => 'record.ssh_port'}
+        %tr.ssh-info
+          %td SSH 账号
+          %td{'v-text' => 'record.ssh_username'}
+        %tr.ssh-info
+          %td SSH 密码
+          %td{'v-text' => 'record.ssh_password'}
+    %table.table.table-hover.table-condensed.table-strip.table-bordered.devices{'v-if' => 'currentSideMenu.id == "device"'}
+      %thead
+        %th 键值
+        %th 内容
+      %tbody
+        %tr
+          %td 系统类型
+          %td
+            %span.label.label-info{'v-text' => 'record.os_type+record.os_version'}
+            &nbsp;&nbsp;&nbsp;&nbsp;
+        %tr.device-info
+          %td UUID
+          %td{'v-text' => 'record.uuid'}
+        %tr
+          %td Host 名称
+          %td{'v-text' => 'record.hostname'}
+        %tr
+          %td 内存
+          %td{'v-text' => 'record.memory'}
+        %tr
+          %td CPU
+          %td{'v-text' => 'record.cpu'}
+        %tr
+          %td 磁盘
+          %td{'v-text' => 'record.disk'}
+        %tr
+          %td 服务监控状态
+          %td{'v-text' => 'record.service_state'}
+        %tr
+          %td 服务监控数量
+          %td{'v-text' => 'record.service_count'}
+        %tr
+          %td 服务未运行数量
+          %td{'v-text' => 'record.service_stopped_count'}
+        %tr.device-info
+          %td LanIP
+          %td{'v-text' => 'record.lan_ip'}
+        %tr.device-info
+          %td WanIP
+          %td{'v-text' => 'record.wan_ip'}
+        %tr.device-info
+          %td 代理账号
+          %td{'v-text' => 'record.username'}
+        %tr.device-info
+          %td 代理密码
+          %td{'v-text' => 'record.password'}
+        %tr.device-info
+          %td 代理 IP
+          %td{'v-text' => 'record.request_ip'}
 
-          if(!confirm('确定删除「' + name + '」?')) {
-            return false;
-          }
+    %div{'v-if' => 'currentSideMenu.id == "service"'}
+      %div 更新时间: {{ record.service_updated_at }}
+      %div 服务列表配置:
+      %pre{'v-text' => 'record.service_config'}
+      %div 服务运行状态:
+      %pre{'v-text' => 'record.service_monitor'}
 
-          window.Loading.show("删除中...");
-          $.ajax({
-            type: 'delete',
-            url: "#{url_for('/')}" + id
-          }).done(function(res, status, xhr) {
-            if(res.code === 201) {
-              $("#dom_" + id).remove();
-              window.Loading.show("删除成功");
+    %div{'v-if' => 'currentSideMenu.id == "backup"'}
+      %div 更新时间: {{ record.file_backup_updated_at }}
+      %table.table.table-hover.table-condensed.table-strip.table-bordered.file-backups
+        %thead
+          %th 文件名称
+          %th 文件描述
+          %th MD5
+        %tbody
+          %tr{'v-for' => '(item, index) in file_backups', ':key' => 'item.id'}
+            %td{'v-text' => 'item.file_path'}
+            %td{'v-text' => 'item.description'}
+            %td{'v-text' => 'item.md5'}
 
-              try {
-                var objects = {device: { id: id, name: name }}
-                window.OperationLogger.record("device.delete", objects);
-              } catch(e) { console.log(e) }
+      %div 备份文件配置:
+      %pre{'v-text' => 'record.file_backup_config'}
+      %div 备份文件状态:
+      %pre{'v-text' => 'record.file_backup_monitor'}
+    
 
-              window.location.href = "#{url_for('/')}";
-            } else {
-              window.Loading.show("删除失败");
-            }
-          }).fail(function(xhr, status, error) {
-              window.Loading.show("删除失败");
-          }).always(function(res, status, xhr) {
-              window.Loading.hide();
-          });
-        },
-        toggleShowSSHInfo: function(ctl) {
-          var $span = $(ctl).children("span").first();
-          if($span.hasClass("glyphicon-eye-open")) {
-            $span.removeClass("glyphicon-eye-open");
-            $span.addClass("glyphicon-eye-close");
-            $(".ssh-info").removeClass("hidden");
-          } else {
-            $span.addClass("glyphicon-eye-open");
-            $span.removeClass("glyphicon-eye-close");
-            $(".ssh-info").addClass("hidden");
-          }
-        },
-        toggleShowDeviceInfo: function(ctl) {
-          var $span = $(ctl).children("span").first();
-          if($span.hasClass("glyphicon-eye-open")) {
-            $span.removeClass("glyphicon-eye-open");
-            $span.addClass("glyphicon-eye-close");
-            $(".device-info").removeClass("hidden");
-          } else {
-            $span.addClass("glyphicon-eye-open");
-            $span.removeClass("glyphicon-eye-close");
-            $(".device-info").addClass("hidden");
-          }
-        }
-      }
-  }).call(this);
+= javascript_include_tag 'account/devices/show.js'

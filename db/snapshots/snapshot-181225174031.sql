@@ -123,13 +123,15 @@ CREATE TABLE IF NOT EXISTS `DATABASE_NAME`.`sys_devices` (
   `request_ip` varchar(255) DEFAULT NULL,
   `request_agent` varchar(255) DEFAULT NULL COMMENT '代理版本信息',
   `monitor_state` tinyint(1) DEFAULT '0' COMMENT '是否监控',
-  `service_state` tinyint(1) DEFAULT '0' COMMENT '服务列表配置状态',
+  `service_config` text COMMENT '服务列表配置 JSON',
   `service_monitor` text COMMENT '服务运行状态',
+  `service_state` tinyint(1) DEFAULT '0' COMMENT '服务列表配置状态',
   `service_count` int(11) DEFAULT '0' COMMENT '服务列表数量',
   `service_stopped_count` int(11) DEFAULT '0' COMMENT '服务未运行数量',
   `device_group_uuid` varchar(255) DEFAULT NULL COMMENT '分组 UUID',
   `user_group_uuid` varchar(255) DEFAULT NULL COMMENT '分组 UUID',
-  `file_backup_list` text DEFAULT NULL COMMENT '文件备份列表，JSON 格式',
+  `file_backup_config` text DEFAULT NULL COMMENT '文件备份列表，JSON 格式',
+  `file_backup_monitor` text DEFAULT NULL COMMENT '文件备份列表执行结果',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='设备服务器表';
 
@@ -426,12 +428,16 @@ call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices'
 call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices', 'request_agent', 'varchar(255) DEFAULT NULL COMMENT "代理版本信息"');
 call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices', 'monitor_state', 'tinyint(1) DEFAULT "0" COMMENT "是否监控"');
 call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices', 'service_state', 'tinyint(1) DEFAULT "0" COMMENT "服务列表配置状态"');
+call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices', 'service_config', 'text COMMENT "服务列表配置 JSON"');
 call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices', 'service_monitor', 'text COMMENT "服务运行状态"');
 call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices', 'service_count', 'int(11) DEFAULT "0" COMMENT "服务列表数量"');
 call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices', 'service_stopped_count', 'int(11) DEFAULT "0" COMMENT "服务未运行数量"');
+call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices', 'service_updated_at', 'varchar(255) DEFAULT NULL COMMENT "提交更新时间"');
 call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices', 'device_group_uuid', 'varchar(255) DEFAULT NULL COMMENT "分组 UUID"');
 call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices', 'user_group_uuid', 'varchar(255) DEFAULT NULL COMMENT "分组 UUID"');
-call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices', 'file_backup_list', 'text DEFAULT NULL COMMENT "文件备份列表，JSON 格式"');
+call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices', 'file_backup_config', 'text DEFAULT NULL COMMENT "文件备份列表，JSON 格式"');
+call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices', 'file_backup_monitor', 'text DEFAULT NULL COMMENT "文件备份列表执行结果"');
+call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_devices', 'file_backup_updated_at', 'varchar(255) DEFAULT NULL COMMENT "提交更新时间"');
 call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_device_groups', 'id', 'bigint(20) NOT NULL AUTO_INCREMENT');
 call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_device_groups', 'user_group_id', 'int(11) DEFAULT NULL');
 call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_device_groups', 'name', 'varchar(255) NOT NULL COMMENT "分组名称"');

@@ -14,10 +14,5 @@ class CreateService < ActiveRecord::Migration[5.2]
       t.datetime :created_at, null: false, default: -> { 'CURRENT_TIMESTAMP' }
       t.datetime :updated_at, null: false, default: -> { 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP' }
     end
-
-    add_column :sys_devices, :service_state, :boolean, default: false, comment: '服务列表配置状态'
-    add_column :sys_devices, :service_monitor, :text, comment: '服务运行状态'
-    add_column :sys_devices, :service_count, :integer, default: 0, comment: '服务列表数量'
-    add_column :sys_devices, :service_stopped_count, :integer, default: 0, comment: '服务未运行数量'
   end
 end

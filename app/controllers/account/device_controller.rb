@@ -35,8 +35,8 @@ module Account
       end
     end
 
-    get '/:id' do
-      unless @record = Device.find_by(id: params[:id])
+    get '/:uuid' do
+      unless @record = Device.find_by(uuid: params[:uuid])
         @record = Device.new
         @record.name = '版本不存在'
       end
@@ -53,8 +53,8 @@ module Account
       haml :show, layout: settings.layout
     end
 
-    get '/:id/edit' do
-      @record = Device.find_by(id: params[:id])
+    get '/:uuid/edit' do
+      @record = Device.find_by(uuid: params[:uuid])
       @record.uuid = "random-#{generate_uuid}" unless @record.uuid
 
       haml :edit, layout: settings.layout
@@ -67,8 +67,8 @@ module Account
       respond_with_json({data: record.monitor_state}, 201)
     end
 
-    post '/:id' do
-      record = Device.find_by(id: params[:id])
+    post '/:uuid' do
+      record = Device.find_by(uuid: params[:uuid])
         
       if record.update_attributes(params[:device])
         flash[:success] = '更新成功'
@@ -79,16 +79,16 @@ module Account
       end
     end
 
-    delete '/:id' do
-      if record = Device.find_by(id: params[:id])
+    delete '/:uuid' do
+      if record = Device.find_by(uuid: params[:uuid])
         record.destroy
       end
       
       respond_with_json({message: "删除成功"}, 201)
     end
 
-    get '/:id/records' do
-      @device = Device.find_by(id: params[:id])
+    get '/:uuid/records' do
+      @device = Device.find_by(uuid: params[:uuid])
       @records = @device.records.paginate(page: params[:page], per_page: 20).order(id: :desc)
 
       haml :'records/index', layout: settings.layout
