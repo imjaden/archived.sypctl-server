@@ -73,6 +73,9 @@ module API
         jobs = Job.where(device_uuid: device.uuid, state: 'waiting').map(&:to_hash)
       end
 
+      puts "FileBackup.db_hash: #{FileBackup.db_hash}"
+      puts "params[:file_backup_db_hash]: #{params[:file_backup_db_hash]}"
+      puts params[:file_backup_db_hash] == FileBackup.db_hash
       if params[:file_backup_db_hash].present? && params[:file_backup_db_hash] != FileBackup.db_hash
         file_backups = FileBackup.db_json
       end

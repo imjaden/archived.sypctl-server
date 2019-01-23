@@ -33,7 +33,7 @@ class FileBackup < ActiveRecord::Base
   def self.db_hash
     cache_path = File.join(ENV['APP_ROOT_PATH'], 'tmp/file-backups')
     hash_path = File.join(cache_path, 'db.hash')
-    File.read(hash_path)
+    File.read(hash_path).strip
   rescue => e
     puts e.message
   end
