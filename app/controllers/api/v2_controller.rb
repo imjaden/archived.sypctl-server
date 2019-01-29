@@ -110,11 +110,46 @@ module API
       respond_with_formt_json({data: records, message: "成功获取#{records.length}条数据"}, 200)
     end
 
+    get '/account/file_backup/read' do
+      authen_api_token([:device_uuid, :file_uuid, :archive_file_name])
+
+      file_path = File.join(Setting.path.file_backup, params[:device_uuid], params[:file_uuid], params[:archive_file_name])
+      data = File.exists?(file_path) ? File.read(file_path) : "文件不存在 #{file_path}"
+      
+      respond_with_formt_json({data: data, message: "查询成功"}, 200)
+    end
+
+    get '/account/file_backup/download' do
+      authen_api_token([:device_uuid, :file_uuid, :archive_file_name])
+
+      file_path = File.join(Setting.path.file_backup, params[:device_uuid], params[:file_uuid], params[:archive_file_name])
+      halt_with_format_json({message: "文件不存在 #{params[:archive_file_name]}"}, 200) unless File.exists?(file_path) 
+      
+      send_file(file_path, type: 'text/plain', filename: params[:archive_file_name], disposition: 'attachment')
+    end
+
     get '/account/device/query' do
       authen_api_token([:uuid])
       record = Device.find_by(uuid: params[:uuid])
 
       respond_with_formt_json({data: record ? record.to_hash : {human_name: '不存在'}, message: "查询成功"}, 200)
+    end
+
+    get '/account/device/list' do
+      keys = [:uuid, :human_name, :hostname, :monitor_state, :ssh_state, :os_type, :os_version, :updated_at, :device_group_uuid]
+      devices = Device.all.order(updated_at: :desc).map { |r| r.to_hash.simple(keys) }
+
+      keys = [:uuid, :name]
+      uuids = devices.map { |hsh| hsh[:device_group_uuid] }.uniq
+      records = DeviceGroup.where(uuid: uuids).map { |r| r.to_hash.simple(keys) }
+      records.push({uuid: nil, name: '未分组'})
+      
+      records = records.map do |hsh|
+        hsh[:devices] = devices.select { |h| h[:device_group_uuid] == hsh[:uuid] }
+        hsh
+      end
+
+      respond_with_formt_json({data: records, message: "查询成功"}, 200)
     end
 
     protected

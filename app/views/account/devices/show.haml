@@ -1,13 +1,16 @@
 :css   
-  .devices th:nth-child(1), .devices td:nth-child(1) { width: 20%; }
-  .devices th:nth-child(2), .devices td:nth-child(2) { width: 80%; }
+  .tableService th:nth-child(n+1), .tableService td:nth-child(n+1) { text-align: left; }
+  .tableBackup th:nth-child(n+4), .tableBackup td:nth-child(n+4) { text-align: center; }
   .list-group li:hover {cursor: pointer;}
+  textarea {word-wrap:normal;white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;}
+
 .row#appVue
-  %ol.breadcrumb
-    %li 设备中心
-    %li
-      %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 主机管理
-    %li= "「#{@record.human_name || @record.hostname}」"
+  .col-sm-12
+    %ol.breadcrumb
+      %li 设备中心
+      %li
+        %a{href: "#{url_for('/')}?page=#{params[:page] || 1}"} 主机管理
+      %li= "「#{@record.human_name || @record.hostname}」"
 
   .col-sm-3
     %ol.list-group
@@ -15,8 +18,9 @@
       %li.list-group-item{'v-for' => '(sideMenu, index) in sideMenus', ':class' => '{active: sideMenu === currentSideMenu}', ':key' => 'sideMenu.id', '@click' => 'clickSideMenu(sideMenu)'}
         {{ sideMenu.label }}
         %span.badge {{ sideMenu.badge }}
-  .col-sm-9{style: 'max-height:600px;overflow:scroll;'}
-    %table.table.table-hover.table-condensed.table-strip.table-bordered.devices{'v-if' => 'currentSideMenu.id == "basic"'}
+        
+  .col-sm-9{':style' => '"height:" + screenHeight + "px;overflow:scroll;"'}
+    %table.table.table-hover.table-condensed.table-strip.table-bordered.tableBasic{'v-if' => 'currentSideMenu.id == "basic"'}
       %thead
         %th 键值
         %th 内容
@@ -54,7 +58,7 @@
           %td
             %a.btn.btn-xs.btn-link{style: "color: red;", '@click' => 'deleteClick'}
               .span.glyphicon.glyphicon-trash
-    %table.table.table-hover.table-condensed.table-strip.table-bordered.devices{'v-if' => 'currentSideMenu.id == "ssh"'}
+    %table.table.table-hover.table-condensed.table-strip.table-bordered.tableSSH{'v-if' => 'currentSideMenu.id == "ssh"'}
       %thead
         %th 键值
         %th 内容
@@ -76,7 +80,7 @@
         %tr.ssh-info
           %td SSH 密码
           %td{'v-text' => 'record.ssh_password'}
-    %table.table.table-hover.table-condensed.table-strip.table-bordered.devices{'v-if' => 'currentSideMenu.id == "device"'}
+    %table.table.table-hover.table-condensed.table-strip.table-bordered.tableDevice{'v-if' => 'currentSideMenu.id == "device"'}
       %thead
         %th 键值
         %th 内容
@@ -127,29 +131,47 @@
           %td{'v-text' => 'record.request_ip'}
 
     %div{'v-if' => 'currentSideMenu.id == "service"'}
-      %div 更新时间: {{ record.service_updated_at }}
-      %div 服务列表配置:
-      %pre{'v-text' => 'record.service_config'}
-      %div 服务运行状态:
-      %pre{'v-text' => 'record.service_monitor'}
+      %div 更新时间: {{ record.service_updated_at }}，<a @click='displayModal("serviceConfig")'>查看监控服务配置档</a>，服务运行状态:
+      %table.table.table-condensed.table-bordered.smart-table.tableService
+        %thead
+          %tr
+            %th{'v-for' => '(head, th_index) in record.service_monitor.heads', ':style' => '"width:" + record.service_monitor.widths[th_index]', 'v-text' => 'head'}
+        %tbody
+          %tr{'v-for' => '(rows, row_index) in record.service_monitor.data'}
+            %td{'v-for' => '(row, td_index) in rows', ':style' => '"width:" +  record.service_monitor.widths[td_index] + ";word-break:break-all;"', 'v-html' => 'row'}
 
     %div{'v-if' => 'currentSideMenu.id == "backup"'}
-      %div 更新时间: {{ record.file_backup_updated_at }}
-      %table.table.table-hover.table-condensed.table-strip.table-bordered.file-backups
+      %div 更新时间: {{ record.file_backup_updated_at }}，<a @click='displayModal("backupConfig")'>查看备份服务配置档</a>，<a @click='displayModal("backupOutput")'>查看备份服务状态</a>
+      %table.table.table-hover.table-condensed.table-strip.table-bordered.file-backups.tableBackup
         %thead
           %th 文件名称
-          %th 文件描述
           %th MD5
+          %th 文件描述
+          %th 查看
+          %th 下载
         %tbody
           %tr{'v-for' => '(item, index) in file_backups', ':key' => 'item.id'}
             %td{'v-text' => 'item.file_path'}
-            %td{'v-text' => 'item.description'}
             %td{'v-text' => 'item.md5'}
+            %td{'v-text' => 'item.description'}
+            %td
+              %a{'@click' => 'getBackupFile("read", record.uuid, item.uuid, item.archive_file_name, item.file_path)'}
+                %span.glyphicon.glyphicon-eye-open
+            %td
+              %a{'@click' => 'getBackupFile("download", record.uuid, item.uuid, item.archive_file_name, item.file_path)'}
+                %span.glyphicon.glyphicon-download
 
-      %div 备份文件配置:
-      %pre{'v-text' => 'record.file_backup_config'}
-      %div 备份文件状态:
-      %pre{'v-text' => 'record.file_backup_monitor'}
-    
+  .modal.fade#infoModal{"aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
+    .modal-dialog{role: "document"}
+      .modal-content
+        .modal-header
+          %button.close{"aria-label" => "Close", "data-dismiss" => "modal", type: "button"}
+            %span{"aria-hidden" => "true"} ×
+          %h4.modal-title{'v-text' => 'modal.title'}
+        .modal-body{style: 'padding: 10px;'}
+          %textarea.form-control{'v-model.trim' => 'modal.body', rows: 20, readonly: true}
+        .modal-footer
+          %span.mtime{style: 'float:left; color: darkgray;'}
+          %button.btn.btn-default{"data-dismiss" => "modal", type: "button"}  关闭
 
 = javascript_include_tag 'account/devices/show.js'

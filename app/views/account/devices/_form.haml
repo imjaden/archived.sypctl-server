@@ -4,7 +4,7 @@
     .form-group
       = f.label '应用分组', class: "col-sm-2 control-label"
       .col-sm-6
-        = f.select :device_group_id, options: DeviceGroup.all.map { |r| [r.name, r.id] }, class: "form-control"
+        = f.select :device_group_uuid, options: DeviceGroup.all.map { |r| [r.name, r.uuid] }, class: "form-control"
       .col-sm-1{style: "padding-top:10px;"}
         %a{href: "/account/device_groups/new", target: "blank"}
           %span.glyphicon.glyphicon-plus

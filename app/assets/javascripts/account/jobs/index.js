@@ -2,6 +2,7 @@ new Vue({
   el: '#appVue',
   data: function() {
     return { 
+      screenHeight: document.documentElement.clientHeight - 150,
       jobGroups: []
     }
   },

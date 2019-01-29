@@ -76,18 +76,21 @@ a:hover {
   background: transparent; 
 }
 
-.footer {
+#footer {
+  position: absolute;
+  text-align: center;
+  width: 100%;
   font-size: 14px;
   line-height: 20px;
   color: #808080;
   font-family: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,serif;
-  bottom: 0px;
+  bottom: 5px;
   top: expression(document.body.clientHeight-this.style.pixelHeight+document.body.scrollTop); 
 }
-.footer a:hover {
+#footer a:hover {
   text-decoration: underline;
 }
-.footer a i {
+#footer a i {
   display: inline-block;
   width: 14px;
   height: 16px;
@@ -307,7 +310,8 @@ iframe {
     text-align: center;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; 
 }
-.breadcrumb-search-input { height: 30px; padding: 3px 6px; font-size: 14px; }
+.breadcrumb {margin-bottom: 10px;}
+.breadcrumb-search-input { height: 30px; padding: 3px 6px; font-size: 14px;}
 
 .smart-table { table-layout: fixed; }
 .smart-table td, .smart-table th {

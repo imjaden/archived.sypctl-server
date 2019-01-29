@@ -9,8 +9,6 @@ module Account
     end
 
     get '/' do
-      @records = Device.paginate(page: params[:page], per_page: 15).order(updated_at: :desc)
-
       haml :index, layout: settings.layout
     end
 
@@ -28,7 +26,7 @@ module Account
 
       if record.save(validate: true)
         flash[:success] = '创建成功'
-        redirect to("/#{record.id}")
+        redirect to("/")
       else
         flash[:danger] = record.errors.messages.to_s
         redirect to('/new')
@@ -72,7 +70,7 @@ module Account
         
       if record.update_attributes(params[:device])
         flash[:success] = '更新成功'
-        redirect to("/#{record.id}")
+        redirect to("/")
       else
         flash[:danger] = record.errors.messages.to_s
         redirect to("/#{record.id}/edit")

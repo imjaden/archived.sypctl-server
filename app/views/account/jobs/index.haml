@@ -6,37 +6,39 @@
   .jobs th:nth-child(4), .jobs td:nth-child(4) { text-align: center; width: 5%; }
   .jobs th:nth-last-child(1), .jobs td:nth-last-child(1) { text-align: center; width:15%; }
 #appVue
-  %ol.breadcrumb
-    %li 部署中心
-    %li 任务管理
-    %li
-      %a{href: "#{url_for('/new')}?page=#{params[:page] || 1}"}
-        新建任务
-        %span.glyphicon.glyphicon-plus
+  .col-sm-12
+    %ol.breadcrumb
+      %li 部署中心
+      %li 任务管理
+      %li
+        %a{href: "#{url_for('/new')}?page=#{params[:page] || 1}"}
+          新建任务
+          %span.glyphicon.glyphicon-plus
 
-  %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.jobs
-    %thead
-      %th 创建时间
-      %th 任务标题
-      %th 部署进度
-      %th 设备数量
-      %th 拷贝
-      %th 删除
-      %th 更新时间
-    %tbody{'v-for' => '(record, index) in jobGroups'}
-      %tr{':id' => "'dom_'+record.id"}
-        %td{'v-text' => 'record.created_at.replace(/:|\/|\s/g, "")'}
-        %td.name
-          %a{'v-text' => 'record.title', ':href' => "'#{url_for('/group/')}'+record.uuid"}
-        %td
-          %span.label{'v-text' => 'record.state', ':class' => "{'label-primary': record.state == 'waiting', 'label-default': record.state != 'waiting'}"}
-        %td{'v-text' => 'record.device_count'}
-        %td
-          %a.btn.btn-success.btn-xs{':href' => '"/account/jobs/new?copy_from=" + record.uuid'}
-            %span.glyphicon.glyphicon-copy
-        %td
-          %a.btn.btn-danger.btn-xs{'@click' => 'deleteClick(record)'}
-            %span.glyphicon.glyphicon-trash
-        %td{'v-text' => 'record.updated_at'}
+  .col-sm-12{':style' => '"height:" + screenHeight + "px;overflow:scroll;"'}
+    %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.jobs
+      %thead
+        %th 创建时间
+        %th 任务标题
+        %th 部署进度
+        %th 设备数量
+        %th 拷贝
+        %th 删除
+        %th 更新时间
+      %tbody{'v-for' => '(record, index) in jobGroups'}
+        %tr{':id' => "'dom_'+record.id"}
+          %td{'v-text' => 'record.created_at.replace(/:|\/|\s/g, "")'}
+          %td.name
+            %a{'v-text' => 'record.title', ':href' => "'#{url_for('/group/')}'+record.uuid"}
+          %td
+            %span.label{'v-text' => 'record.state', ':class' => "{'label-primary': record.state == 'waiting', 'label-default': record.state != 'waiting'}"}
+          %td{'v-text' => 'record.device_count'}
+          %td
+            %a.btn.btn-success.btn-xs{':href' => '"/account/jobs/new?copy_from=" + record.uuid'}
+              %span.glyphicon.glyphicon-copy
+          %td
+            %a.btn.btn-danger.btn-xs{'@click' => 'deleteClick(record)'}
+              %span.glyphicon.glyphicon-trash
+          %td{'v-text' => 'record.updated_at'}
 
 = javascript_include_tag 'account/jobs/index.js'
