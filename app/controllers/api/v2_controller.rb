@@ -137,13 +137,13 @@ module API
 
     get '/account/device/list' do
       keys = [:uuid, :human_name, :hostname, :monitor_state, :ssh_state, :os_type, :os_version, :updated_at, :device_group_uuid]
-      devices = Device.all.order(updated_at: :desc).map { |r| r.to_hash.simple(keys) }
+      devices = Device.all.order(order_index: :asc).map { |r| r.to_hash.simple(keys) }
 
       keys = [:uuid, :name]
       uuids = devices.map { |hsh| hsh[:device_group_uuid] }.uniq
-      records = DeviceGroup.where(uuid: uuids).map { |r| r.to_hash.simple(keys) }
+      records = DeviceGroup.where(uuid: uuids).order(order_index: :asc).map { |r| r.to_hash.simple(keys) }
       records.push({uuid: nil, name: '未分组'})
-      
+
       records = records.map do |hsh|
         hsh[:devices] = devices.select { |h| h[:device_group_uuid] == hsh[:uuid] }
         hsh
