@@ -29,7 +29,7 @@
         %tr{':id' => "'dom_'+record.id"}
           %td{'v-text' => 'record.created_at.replace(/:|\/|\s/g, "")'}
           %td.name
-            %a{'v-text' => 'record.title', ':href' => "'#{url_for('/group/')}'+record.uuid"}
+            %a{'v-text' => 'record.title', '@click' => "showIframeModal(record.title, '/account/jobs/group/'+record.uuid)"}
           %td
             %span.label{'v-text' => 'record.state', ':class' => "{'label-primary': record.state == 'waiting', 'label-default': record.state != 'waiting'}"}
           %td{'v-text' => 'record.device_count'}
@@ -40,5 +40,16 @@
             %a.btn.btn-danger.btn-xs{'@click' => 'deleteClick(record)'}
               %span.glyphicon.glyphicon-trash
           %td{'v-text' => 'record.updated_at'}
+
+  .modal.fade#iframeModal
+    .modal-dialog{style: 'width:80%;max-width:1170px;height:80%;min-height:600px;'}
+      .modal-content{style: 'height:100%;'}
+        .modal-header
+          %button.close{'type' => 'button', 'data-dismiss' => 'modal', 'aria-label' => 'Close'}
+            %span{'aria-hidden' => 'true'} &times;
+          %h4.modal-title{'v-text' => 'iframeTitle'}
+        .modal-body{style: 'width:100%;height:90%;overflow:hidden'}
+          %iframe.hidden{ref:"iframe", style: 'border:none;width:100%;height:100%;overflow:scroll', ':src' => 'iframeSrc'}
+          .loader{style: 'margin: 0 auto;'}
 
 = javascript_include_tag 'account/jobs/index.js'

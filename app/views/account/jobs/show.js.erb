@@ -1,10 +1,23 @@
 <script>
+// 页面被加载在 iframe 时
+if (self != top) {
+  $('.col-sm-8').addClass('col-sm-12').removeClass('col-sm-8')
+  $("nav,.col-sm-4,.breadcrumb").remove()
+  $("html, body").css({background: 'white'})
+  setTimeout(function() {
+    $("#footer").remove()
+    window.parent.postMessage({cmd: "loaded"}, "*");
+  }, 500)
+}
+
 new Vue({
   el: '#JobShow',
   data: function() {
     return { 
       jobList: <%= @record.jobs.map(&:to_hash).map(&:to_json) %>.map(function(job) { return JSON.parse(job); }),
-      job: null
+      job: null,
+      isOutputFull: false,
+      isCommandFull: false
     }
   },
   created() {
@@ -13,6 +26,28 @@ new Vue({
     // $("#output").textareafullscreen()
   },
   methods: {
+    resizeOutputArea() {
+      if(this.isOutputFull) {
+        $("table.app tr").removeClass('hidden')
+        $("#output").removeClass('full').addClass('small')
+      } else {
+        $("table.app tr:nth-child(n+2)").addClass('hidden')
+        $("table.app tr:eq(7)").removeClass('hidden')
+        $("#output").removeClass('small').addClass('full')
+      }
+      this.isOutputFull = !this.isOutputFull
+    },
+    resizeCommandArea() {
+      if(this.isCommandFull) {
+        $("table.app tr").removeClass('hidden')
+        $("#command").removeClass('full').addClass('small')
+      } else {
+        $("table.app tr:nth-child(n+2)").addClass('hidden')
+        $("table.app tr:eq(6)").removeClass('hidden')
+        $("#command").removeClass('small').addClass('full')
+      }
+      this.isCommandFull = !this.isCommandFull
+    },
     switchJob(job) {
       this.job = job
     },

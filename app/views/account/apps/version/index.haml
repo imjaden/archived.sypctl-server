@@ -27,7 +27,19 @@
         %td= record.build
         %td= record.file_name
         %td= record.md5
-        %td= record.file_size
+        %td= record.file_size.to_i.number_to_human_size
         %td= record.created_at.strftime('%y/%m/%d %H:%M')
 
 = will_paginater @versions
+
+:javascript
+  // 编辑页面被加载在 iframe 时
+  if (self != top) {
+    $('.col-sm-8').addClass('col-sm-12').removeClass('col-sm-8')
+    $("nav,.col-sm-4").remove()
+    $("html, body").css({background: 'white'})
+    setTimeout(function() {
+      $("#footer").remove()
+      window.parent.postMessage({cmd: "loaded"}, "*");
+    }, 500)
+  }

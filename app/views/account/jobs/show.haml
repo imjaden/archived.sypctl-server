@@ -3,10 +3,12 @@
   %li= link_to '任务管理', 'javascript:void(0);', onclick: 'window.history.go(-1)'
   %li= @record.title
 
-:css   
+:css
+  .app td:nth-child(1) { vertical-align: middle; text-align: center;}
   .app th:nth-child(1), .app td:nth-child(1) { min-width: 100px; width: 10%; }
   .app th:nth-child(2), .app td:nth-child(2) { max-width: 800px; width: 90%; }
-  .app pre { max-width: 700px; max-height: 200px; }
+  .app pre.full { max-width: 600px; height: 600px; }
+  .app pre.small { max-width: 600px; height: 100px; }
   .list-group-item:hover {
     cursor: pointer;
   }
@@ -44,13 +46,21 @@
           %td 应用版本
           %td{'v-text' => 'job.version_name'}
         %tr
-          %td 部署脚本
+          %td 
+            部署脚本
+            %br
+            %a{'@click' => 'resizeCommandArea'}
+              %span.glyphicon{':class' => '{"glyphicon-resize-full": !isOutputFull, "glyphicon-resize-small": isOutputFull}'}
           %td
-            %pre#command{'v-text' => 'job.command', readonly: 'true'}
+            %pre#command.small{'v-text' => 'job.command', readonly: 'true'}
         %tr
-          %td 脚本输出
+          %td 
+            脚本输出
+            %br
+            %a{'@click' => 'resizeOutputArea'}
+              %span.glyphicon{':class' => '{"glyphicon-resize-full": !isOutputFull, "glyphicon-resize-small": isOutputFull}'}
           %td
-            %pre#output{'v-text' => 'job.output || "无日志输出"', readonly: 'true'}
+            %pre#output.small{'v-text' => 'job.output || "无日志输出"', readonly: 'true'}
         %tr
           %td 创建时间
           %td{'v-text' => 'job.created_at'}
@@ -58,7 +68,7 @@
           %td 更新时间
           %td{'v-text' => 'job.updated_at'}
         %tr
-          %td 删除
+          %td 删除任务
           %td
             %a.btn.btn-xs.btn-link{style: "color: red;", '@click' => "removeJob(job)"}
               .span.glyphicon.glyphicon-trash

@@ -167,7 +167,7 @@ module API
 
       version = Version.find_by(uuid: params[:uuid])
       data = version.to_hash
-      data[:download_path] = "/api/v1/download/version?app_uuid=#{version.app_uuid}&version_file_name=#{version.file_name}"
+      data[:download_path] = "/download-version/#{version.app_uuid}/#{version.file_name}"
 
       respond_with_formt_json({data: data, message: '查询成功'}, 200)
     end

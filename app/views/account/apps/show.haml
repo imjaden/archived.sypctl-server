@@ -56,37 +56,48 @@
 
 :javascript
   (function() {
-      window.AppObject = {
-        remove: function(id) {
-          var name = $(".name").text();
+    window.AppObject = {
+      remove: function(id) {
+        var name = $(".name").text();
 
-          if(!confirm('确定删除「' + name + '」?')) {
-            return false;
-          }
-
-          window.Loading.show("删除中...");
-          $.ajax({
-            type: 'delete',
-            url: "#{url_for('/')}" + id
-          }).done(function(res, status, xhr) {
-            if(res.code === 201) {
-              $("#dom_" + id).remove();
-              window.Loading.show("删除成功");
-
-              try {
-                var objects = {app: { id: id, name: name }}
-                window.OperationLogger.record("app.delete", objects);
-              } catch(e) { console.log(e) }
-              
-              window.location.href = "#{url_for('/')}";
-            } else {
-              window.Loading.show("删除失败");
-            }
-          }).fail(function(xhr, status, error) {
-              window.Loading.show("删除失败");
-          }).always(function(res, status, xhr) {
-              window.Loading.hide();
-          });
+        if(!confirm('确定删除「' + name + '」?')) {
+          return false;
         }
+
+        window.Loading.show("删除中...");
+        $.ajax({
+          type: 'delete',
+          url: "#{url_for('/')}" + id
+        }).done(function(res, status, xhr) {
+          if(res.code === 201) {
+            $("#dom_" + id).remove();
+            window.Loading.show("删除成功");
+
+            try {
+              var objects = {app: { id: id, name: name }}
+              window.OperationLogger.record("app.delete", objects);
+            } catch(e) { console.log(e) }
+            
+            window.location.href = "#{url_for('/')}";
+          } else {
+            window.Loading.show("删除失败");
+          }
+        }).fail(function(xhr, status, error) {
+            window.Loading.show("删除失败");
+        }).always(function(res, status, xhr) {
+            window.Loading.hide();
+        });
       }
+    }
+
+    // 页面被加载在 iframe 时
+    if (self != top) {
+      $('.col-sm-8').addClass('col-sm-12').removeClass('col-sm-8')
+      $("nav,.col-sm-4,.breadcrumb").remove()
+      $("html, body").css({background: 'white'})
+      setTimeout(function() {
+        $("#footer").remove()
+        window.parent.postMessage({cmd: "loaded"}, "*");
+      }, 500)
+    }
   }).call(this);

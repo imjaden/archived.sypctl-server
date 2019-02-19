@@ -3,8 +3,16 @@ new Vue({
   data: function() {
     return { 
       screenHeight: document.documentElement.clientHeight - 150,
-      jobGroups: []
+      jobGroups: [],
+      iframeWin: {},
+      iframeSrc: null,
+      iframeTitle: null
     }
+  },
+  mounted () {
+    // 在外部vue的window上添加postMessage的监听，并且绑定处理函数handleMessage
+    window.addEventListener('message', this.handleMessage)
+    this.iframeWin = this.$refs.iframe.contentWindow
   },
   created() {
     this.getJobGroups()
@@ -30,7 +38,6 @@ new Vue({
       });
     },
     copyClick(item) {
-
     },
     deleteClick(item) {
       if(!confirm('确定删除「' + item.title + '」?')) {
@@ -60,6 +67,51 @@ new Vue({
       }).always(function(res, status, xhr) {
         window.Loading.hide();
       });
+    },
+    showIframeModal(title, url) {
+      console.log(title, url)
+      this.iframeTitle = title
+      this.iframeSrc = url
+      $("#iframeModal").modal('show')
+    },
+    closeIframeModal() {
+      $("#iframeModal").modal('hide')
+      $("#iframeModal .loader").removeClass('hidden')
+      $("#iframeModal iframe").addClass('hidden')
+      this.iframeSrc = null
+    },
+    async handleMessage (event) {
+      let that = this,
+          cmd = event.data.cmd,
+          params = event.data.params;
+      switch (cmd) {
+        case 'created_or_updated':
+          that.closeIframeModal()
+          window.App.addSuccessNotify(params.message)
+          that.$nextTick(function() {
+            if(that.editItemIndex >= 0) {
+              params.data._class = 'success'
+              params.data.icon_path = "/images/icons/" + params.data.icon
+              Vue.set(that.records, that.editItemIndex, params.data)
+            } else {
+              that.createItemId = params.data.id
+              that.getTabToolboxMenu()
+            }
+          })
+          break
+        case 'loaded': 
+          setTimeout(function() {
+            $("#iframeModal .loader").addClass('hidden')
+            $("#iframeModal iframe").removeClass('hidden')
+          }, 500)
+          break
+        case 'close':
+          that.closeIframeModal()
+          break
+        default:
+          console.log('unkonwn cmd, data:', event.data)
+          break
+      }
     }
   }
 })

@@ -43,13 +43,13 @@ class ApplicationController < Sinatra::Base
   use AssetsHandler
   use ExceptionHandler
 
-  use Rack::MiniProfiler
-  Rack::MiniProfiler.config.position = 'top-right'
-  Rack::MiniProfiler.config.start_hidden = false
-  Rack::MiniProfiler.config.disable_caching = false
-  Rack::MiniProfiler.config.storage = Rack::MiniProfiler::FileStore
-  Rack::MiniProfiler.config.storage_options = {path: File.join(ENV['APP_ROOT_PATH'], 'tmp/mini-profiler')}
-  Rack::MiniProfiler.config.skip_paths = ['/login', '/images/', '/stylesheets/', '/javascripts/', '/api/']
+  # use Rack::MiniProfiler
+  # Rack::MiniProfiler.config.position = 'top-right'
+  # Rack::MiniProfiler.config.start_hidden = false
+  # Rack::MiniProfiler.config.disable_caching = false
+  # Rack::MiniProfiler.config.storage = Rack::MiniProfiler::FileStore
+  # Rack::MiniProfiler.config.storage_options = {path: File.join(ENV['APP_ROOT_PATH'], 'tmp/mini-profiler')}
+  # Rack::MiniProfiler.config.skip_paths = ['/login', '/images/', '/stylesheets/', '/javascripts/', '/api/']
 
   # sprockets
   set :sprockets, Sprockets::Environment.new(root) { |env| env.logger = Logger.new(STDOUT) }
