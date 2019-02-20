@@ -159,6 +159,12 @@ module API
       respond_with_formt_json({data: records, message: "查询成功"}, 200)
     end
 
+    get '/account/app/list' do
+      records = App.order(id: :desc).limit(30).map(&:to_hash)
+
+      respond_with_formt_json({data: records, message: "成功获取#{records.length}条数据"}, 200)
+    end
+
     protected
 
     def authen_api_token(api_token)

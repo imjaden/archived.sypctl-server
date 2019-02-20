@@ -39,14 +39,12 @@
           %a{':href' => "'#{url_for('/')}' + app.uuid + '/version/upload'"}
             %span.glyphicon.glyphicon-upload
         %td
-          %a{':href' => "'#{url_for('/')}' + app.uuid + '/edit'"}
+          %a{'@click' => "showIframeModal('编辑[' + app.name + ']' ,'#{url_for('/')}' + app.uuid + '/edit')"}
             %span.glyphicon.glyphicon-edit
         %td
           %a.btn.btn-xs.btn-link{'@click' => "removeApp(app)", style: "color: red;"}
             .span.glyphicon.glyphicon-trash
         %td{'v-text' => 'app.updated_at'}
-
-  = will_paginater @records
 
   .modal.fade#iframeModal
     .modal-dialog{style: 'width:80%;max-width:1170px;height:80%;min-height:600px;'}
@@ -64,7 +62,7 @@
     el: '#AppIndex',
     data: function() {
       return { 
-        apps: #{@records.map(&:to_hash).map(&:to_json) }.map(function(record) { return JSON.parse(record); }),
+        apps: [],
         iframeWin: {},
         iframeSrc: null,
         iframeTitle: null
@@ -76,9 +74,28 @@
       this.iframeWin = this.$refs.iframe.contentWindow
     },
     created() {
-      console.log('apps:', this.apps)
+      this.getApps()
     },
     methods: {
+      getApps() {
+        window.Loading.show("获取数据中...");
+        let that = this;
+        $.ajax({
+          type: 'get',
+          url: '/api/v2/account/app/list',
+          contentType: 'application/json'
+        }).done(function(res, status, xhr) {
+          if(res.code === 200) {
+            window.App.addSuccessNotify(res.message)
+            that.apps = res.data
+          } else {
+            window.App.addDangerNotify(res.message)
+          }
+        }).fail(function(xhr, status, error) {
+        }).always(function(res, status, xhr) {
+          window.Loading.hide();
+        });
+      },
       showIframeModal(title, url) {
         this.iframeTitle = title
         this.iframeSrc = url
@@ -117,6 +134,10 @@
             break
           case 'close':
             that.closeIframeModal()
+            break
+          case 'close_and_refresh':
+            that.closeIframeModal()
+            that.getApps()
             break
           default:
             console.log('unkonwn cmd, data:', event.data)

@@ -16,7 +16,7 @@ html, body {
   position: fixed;
 }
 .visit-menus {
-  width: 350px;
+  width: 200px;
   min-height: 400px;
 }
 .top-right {
@@ -24,7 +24,7 @@ html, body {
   top: 50px;
 }
 .system-notify .alert { 
-  width: 350px;
+  width: 200px;
 }
 .system-notify .alert small { 
   color: darkgray;

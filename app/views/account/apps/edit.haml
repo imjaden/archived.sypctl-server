@@ -3,9 +3,21 @@
   %li= link_to "应用管理", url_for("/")
   %li= @record.name
 
-= haml :_form
+.col-sm-12
+  = haml :_form
 
 :javascript
+  // 页面被加载在 iframe 时
+  if (self != top) {
+    $('.col-sm-8').addClass('col-sm-12').removeClass('col-sm-8')
+    $("nav,.col-sm-4,.breadcrumb").remove()
+    $("html, body").css({background: 'white'})
+    setTimeout(function() {
+      $("#footer").remove()
+      window.parent.postMessage({cmd: "loaded"}, "*");
+    }, 500)
+  }
+
   window.AppObject = {
     onsubmit: function() {
       try {
@@ -14,5 +26,11 @@
       } catch(e) { console.log(e) }
 
       $("#recordForm").submit();
+
+      if (self != top) {
+          window.parent.postMessage({cmd: "close_and_refresh"}, "*");
+      } else {
+          window.location.href = '/account/apps'
+      }
     }
   }

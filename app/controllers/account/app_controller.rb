@@ -27,10 +27,12 @@ module Account
 
       if record.save(validate: true)
         flash[:success] = '创建成功'
-        redirect to("/") # /#{record.uuid}
+        # redirect to("/") # /#{record.uuid}
+        flash[:success]
       else
         flash[:danger] = record.errors.messages.to_s
-        redirect to('/new')
+        # redirect to('/new')
+        flash[:danger]
       end
     end
 

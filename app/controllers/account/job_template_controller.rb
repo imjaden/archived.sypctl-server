@@ -68,7 +68,7 @@ module Account
         redirect to("/#{record.id}")
       else
         flash[:danger] = record.errors.messages.to_s
-        redirect to("/#{record.id}/edit")
+        redirect to("/?id=#{record.id}")
       end
     end
 

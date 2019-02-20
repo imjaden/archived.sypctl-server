@@ -29,6 +29,13 @@
       .col-sm-offset-2.col-sm-10
         = f.submit "提交", class: "btn btn-primary hidden"
         = link_to "提交", "javascript:void(0);", class: "btn btn-primary", onclick: "window.AppObject.onsubmit();"
-        = button_tag "取消", class: "btn btn-default", onclick: "window.history.go(-1);"
+        = button_tag "取消", class: "btn btn-default", onclick: "cancel()"
 
-
+:javascript
+  function cancel() {
+    if (self != top) {
+        window.parent.postMessage({cmd: "close"}, "*");
+    } else {
+        window.history.go(-1)
+    }
+  }
