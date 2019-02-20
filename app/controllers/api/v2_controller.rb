@@ -55,6 +55,13 @@ module API
       respond_with_formt_json({data: {items: records.map(&:to_hash), total: Device.count}, message: '接收成功'}, 201)
     end
 
+    get '/account/job_group' do
+      authen_api_token([:uuid])
+      record = JobGroup.find_by(uuid: params[:uuid])
+
+      respond_with_json({data: record.jobs.map(&:to_hash), message: '查询成功', code: 200}, 200)
+    end
+
     get '/account/job_group/new' do
       record = JobGroup.new
       record.uuid = generate_uuid

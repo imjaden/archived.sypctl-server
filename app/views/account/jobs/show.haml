@@ -1,29 +1,25 @@
-%ol.breadcrumb
-  %li 部署中心
-  %li= link_to '任务管理', 'javascript:void(0);', onclick: 'window.history.go(-1)'
-  %li= @record.title
-
 :css
   .app td:nth-child(1) { vertical-align: middle; text-align: center;}
   .app th:nth-child(1), .app td:nth-child(1) { min-width: 100px; width: 10%; }
   .app th:nth-child(2), .app td:nth-child(2) { max-width: 800px; width: 90%; }
   .app pre.full { max-width: 600px; height: 600px; }
   .app pre.small { max-width: 600px; height: 100px; }
-  .list-group-item:hover {
-    cursor: pointer;
-  }
+  .list-group-item:hover {cursor: pointer;}
 
-// = stylesheet_link_tag 'textareafullscreen.css'
-// = javascript_include_tag 'jquery.textareafullscreen.js'
-#JobShow.row
-  .col-sm-3
+.row#appVue
+  %ol.breadcrumb
+    %li 部署中心
+    %li= link_to '任务管理', 'javascript:void(0);', onclick: 'window.history.go(-1)'
+    %li{'v-text' => 'job.title'}
+
+  .col-sm-3{'v-if' => 'jobList.length > 1'}
     %button.list-group-item.disabled{type: 'button', 'v-text' => '"设备列表：(" + jobList.length + " 台)"'}
     %ul.list-group{style: 'max-height:500px;overflow:scroll;'}
-      %li.list-group-item{'v-for' => '(item, index) in jobList', ':class' => '{active: item.uuid === job.uuid}', ':key' => 'item.id', '@click' => 'switchJob(item)'}
+      %li.list-group-item{'v-for' => '(item, index) in jobList', ':class' => '{active: item.uuid === job.uuid}', ':key' => 'item.id', '@click' => 'switchJob(item, index)'}
         %span.badge{'v-text' => 'item.state'}
         {{ item.device_name }}
 
-  .col-sm-9
+  %div{':class' => '{"col-sm-9": jobList.length > 1, "col-sm-12": jobList.length <= 1}'}
     %table.table.table-hover.table-condensed.table-strip.table-bordered.app
       %tbody
         %tr
@@ -59,6 +55,8 @@
             %br
             %a{'@click' => 'resizeOutputArea'}
               %span.glyphicon{':class' => '{"glyphicon-resize-full": !isOutputFull, "glyphicon-resize-small": isOutputFull}'}
+            %a{'@click' => 'getJobList'}
+              %span.glyphicon.glyphicon-refresh
           %td
             %pre#output.small{'v-text' => 'job.output || "无日志输出"', readonly: 'true'}
         %tr

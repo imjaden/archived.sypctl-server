@@ -11,21 +11,41 @@ if (self != top) {
 }
 
 new Vue({
-  el: '#JobShow',
+  el: '#appVue',
   data: function() {
-    return { 
-      jobList: <%= @record.jobs.map(&:to_hash).map(&:to_json) %>.map(function(job) { return JSON.parse(job); }),
-      job: null,
+    return {
+      uuid: '<%= params[:uuid] %>',
+      jobList: [],
+      job: {},
+      jobIndex: 0,
       isOutputFull: false,
       isCommandFull: false
     }
   },
   created() {
-    this.job = this.jobList[0]
-    // $("#command").textareafullscreen()
-    // $("#output").textareafullscreen()
+    this.getJobList()
   },
   methods: {
+    getJobList() {
+      window.Loading.show("获取数据中...");
+      let that = this;
+      $.ajax({
+        type: 'get',
+        url: `/api/v2/account/job_group?uuid=${that.uuid}`,
+        contentType: 'application/json'
+      }).done(function(res, status, xhr) {
+        if(res.code === 200) {
+          window.App.addSuccessNotify(res.message)
+          that.jobList = res.data
+          that.job = that.jobList[that.jobIndex]
+        } else {
+          window.App.addDangerNotify(res.message)
+        }
+      }).fail(function(xhr, status, error) {
+      }).always(function(res, status, xhr) {
+        window.Loading.hide();
+      });
+    },
     resizeOutputArea() {
       if(this.isOutputFull) {
         $("table.app tr").removeClass('hidden')
@@ -48,8 +68,9 @@ new Vue({
       }
       this.isCommandFull = !this.isCommandFull
     },
-    switchJob(job) {
+    switchJob(job, index) {
       this.job = job
+      this.jobIndex = index
     },
     removeJob(job) {
       if(!confirm('确定删除「' + job.title + '」?')) {

@@ -43,11 +43,6 @@ module Account
     end
 
     get '/group/:uuid' do
-      unless @record = JobGroup.find_by(uuid: params[:uuid])
-        @record = JobGroup.new
-        @record.title = '任务不存在'
-      end
-
       haml :show, layout: settings.layout
     end
 
