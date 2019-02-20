@@ -1,6 +1,6 @@
 :css   
   .jobs th:nth-child(n+1), .jobs td:nth-child(n+1) { text-align: center; width: 5%; }
-  .jobs th:nth-child(1), .jobs td:nth-child(1) { width: 15%; }
+  .jobs th:nth-child(1), .jobs td:nth-child(1) { text-align: left; width: 15%; }
   .jobs th:nth-child(2), .jobs td:nth-child(2) { text-align: left; width: 45%; }
   .jobs th:nth-child(3), .jobs td:nth-child(3) { text-align: center; width: 10%; }
   .jobs th:nth-child(4), .jobs td:nth-child(4) { text-align: center; width: 5%; }
@@ -18,7 +18,7 @@
   .col-sm-12{':style' => '"height:" + screenHeight + "px;overflow:scroll;"'}
     %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.jobs
       %thead
-        %th 创建时间
+        %th 时间戳
         %th 任务标题
         %th 部署进度
         %th 设备数量
