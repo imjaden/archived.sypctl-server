@@ -18,6 +18,10 @@ class FileBackup < ActiveRecord::Base
   end
 
   def refresh_file_backup_cache
+    self.class.refresh_file_backup_cache
+  end
+
+  def self.refresh_file_backup_cache
     records = FileBackup.all.order(id: :desc).map { |fb| { uuid: fb.uuid, file_path: fb.file_path, description: fb.description }}.to_json
 
     cache_path = File.join(ENV['APP_ROOT_PATH'], 'tmp/file-backups')
@@ -33,14 +37,20 @@ class FileBackup < ActiveRecord::Base
   def self.db_hash
     cache_path = File.join(ENV['APP_ROOT_PATH'], 'tmp/file-backups')
     hash_path = File.join(cache_path, 'db.hash')
+    refresh_file_backup_cache unless File.exists?(hash_path)
+
     File.read(hash_path).strip
-  rescue => e
-    puts e.message
   end
 
   def self.db_json
     cache_path = File.join(ENV['APP_ROOT_PATH'], 'tmp/file-backups')
     json_path = File.join(cache_path, 'db.json')
+    refresh_file_backup_cache unless File.exists?(json_path)
+
     JSON.parse(File.read(json_path))
+  end
+
+  def self.db_info
+    {db_hash: db_hash, db_json: db_json}
   end
 end

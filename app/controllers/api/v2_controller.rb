@@ -135,6 +135,16 @@ module API
       send_file(file_path, type: 'text/plain', filename: params[:archive_file_name], disposition: 'attachment')
     end
 
+    get '/account/file_backup/db_info' do
+      respond_with_formt_json({data: FileBackup.db_info, message: "查询成功"}, 200)
+    end
+
+    post '/account/file_backup/db_info' do
+      FileBackup.refresh_file_backup_cache
+
+      respond_with_formt_json({data: FileBackup.db_info, message: "刷新成功"}, 200)
+    end
+
     get '/account/device/query' do
       authen_api_token([:uuid])
       record = Device.find_by(uuid: params[:uuid])

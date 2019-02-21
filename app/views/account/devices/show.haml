@@ -1,7 +1,11 @@
 :css   
   .tableService th:nth-child(n+1), .tableService td:nth-child(n+1) { text-align: left; }
-  .tableBackup th:nth-child(n+4), .tableBackup td:nth-child(n+4) { text-align: center; }
+  .tableBackup th:nth-child(1), .tableBackup td:nth-child(1) { text-align: left; width: 20%; }
+  .tableBackup th:nth-child(2), .tableBackup td:nth-child(2) { text-align: left; width: 70%; }
+  .tableBackup th:nth-child(3), .tableBackup td:nth-child(3) { text-align: center; width: 5%; }
+  .tableBackup th:nth-child(4), .tableBackup td:nth-child(4) { text-align: center; width: 5%; }
   .list-group li:hover {cursor: pointer;}
+  .not-exist { text-decoration: line-through; }
   textarea {word-wrap:normal;white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;}
 
 .row#appVue
@@ -144,22 +148,27 @@
       %div 更新时间: {{ record.file_backup_updated_at }}，<a @click='displayModal("backupConfig")'>查看备份服务配置档</a>，<a @click='displayModal("backupOutput")'>查看备份服务状态</a>
       %table.table.table-hover.table-condensed.table-strip.table-bordered.file-backups.tableBackup
         %thead
+          %th 修改时间
           %th 文件名称
-          %th MD5
-          %th 文件描述
           %th 查看
           %th 下载
         %tbody
           %tr{'v-for' => '(item, index) in file_backups', ':key' => 'item.id'}
+            %td{'v-text' => 'formatDate(item.timestamp)'}
             %td{'v-text' => 'item.file_path'}
-            %td{'v-text' => 'item.md5'}
-            %td{'v-text' => 'item.description'}
             %td
               %a{'@click' => 'getBackupFile("read", record.uuid, item.uuid, item.archive_file_name, item.file_path)'}
                 %span.glyphicon.glyphicon-eye-open
             %td
               %a{'@click' => 'getBackupFile("download", record.uuid, item.uuid, item.archive_file_name, item.file_path)'}
                 %span.glyphicon.glyphicon-download
+          %tr{'v-for' => '(item, index) in file_backups_not_exist', ':key' => 'item.id'}
+            %td.not-exist{'v-text' => '"-"'}
+            %td.not-exist{'v-text' => 'item.file_path'}
+            %td
+              %span.glyphicon.glyphicon-eye-open
+            %td
+              %span.glyphicon.glyphicon-download
 
   .modal.fade#infoModal{"aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
     .modal-dialog{role: "document"}
@@ -172,6 +181,6 @@
           %textarea.form-control{'v-model.trim' => 'modal.body', rows: 20, readonly: true}
         .modal-footer
           %span.mtime{style: 'float:left; color: darkgray;'}
-          %button.btn.btn-default{"data-dismiss" => "modal", type: "button"}  关闭
+          %button.btn.btn-default{"data-dismiss" => "modal", type: "button"} 关闭
 
 = javascript_include_tag 'account/devices/show.js'

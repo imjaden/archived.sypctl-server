@@ -9,8 +9,12 @@
     %li 文件备份
     %li
       %a{'data-toggle' => 'modal', 'data-target' => '#newModal'} 
-        新建文件
+        添加文件
         %span.glyphicon.glyphicon-plus
+    %li
+      %a{'@click' => 'displayModal'} 
+        备份配置档
+        %span.glyphicon.glyphicon-info-sign
 
   %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.jobs
     %thead
@@ -44,5 +48,21 @@
               %input.btn.btn-primary{:type => "submit", :value => "创建", style: 'width: 100%;'}/
             .form-group{style: 'margin-bottom: 10px;text-align: center;'}
               %p.text-danger{'v-text' => 'file.message'}
+
+  .modal.fade#infoModal{"aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
+    .modal-dialog{role: "document"}
+      .modal-content
+        .modal-header
+          %button.close{"aria-label" => "Close", "data-dismiss" => "modal", type: "button"}
+            %span{"aria-hidden" => "true"} ×
+          %h4.modal-title{'v-text' => 'modal.title', style: 'display:inline'}
+          %a{'@click' => 'refreshDbInfo'} 
+            刷新
+            %span.glyphicon.glyphicon-refresh
+        .modal-body{style: 'padding: 10px;'}
+          %textarea.form-control{'v-model.trim' => 'modal.body', rows: 20, readonly: true}
+        .modal-footer
+          %span.mtime{style: 'float:left; color: darkgray;'}
+          %button.btn.btn-default{"data-dismiss" => "modal", type: "button"} 关闭
 
 = javascript_include_tag 'account/file_backups/index.js'

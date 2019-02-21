@@ -7,6 +7,10 @@ new Vue({
         file_path: '',
         description: '',
         message: ''
+      },
+      modal: {
+        title: '标题',
+        body: '加载中...',
       }
     }
   },
@@ -60,6 +64,41 @@ new Vue({
         });
       }
       el.preventDefault();
+    },
+    displayModal() {
+      window.Loading.show("获取数据中...");
+      let that = this;
+      $.ajax({
+        type: 'get',
+        url: '/api/v2/account/file_backup/db_info',  
+        contentType: 'application/json'
+      }).done(function(res, status, xhr) {
+        window.App.addSuccessNotify(res.message)
+
+        $("#infoModal").modal('show')
+        that.modal.title = '备份配置档'
+        that.modal.body = JSON.stringify(res.data, null, 4)
+      }).fail(function(xhr, status, error) {
+      }).always(function(res, status, xhr) {
+        window.Loading.hide()
+      });
+    },
+    refreshDbInfo() {
+      window.Loading.show("刷新...");
+      let that = this;
+      $.ajax({
+        type: 'post',
+        url: '/api/v2/account/file_backup/db_info',  
+        contentType: 'application/json'
+      }).done(function(res, status, xhr) {
+        window.App.addSuccessNotify(res.message)
+
+        that.modal.title = '备份配置档'
+        that.modal.body = JSON.stringify(res.data, null, 4)
+      }).fail(function(xhr, status, error) {
+      }).always(function(res, status, xhr) {
+        window.Loading.hide()
+      });
     }
   }
 })

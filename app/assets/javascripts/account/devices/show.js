@@ -13,6 +13,7 @@ new Vue({
       ],
       currentSideMenu: {},
       file_backups: [],
+      file_backups_not_exist: [],
       modal: {
         title: '标题',
         body: '加载中...',
@@ -36,7 +37,7 @@ new Vue({
     getRecord() {
       let that = this,
           uuid = window.location.pathname.split('/').reverse()[0],
-          data, file_backups;
+          data, service_monitor, file_backups, keys;
       window.Loading.show("获取数据中...");
       $.ajax({
         type: 'get',
@@ -47,17 +48,20 @@ new Vue({
         if(res.code === 200) {
           data = res.data
           window.App.addSuccessNotify(res.message)
+
+          // data.file_backup_config = data.file_backup_config
+          // data.file_backup_monitor = data.file_backup_monitor
+          // data.service_config = data.service_config
+
           try {
             file_backups = JSON.parse(data.file_backup_monitor)
-            that.file_backups = Object.keys(file_backups).map(function(key) { return file_backups[key]; })
+            keys = Object.keys(file_backups)
+            that.file_backups = keys.map(function(key) { return file_backups[key]; })
+            that.file_backups_not_exist = JSON.parse(data.file_backup_config).filter(function(item) { return keys.indexOf(item.uuid) < 0;})
 
-            data.file_backup_config = data.file_backup_config
-            data.file_backup_monitor = data.file_backup_monitor
-            data.service_config = data.service_config 
-            
-            let table = JSON.parse(data.service_monitor)
-            table.widths = ['30%', '20%', '10%', '10%', '30%'],
-            data.service_monitor = table
+            service_monitor = JSON.parse(data.service_monitor)
+            service_monitor.widths = ['30%', '20%', '10%', '10%', '30%'],
+            data.service_monitor = service_monitor
           } catch(e) {
             console.log(e)
           }
@@ -136,5 +140,26 @@ new Vue({
         window.Loading.hide();
       });
     },
+    formatDate(timestamp) {
+      try {
+        let date = new Date(parseInt(timestamp) * 1000),
+            y = date.getFullYear(),
+            MM = date.getMonth() + 1,
+            d = date.getDate(),
+            h = date.getHours(),
+            m = date.getMinutes(),
+            s = date.getSeconds();
+
+        MM = MM < 10 ? ('0' + MM) : MM;
+        d = d < 10 ? ('0' + d) : d;
+        h = h < 10 ? ('0' + h) : h;
+        m = m < 10 ? ('0' + m) : m;
+        s = s < 10 ? ('0' + s) : s;
+        return y + '/' + MM + '/' + d + ' ' + h + ':' + m + ':' + s;
+      } catch(e) {
+        console.log(e)
+        return timestamp
+      }
+    }
   }
 })
