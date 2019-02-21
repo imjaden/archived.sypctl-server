@@ -37,7 +37,7 @@ new Vue({
     getRecord() {
       let that = this,
           uuid = window.location.pathname.split('/').reverse()[0],
-          data, service_monitor, file_backups, keys;
+          data, service_monitor, file_backups, file_backups_keys, array;
       window.Loading.show("获取数据中...");
       $.ajax({
         type: 'get',
@@ -54,10 +54,22 @@ new Vue({
           // data.service_config = data.service_config
 
           try {
+            array = []
             file_backups = JSON.parse(data.file_backup_monitor)
-            keys = Object.keys(file_backups)
-            that.file_backups = keys.map(function(key) { return file_backups[key]; })
-            that.file_backups_not_exist = JSON.parse(data.file_backup_config).filter(function(item) { return keys.indexOf(item.uuid) < 0;})
+            file_backups_keys = Object.keys(file_backups)
+            file_backups_keys.forEach(function(key) {
+              if(file_backups[key]['file_list']) {
+                Object.keys(file_backups[key]['file_list']).forEach(function(k) {
+                  file_backups[key]['file_list'][k]['uuid'] = file_backups[key]['uuid']
+                  file_backups[key]['file_list'][k]['file_path'] = file_backups[key]['file_path'] + '/' + k
+                  array.push(file_backups[key]['file_list'][k])
+                })
+              } else {
+                 array.push(file_backups[key])
+              } 
+            })
+            that.file_backups = array
+            that.file_backups_not_exist = JSON.parse(data.file_backup_config).filter(function(item) { return file_backups_keys.indexOf(item.uuid) < 0;})
 
             service_monitor = JSON.parse(data.service_monitor)
             service_monitor.widths = ['30%', '20%', '10%', '10%', '30%'],
@@ -107,13 +119,13 @@ new Vue({
     displayModal(type) {
       $("#infoModal").modal('show')
       if(type == 'backupConfig') {
-        this.modal.title = '备份服务配置档'
+        this.modal.title = '备份配置档'
         this.modal.body = JSON.stringify(JSON.parse(this.record.file_backup_config), null, 4)
       } else if(type == 'backupOutput') {
         this.modal.title = '备份状态'
         this.modal.body = JSON.stringify(JSON.parse(this.record.file_backup_monitor), null, 4)
       } else if(type == 'serviceConfig') {
-        this.modal.title = '监控服务配置档'
+        this.modal.title = '监控配置档'
         this.modal.body = JSON.stringify(JSON.parse(this.record.service_config), null, 4)
       }
     },
@@ -142,6 +154,7 @@ new Vue({
     },
     formatDate(timestamp) {
       try {
+        if(!timestamp || String(timestamp).length != 10) { return '-' }
         let date = new Date(parseInt(timestamp) * 1000),
             y = date.getFullYear(),
             MM = date.getMonth() + 1,

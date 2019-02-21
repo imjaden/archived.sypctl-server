@@ -185,10 +185,10 @@ module API
       respond_with_formt_json({message: message, code: 201}, 201)
     end
 
-    post '/upload/file_backup' do
-      api_authen_params([:device_uuid, :file_uuid, :archive_file_name, :backup_file])
+    post '/upload/files_backup' do
+      api_authen_params([:device_uuid, :file_uuid, :files_md5, :file_list])
 
-      message = upload_file_backup(params)
+      message = upload_files_backup(params)
       respond_with_formt_json({message: message, code: 201}, 201)
     end
     
@@ -243,12 +243,30 @@ module API
     end
 
     def upload_file_backup(params)
-      device_path = File.join(Setting.path.file_backup, params[:device_uuid], params[:file_uuid])
-      FileUtils.mkdir_p(device_path) unless File.exists?(device_path)
-      backup_path = File.join(device_path, params[:archive_file_name])
+      file_folder = File.join(Setting.path.file_backup, params[:device_uuid], params[:file_uuid])
+      FileUtils.mkdir_p(file_folder) unless File.exists?(file_folder)
+      file_path = File.join(file_folder, params[:archive_file_name])
 
       temp_file = params[:backup_file][:tempfile]
-      File.open(backup_path, "wb") { |file| file.write(temp_file.read) }
+      File.open(file_path, "wb") { |file| file.write(temp_file.read) } if temp_file
+      "上传成功"
+    rescue => e
+      puts e.backtrace.select { |line| line.include?(ENV['APP_ROOT_PATH']) }
+      "上传失败, #{__FILE__}@#{__LINE__} - #{e.message}"
+    end
+
+    def upload_files_backup(params)
+      file_folder = File.join(Setting.path.file_backup, params[:device_uuid], params[:file_uuid])
+      FileUtils.mkdir_p(file_folder) unless File.exists?(file_folder)
+
+      params[:file_list].keys.each do |key|
+        hsh = params[:file_list][key]
+        next unless hsh[:backup_file]
+
+        file_path = File.join(file_folder, hsh[:archive_file_name])
+        temp_file = hsh[:backup_file][:tempfile]
+        File.open(file_path, "wb") { |file| file.write(temp_file.read) } if temp_file
+      end
       "上传成功"
     rescue => e
       puts e.backtrace.select { |line| line.include?(ENV['APP_ROOT_PATH']) }

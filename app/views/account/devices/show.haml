@@ -1,9 +1,16 @@
 :css   
   .tableService th:nth-child(n+1), .tableService td:nth-child(n+1) { text-align: left; }
-  .tableBackup th:nth-child(1), .tableBackup td:nth-child(1) { text-align: left; width: 20%; }
-  .tableBackup th:nth-child(2), .tableBackup td:nth-child(2) { text-align: left; width: 70%; }
-  .tableBackup th:nth-child(3), .tableBackup td:nth-child(3) { text-align: center; width: 5%; }
-  .tableBackup th:nth-child(4), .tableBackup td:nth-child(4) { text-align: center; width: 5%; }
+  .tableBackup th:nth-child(1), .tableBackup td:nth-child(1) { 
+    text-align: left; 
+    display: block;/* 内联对象需加 */
+    word-break:keep-all;/* 不换行 */  
+    white-space:nowrap;/* 不换行 */  
+    overflow:hidden;/* 内容超出宽度时隐藏超出部分的内容 */  
+    text-overflow:ellipsis;/* 当对象内文本溢出时显示省略标记 (...) ；需与 overflow:hidden; 一起使用。*/  
+  }
+  .tableBackup th:nth-child(2), .tableBackup td:nth-child(2) { text-align:left;width:20%;word-break:keep-all;white-space:nowrap;}
+  .tableBackup th:nth-child(3), .tableBackup td:nth-child(3) { text-align:left;width:10%;word-break:keep-all;white-space:nowrap;}
+  .tableBackup th:nth-child(n+4), .tableBackup td:nth-child(n+4) { text-align: center; width: 5%; }
   .list-group li:hover {cursor: pointer;}
   .not-exist { text-decoration: line-through; }
   textarea {word-wrap:normal;white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;}
@@ -145,17 +152,19 @@
             %td{'v-for' => '(row, td_index) in rows', ':style' => '"width:" +  record.service_monitor.widths[td_index] + ";word-break:break-all;"', 'v-html' => 'row'}
 
     %div{'v-if' => 'currentSideMenu.id == "backup"'}
-      %div 更新时间: {{ record.file_backup_updated_at }}，<a @click='displayModal("backupConfig")'>查看备份服务配置档</a>，<a @click='displayModal("backupOutput")'>查看备份服务状态</a>
+      %div 更新时间: {{ record.file_backup_updated_at }}，<a @click='displayModal("backupConfig")'>备份配置档</a>，<a @click='displayModal("backupOutput")'>备份状态</a>
       %table.table.table-hover.table-condensed.table-strip.table-bordered.file-backups.tableBackup
         %thead
+          %th 文件路径
           %th 修改时间
-          %th 文件名称
-          %th 查看
-          %th 下载
+          %th 文件大小
+          %th -
+          %th -
         %tbody
           %tr{'v-for' => '(item, index) in file_backups', ':key' => 'item.id'}
-            %td{'v-text' => 'formatDate(item.timestamp)'}
             %td{'v-text' => 'item.file_path'}
+            %td{'v-text' => 'formatDate(item.file_mtime)'}
+            %td{'v-text' => 'item.file_size'}
             %td
               %a{'@click' => 'getBackupFile("read", record.uuid, item.uuid, item.archive_file_name, item.file_path)'}
                 %span.glyphicon.glyphicon-eye-open
@@ -163,8 +172,9 @@
               %a{'@click' => 'getBackupFile("download", record.uuid, item.uuid, item.archive_file_name, item.file_path)'}
                 %span.glyphicon.glyphicon-download
           %tr{'v-for' => '(item, index) in file_backups_not_exist', ':key' => 'item.id'}
-            %td.not-exist{'v-text' => '"-"'}
             %td.not-exist{'v-text' => 'item.file_path'}
+            %td.not-exist{'v-text' => '"-"'}
+            %td.not-exist{'v-text' => '"-"'}
             %td
               %span.glyphicon.glyphicon-eye-open
             %td

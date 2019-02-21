@@ -1,8 +1,9 @@
 :css   
   .jobs th:nth-child(n+1), .jobs td:nth-child(n+1) { text-align: left; width: 5%; }
-  .jobs th:nth-child(1), .jobs td:nth-child(1) { width: 50%; }
-  .jobs th:nth-child(2), .jobs td:nth-child(2) { width: 30%; }
-  .jobs th:nth-child(3), .jobs td:nth-child(3) { text-align: center; width: 20%; }
+  .jobs th:nth-child(1), .jobs td:nth-child(1) { width: 25%; }
+  .jobs th:nth-child(2), .jobs td:nth-child(2) { width: 40%; }
+  .jobs th:nth-child(3), .jobs td:nth-child(3) { width: 20%; }
+  .jobs th:nth-child(4), .jobs td:nth-child(4) { text-align: center; width: 15%; }
 #appVue
   %ol.breadcrumb
     %li 设备中心
@@ -18,11 +19,13 @@
 
   %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.jobs
     %thead
+      %th UUID
       %th 文件路径
       %th 文件描述
       %th 更新时间
     %tbody{'v-for' => '(record, index) in records'}
       %tr
+        %td{'v-text' => 'record.uuid'}
         %td{'v-text' => 'record.file_path'}
         %td{'v-text' => 'record.description'}
         %td{'v-text' => 'record.updated_at'}
