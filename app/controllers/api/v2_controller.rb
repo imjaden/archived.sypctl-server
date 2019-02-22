@@ -95,26 +95,48 @@ module API
       authen_api_token([:uuid])
 
       record = JobGroup.find_by(uuid: params[:uuid])
-      halt_with_format_json({data: params[:uuid], message: "查询任务分组失败，#{params[:uuid]}", code: 200}, 200) unless record
+      halt_with_format_json({data: params[:uuid], message: "任务分组查询失败", code: 200}, 200) unless record
 
       count = record.jobs.count
-      halt_with_format_json({data: params[:uuid], message: "删除任务分组失败，请手工删除分组下的#{count}个任务", code: 200}, 200) unless count.zero?
+      halt_with_format_json({data: params[:uuid], message: "任务分组删除失败，请手工删除分组下的#{count}个任务", code: 200}, 200) unless count.zero?
 
       record.destroy
       respond_with_json({message: "成功删除任务分组「#{record.title}」", code: 201}, 201)
     end
 
     post '/account/file_backup/create' do
+      authen_api_token([:file])
+
       params[:file][:uuid] ||= generate_uuid
       record = FileBackup.create(params[:file])
 
-      respond_with_formt_json({data: record.to_hash, message: "成功创建文件备份", code: 201}, 201)
+      respond_with_formt_json({data: record.to_hash, message: "备份文件创建成功", code: 201}, 201)
+    end
+
+    post '/account/file_backup/update' do
+      authen_api_token([:file])
+
+      record = FileBackup.find_by(uuid: params[:file][:uuid])
+      halt_with_format_json({data: params[:uuid], message: "备份文件查询失败", code: 200}, 200) unless record
+
+      record.update_attributes(params[:file])
+      respond_with_formt_json({data: record.to_hash, message: "备份文件更新成功", code: 201}, 201)
+    end
+
+    post '/account/file_backup/delete' do
+      authen_api_token([:file])
+
+      record = FileBackup.find_by(uuid: params[:file][:uuid])
+      halt_with_format_json({data: params[:uuid], message: "备份文件查询失败", code: 200}, 200) unless record
+
+      record.destroy
+      respond_with_formt_json({data: params[:file][:uuid], message: "文件备份删除成功", code: 201}, 201)
     end
 
     get '/account/file_backup/list' do
-      records = FileBackup.all.order(id: :desc).map(&:to_hash)
+      records = FileBackup.all.order(description: :asc).map(&:to_hash)
 
-      respond_with_formt_json({data: records, message: "成功获取#{records.length}条数据"}, 200)
+      respond_with_formt_json({data: records, message: "备份文件查询成功(#{records.length}条)"}, 200)
     end
 
     get '/account/file_backup/read' do
@@ -123,7 +145,7 @@ module API
       file_path = File.join(Setting.path.file_backup, params[:device_uuid], params[:file_uuid], params[:archive_file_name])
       data = File.exists?(file_path) ? File.read(file_path) : "文件不存在 #{file_path}"
       
-      respond_with_formt_json({data: data, message: "查询成功"}, 200)
+      respond_with_formt_json({data: data, message: "备份文件读取成功"}, 200)
     end
 
     get '/account/file_backup/download' do

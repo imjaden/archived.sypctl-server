@@ -4,6 +4,8 @@ new Vue({
     return { 
       records: [],
       file: {
+        type: 'new',
+        title: '添加文件',
         file_path: '',
         description: '',
         message: ''
@@ -36,34 +38,6 @@ new Vue({
       }).always(function(res, status, xhr) {
         window.Loading.hide();
       });
-    },
-    createSubmit(el) {
-      if(!this.file.file_path.length) {
-        this.file.message = '请输入文件路径'
-      } else if(!this.file.description.length) {
-        this.file.message = '请输入文件描述'
-      } else {
-        let that = this;
-        $.ajax({
-          type: 'post',
-          url: '/api/v2/account/file_backup/create',  
-          contentType: 'application/json',
-          dataType: 'json',
-          processData: false,
-          data: JSON.stringify({file: {file_path: that.file.file_path, description: that.file.description}})
-        }).done(function(res, status, xhr) {
-          window.App.addSuccessNotify(res.message)
-          $("#newModal").modal('hide')
-          if(res.code === 201) {
-            that.$nextTick(function() {
-              that.getRecords()
-            })
-          }
-        }).fail(function(xhr, status, error) {
-        }).always(function(res, status, xhr) {
-        });
-      }
-      el.preventDefault();
     },
     displayModal() {
       window.Loading.show("获取数据中...");
@@ -99,6 +73,66 @@ new Vue({
       }).always(function(res, status, xhr) {
         window.Loading.hide()
       });
-    }
+    },
+    newClick() {
+      this.file = {
+        type: 'new',
+        title: '添加文件',
+        file_path: '',
+        description: ''
+      }
+      $("#newOrEditModal").modal('show')
+    },
+    editClick(file) {
+      this.file.type = 'edit'
+      this.file.title = '编辑文件'
+      this.file.uuid = file.uuid
+      this.file.file_path = file.file_path
+      this.file.description = file.description
+      $("#newOrEditModal").modal('show')
+    },
+    deleteClick(file) {
+      this.file.type = 'delete'
+      this.file.title = '确认删除文件？'
+      this.file.uuid = file.uuid
+      this.file.file_path = file.file_path
+      this.file.description = file.description
+      $("#newOrEditModal").modal('show')
+    },
+    createSubmit(el) {
+      if(!this.file.file_path.length) {
+        this.file.message = '请输入文件路径'
+      } else if(!this.file.description.length) {
+        this.file.message = '请输入文件描述'
+      } else {
+        let that = this,
+            file = {file_path: that.file.file_path, description: that.file.description},
+            action = 'create';
+        if(that.file.type != 'new') { file.uuid = that.file.uuid }
+        if(that.file.type == 'new') { action = 'create' }
+        if(that.file.type == 'edit') { action = 'update' }
+        if(that.file.type == 'delete') { action = 'delete' }
+
+        $.ajax({
+          type: 'post',
+          url: `/api/v2/account/file_backup/${action}`,  
+          contentType: 'application/json',
+          dataType: 'json',
+          processData: false,
+          data: JSON.stringify({file: file})
+        }).done(function(res, status, xhr) {
+          window.App.addSuccessNotify(res.message)
+          $("#newOrEditModal").modal('hide')
+          if(res.code === 201) {
+            that.$nextTick(function() {
+              that.getRecords()
+            })
+          }
+        }).fail(function(xhr, status, error) {
+        }).always(function(res, status, xhr) {
+        });
+      }
+      el.preventDefault();
+    },
   }
 })

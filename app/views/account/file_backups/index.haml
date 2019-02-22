@@ -1,15 +1,17 @@
 :css   
   .jobs th:nth-child(n+1), .jobs td:nth-child(n+1) { text-align: left; width: 5%; }
-  .jobs th:nth-child(1), .jobs td:nth-child(1) { width: 25%; }
+  .jobs th:nth-child(1), .jobs td:nth-child(1) { text-align:center; width: 3%; }
   .jobs th:nth-child(2), .jobs td:nth-child(2) { width: 40%; }
-  .jobs th:nth-child(3), .jobs td:nth-child(3) { width: 20%; }
-  .jobs th:nth-child(4), .jobs td:nth-child(4) { text-align: center; width: 15%; }
+  .jobs th:nth-child(3), .jobs td:nth-child(3) { width: 15%; }
+  .jobs th:nth-child(4), .jobs td:nth-child(4) { width: 19%; }
+  .jobs th:nth-child(5), .jobs td:nth-child(5) { text-align: center; width: 13%; }
+  .jobs th:nth-child(n+6), .jobs td:nth-child(n+6) { text-align:center; width: 5%; }
 #appVue
   %ol.breadcrumb
     %li 设备中心
     %li 文件备份
     %li
-      %a{'data-toggle' => 'modal', 'data-target' => '#newModal'} 
+      %a{'@click' => 'newClick'} 
         添加文件
         %span.glyphicon.glyphicon-plus
     %li
@@ -19,24 +21,34 @@
 
   %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.jobs
     %thead
-      %th UUID
+      %th -
       %th 文件路径
       %th 文件描述
+      %th UUID
       %th 更新时间
+      %th -
+      %th -
     %tbody{'v-for' => '(record, index) in records'}
       %tr
-        %td{'v-text' => 'record.uuid'}
+        %td{'v-text' => 'index + 1'}
         %td{'v-text' => 'record.file_path'}
         %td{'v-text' => 'record.description'}
+        %td{'v-text' => 'record.uuid'}
         %td{'v-text' => 'record.updated_at'}
+        %td
+          %a{'@click' => 'editClick(record)'}
+            %span.glyphicon.glyphicon-edit
+        %td
+          %a{'@click' => 'deleteClick(record)', style: 'color:red;'}
+            %span.glyphicon.glyphicon-trash
 
-  .modal.fade#newModal
+  .modal.fade#newOrEditModal
     .modal-dialog{style: 'width: 500px;'}
       .modal-content
         .modal-header
           %button.close{'type' => 'button', 'data-dismiss' => 'modal', 'aria-label' => 'Close'}
             %span{'aria-hidden' => 'true'} &times;
-          %h4.modal-title 新建文件
+          %h4.modal-title{'v-text' => 'file.title'}
         .modal-body{style: 'width: 500px;'}
           %form{'@submit' => 'createSubmit', method: "post", role: "form", style: 'width: 450px;'}
             .input-group
@@ -46,9 +58,9 @@
             .input-group{style: 'margin-bottom: 10px;'}
               .input-group-addon
                 %span 文件描述
-              %textarea.form-control{name: "description", type: "text", 'v-model.trim' => 'file.description'}
+              %input.form-control{name: "description", type: "text", 'v-model.trim' => 'file.description'}
             .form-group{style: 'margin-bottom: 10px;'}
-              %input.btn.btn-primary{:type => "submit", :value => "创建", style: 'width: 100%;'}/
+              %input.btn{type: "submit", :value => "提交", style: 'width: 100%;', ':class' => '{"btn-primary": file.type != "delete", "btn-danger": file.type == "delete"}'}/
             .form-group{style: 'margin-bottom: 10px;text-align: center;'}
               %p.text-danger{'v-text' => 'file.message'}
 

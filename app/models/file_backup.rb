@@ -9,6 +9,8 @@ class FileBackup < ActiveRecord::Base
   self.table_name = 'sys_file_backups'
   
   after_create :refresh_file_backup_cache
+  after_update :refresh_file_backup_cache
+  after_destroy :refresh_file_backup_cache
 
   def to_hash
     self.class.column_names.each_with_object({}) do |column_name, hsh|
@@ -42,6 +44,14 @@ class FileBackup < ActiveRecord::Base
     File.read(hash_path).strip
   end
 
+  def self.db_mtime
+    cache_path = File.join(ENV['APP_ROOT_PATH'], 'tmp/file-backups')
+    hash_path = File.join(cache_path, 'db.json')
+    refresh_file_backup_cache unless File.exists?(hash_path)
+
+    File.mtime(hash_path).strftime('%Y/%m/%d %H:%M:%S')
+  end
+
   def self.db_json
     cache_path = File.join(ENV['APP_ROOT_PATH'], 'tmp/file-backups')
     json_path = File.join(cache_path, 'db.json')
@@ -51,6 +61,9 @@ class FileBackup < ActiveRecord::Base
   end
 
   def self.db_info
-    {db_hash: db_hash, db_json: db_json}
+    {
+      db_mtime: db_mtime,
+      db_hash: db_hash,
+      db_json: db_json}
   end
 end
