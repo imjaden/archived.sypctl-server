@@ -236,6 +236,15 @@ module API
       respond_with_formt_json({message: '接收成功'}, 201)
     end
 
+    post '/agent/behavior_log' do
+      api_authen_params([:behavior])
+
+      params[:behavior][:uuid] = generate_uuid
+      record = AgentBehaviorLog.create(params[:behavior])
+
+      respond_with_formt_json({data: record.id, message: "接收成功"}, 201)
+    end
+
     protected
 
     def authen_api_token(api_token)

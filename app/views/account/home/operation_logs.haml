@@ -5,7 +5,6 @@
     %a{"data-toggle" => "modal", "data-target" => "#templateModal"}
       %span.glyphicon.glyphicon-info-sign
 
-= stylesheet_link_tag "materialdesignicons.min.css"
 :css
   .operation-logs th:nth-child(1), .operation-logs td:nth-child(1) { width: 100%; }
 %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.operation-logs
@@ -16,7 +15,7 @@
           %span{style: "color: darkgray;"}
             = record.created_at.strftime("%y-%m-%d %H:%M:%S")
             &nbsp;-&nbsp;
-          %span{class: "mdi #{operation_log_type(record.tags)}"}
+          %span.glyphicon.glyphicon-grain
           = record.description
 
 = will_paginater @records

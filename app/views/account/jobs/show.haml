@@ -2,8 +2,8 @@
   .app td:nth-child(1) { vertical-align: middle; text-align: center;}
   .app th:nth-child(1), .app td:nth-child(1) { min-width: 100px; width: 10%; }
   .app th:nth-child(2), .app td:nth-child(2) { max-width: 800px; width: 90%; }
-  .app pre.full { max-width: 600px; height: 600px; }
-  .app pre.small { max-width: 600px; height: 100px; }
+  .app pre.full { max-width: 600px; height: 500px; }
+  .app pre.small { max-width: 600px; height: 150px; }
   .list-group-item:hover {cursor: pointer;}
 
 .row#appVue
@@ -23,24 +23,21 @@
     %table.table.table-hover.table-condensed.table-strip.table-bordered.app
       %tbody
         %tr
-          %td 任务 UUID
-          %td{'v-text' => 'job.uuid'}
-        %tr
           %td 任务名称
-          %td.name{'v-text' => 'job.title'}
-        %tr
-          %td 任务状态
           %td
+            %span.name{'v-text' => 'job.title'}
             %span.label.label-info{'v-text' => 'job.state'}
+        %tr
+          %td 任务标识
+          %td{'v-text' => 'job.uuid'}
         %tr
           %td 主机名称
           %td{'v-text' => 'job.device_name'}
         %tr
           %td 应用名称
-          %td{'v-text' => 'job.app_name'}
-        %tr
-          %td 应用版本
-          %td{'v-text' => 'job.version_name'}
+          %td
+            %span{'v-text' => 'job.app_name'}
+            %span.label.label-info{'v-text' => 'job.version_name'}
         %tr
           %td 
             部署脚本
@@ -55,13 +52,11 @@
             %br
             %a{'@click' => 'resizeOutputArea'}
               %span.glyphicon{':class' => '{"glyphicon-resize-full": !isOutputFull, "glyphicon-resize-small": isOutputFull}'}
+            &nbsp;&nbsp;
             %a{'@click' => 'getJobList'}
               %span.glyphicon.glyphicon-refresh
           %td
             %pre#output.small{'v-text' => 'job.output || "无日志输出"', readonly: 'true'}
-        %tr
-          %td 创建时间
-          %td{'v-text' => 'job.created_at'}
         %tr
           %td 更新时间
           %td{'v-text' => 'job.updated_at'}

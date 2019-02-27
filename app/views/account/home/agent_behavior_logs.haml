@@ -1,0 +1,27 @@
+%ol.breadcrumb
+  %li 日志中心
+  %li 代理行为
+
+:css
+  .operation-logs th:nth-child(1), .operation-logs td:nth-child(1) { width: 100%; }
+
+%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.operation-logs
+  %tbody
+    - @records.each do |record|
+      %tr{id: "dom_#{record.id}"}
+        %td
+          %span{style: "color: darkgray;"}
+            = record.created_at.strftime("%y-%m-%d %H:%M:%S")
+            &nbsp;-&nbsp;
+          %span.glyphicon.glyphicon-grain
+          = record.behavior
+
+= will_paginater @records
+
+:javascript
+  $(function() {
+    $(".operation-logs td a").each(function() {
+      $(this).attr("target", "_blank");
+      $(this).attr("href", "javascript:void(0);");
+    })
+  })

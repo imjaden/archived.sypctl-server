@@ -11,6 +11,8 @@
   .tableBackup th:nth-child(2), .tableBackup td:nth-child(2) { text-align:left;width:20%;word-break:keep-all;white-space:nowrap;}
   .tableBackup th:nth-child(3), .tableBackup td:nth-child(3) { text-align:left;width:10%;word-break:keep-all;white-space:nowrap;}
   .tableBackup th:nth-child(n+4), .tableBackup td:nth-child(n+4) { text-align: center; width: 5%; }
+  .tableBehaviorLog th:nth-child(1), .tableBehaviorLog td:nth-child(1) { text-align:left;width:80%;word-break:keep-all;white-space:nowrap;}
+  .tableBehaviorLog th:nth-child(2), .tableBehaviorLog td:nth-child(2) { text-align: center; width: 20%; }
   .list-group li:hover {cursor: pointer;}
   .not-exist { text-decoration: line-through; }
   textarea {word-wrap:normal;white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;}
@@ -151,7 +153,7 @@
           %tr{'v-for' => '(rows, row_index) in record.service_monitor.data'}
             %td{'v-for' => '(row, td_index) in rows', ':style' => '"width:" +  record.service_monitor.widths[td_index] + ";word-break:break-all;"', 'v-html' => 'row'}
 
-    %div{'v-if' => 'currentSideMenu.id == "backup"'}
+    %div{'v-if' => 'currentSideMenu.id == "file_backup"'}
       %div 更新时间: {{ record.file_backup_updated_at }}，<a @click='displayModal("backupConfig")'>备份配置档</a>，<a @click='displayModal("backupOutput")'>备份状态</a>
       %table.table.table-hover.table-condensed.table-strip.table-bordered.file-backups.tableBackup
         %thead
@@ -179,6 +181,17 @@
               %span.glyphicon.glyphicon-eye-open
             %td
               %span.glyphicon.glyphicon-download
+
+    %div{'v-if' => 'currentSideMenu.id == "behavior_log"'}
+      %div 共计提交 {{ behavior_logs.length }} 条行为操作。
+      %table.table.table-hover.table-condensed.table-strip.table-bordered.behavior-logs.tableBehaviorLog
+        %thead
+          %th 行为描述
+          %th 提交时间
+        %tbody
+          %tr{'v-for' => '(item, index) in behavior_logs', ':key' => 'item.id'}
+            %td{'v-text' => 'item.behavior'}
+            %td{'v-text' => 'item.created_at'}
 
   .modal.fade#infoModal{"aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
     .modal-dialog{role: "document"}

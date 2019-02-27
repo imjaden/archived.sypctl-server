@@ -8,12 +8,14 @@ new Vue({
         {label: '基本信息', id: 'basic'},
         {label: '设备信息', id: 'device'},
         {label: '服务状态', id: 'service'},
-        {label: '备份状态', id: 'backup'},
+        {label: '文档备份', id: 'file_backup'},
+        {label: '代理行为', id: 'behavior_log'},
         {label: 'SSH 信息', id: 'ssh'}
       ],
       currentSideMenu: {},
       file_backups: [],
       file_backups_not_exist: [],
+      behavior_logs: [],
       modal: {
         title: '标题',
         body: '加载中...',
@@ -21,20 +23,26 @@ new Vue({
     }
   },
   created() {
-    this.getRecord()
-
-    let menuId = window.localStorage.getItem('device.show.menu.id'),
-        menuIndex = 0;
-    if(menuId && [].findIndex) { menuIndex = this.sideMenus.findIndex(function(menu) { return menu.id == menuId; }) }
-    if(menuIndex < 0 || menuIndex >= this.sideMenus.length) { menuIndex = 0; }
-    this.currentSideMenu = this.sideMenus[menuIndex]
+    this.getRecord(() => {
+      let menuId = window.localStorage.getItem('device.show.menu.id'),
+          menuIndex = 0;
+      if(menuId && [].findIndex) { menuIndex = this.sideMenus.findIndex(function(menu) { return menu.id == menuId; }) }
+      if(menuIndex < 0 || menuIndex >= this.sideMenus.length) { menuIndex = 0; }
+      this.currentSideMenu = this.sideMenus[menuIndex]
+      if(this.currentSideMenu.id == 'behavior_log') {
+        this.getAgentBehaviorLogs()
+      }
+    })
   },
   methods: {
     clickSideMenu(menu) {
       this.currentSideMenu = menu
       window.localStorage.setItem('device.show.menu.id', menu.id)
+      if(this.currentSideMenu.id == 'behavior_log') {
+        this.getAgentBehaviorLogs()
+      }
     },
-    getRecord() {
+    getRecord(callback) {
       let that = this,
           uuid = window.location.pathname.split('/').reverse()[0],
           data, service_monitor, file_backups, file_backups_keys, array;
@@ -68,7 +76,7 @@ new Vue({
                  array.push(file_backups[key])
               } 
             })
-            that.file_backups = array
+            that.file_backups = array.sort((a, b) => { return (b['file_mtime'] || 0) - (a['file_mtime'] || 0); })
             that.file_backups_not_exist = JSON.parse(data.file_backup_config).filter(function(item) { return file_backups_keys.indexOf(item.uuid) < 0;})
 
             service_monitor = JSON.parse(data.service_monitor)
@@ -84,6 +92,9 @@ new Vue({
       }).fail(function(xhr, status, error) {
       }).always(function(res, status, xhr) {
         window.Loading.hide();
+        if(callback) {
+          callback()
+        }
       });
     },
     deleteClick() {
@@ -147,6 +158,26 @@ new Vue({
         that.modal.title = file_path
         that.modal.body = res.code == 200 ? res.data : res.message
         $("#infoModal").modal('show')
+      }).fail(function(xhr, status, error) {
+      }).always(function(res, status, xhr) {
+        window.Loading.hide();
+      });
+    },
+    getAgentBehaviorLogs() {
+      let that = this,
+          url = `/api/v2/account/agent_behavior_log/list?device_uuid=${that.record.uuid}`;
+      
+      window.Loading.show("获取数据中...");
+      $.ajax({
+        type: 'get',
+        url: url,
+        contentType: 'application/json'
+      }).done(function(res, status, xhr) {
+        console.log(res)
+        that.$nextTick(() => {
+          that.behavior_logs = res.data
+        })
+
       }).fail(function(xhr, status, error) {
       }).always(function(res, status, xhr) {
         window.Loading.hide();

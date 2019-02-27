@@ -16,7 +16,7 @@ gem 'emk-sinatra-url-for', '~> 0.2.1'
 gem 'rake', '~> 12.3.0'
 gem 'unicorn', '~> 5.0.1'
 gem 'unicorn-worker-killer', '~> 0.4.4'
-gem 'unicorn_metrics', '~> 0.3.1', github: 'superiorlu/unicorn_metrics'
+# gem 'unicorn_metrics', '~> 0.3.1', github: 'superiorlu/unicorn_metrics'
 
 # orm
 gem 'mysql2', '~> 0.4.4'

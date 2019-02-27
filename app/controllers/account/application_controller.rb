@@ -1,7 +1,7 @@
 # encoding: utf-8
 module Account
   class ApplicationController < ::ApplicationController
-    set :views, File.join(ENV['VIEW_PATH'], 'account/apps')
+    set :views, File.join(ENV['VIEW_PATH'], 'account/home')
     set :layout, :'../../layouts/layout'
 
     helpers Account::ApplicationHelper
@@ -30,6 +30,18 @@ module Account
 
       settings.startup_time = Time.now
       respond_with_json({ redis_cache_num: redis_cache_num }, 200)
+    end
+
+    get '/operation_logs' do
+      @records = OperationLog.paginate(page: params[:page], per_page: 20).order(id: :desc)
+
+      haml :operation_logs, layout: settings.layout
+    end
+
+    get '/agent_behavior_logs' do
+      @records = AgentBehaviorLog.paginate(page: params[:page], per_page: 20).order(id: :desc)
+
+      haml :agent_behavior_logs, layout: settings.layout
     end
   end
 end

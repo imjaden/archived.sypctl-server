@@ -610,3 +610,18 @@ call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_wx_users
 call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_wx_users', 'mobile', 'varchar(255) DEFAULT NULL COMMENT "手机号"');
 call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_wx_users', 'created_at', 'datetime NOT NULL DEFAULT CURRENT_TIMESTAMP');
 call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', 'sys_wx_users', 'updated_at', 'datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP');
+
+CREATE TABLE IF NOT EXISTS `sys_agent_behavior_logs` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(255) COLLATE utf8_bin NOT NULL COMMENT 'UUID',
+  `device_name` varchar(255) COLLATE utf8_bin NOT NULL COMMENT '设备名称',
+  `device_uuid` varchar(255) COLLATE utf8_bin NOT NULL COMMENT '设备 UUID',
+  `behavior` varchar(255) COLLATE utf8_bin NOT NULL COMMENT '行为描述',
+  `object_type` varchar(255) COLLATE utf8_bin NOT NULL COMMENT '行为对象类型',
+  `object_id` varchar(255) COLLATE utf8_bin NOT NULL COMMENT '行为对象标识',
+  `description` varchar(255) COLLATE utf8_bin DEFAULT NULL COMMENT '描述',
+  `string` varchar(255) COLLATE utf8_bin DEFAULT NULL COMMENT '描述',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='代理端行为记录';

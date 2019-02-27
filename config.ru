@@ -1,7 +1,7 @@
 # encoding: utf-8
 require 'unicorn/oob_gc'
 require 'unicorn/worker_killer'
-require 'unicorn_metrics/middleware'
+# require 'unicorn_metrics/middleware'
 require './config/boot.rb'
 
 # 每10次请求，才执行一次GC
@@ -21,7 +21,6 @@ use Unicorn::WorkerKiller::Oom, (256*(1024**2)), (1024*(1024**2))
   '/account/device_groups' => 'Account::DeviceGroupController',
   '/account/jobs' => 'Account::JobController',
   '/account/job_templates' => 'Account::JobTemplateController',
-  '/account/operation_logs' => 'Account::OperationLogController',
   '/account/file_backups' => 'Account::FileBackupController',
   '/api' => 'API::ApplicationController',
   '/api/v1' => 'API::V1Controller',
