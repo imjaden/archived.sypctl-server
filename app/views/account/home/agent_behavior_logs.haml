@@ -1,27 +1,29 @@
-%ol.breadcrumb
-  %li 日志中心
-  %li 代理行为
 
 :css
-  .operation-logs th:nth-child(1), .operation-logs td:nth-child(1) { width: 100%; }
+  .behavior-logs { margin-bottom: 2px;}
+  .behavior-logs th:nth-child(1), .behavior-logs td:nth-child(1) { width: 100%; }
 
-%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.operation-logs
-  %tbody
-    - @records.each do |record|
-      %tr{id: "dom_#{record.id}"}
+#appVue
+  %ol.breadcrumb
+    %li 日志中心
+    %li 代理行为
+
+  %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.behavior-logs
+    %tbody
+      %tr{'v-for' => '(record, index) in behaviorLogs', ':key' => 'record.id'}
         %td
-          %span{style: "color: darkgray;"}
-            = record.created_at.strftime("%y-%m-%d %H:%M:%S")
-            &nbsp;-&nbsp;
-          %span.glyphicon.glyphicon-grain
-          = record.behavior
+          %span{style: "color: darkgray;", 'v-text' => 'record.updated_at'}
+          &nbsp;-&nbsp;
+          %a{'v-text' => 'record.device_name', ':href' => '"/account/devices/" + record.device_uuid', 'target' => 'blank'}
+          .glyphicon.glyphicon-cloud-upload
+          %span{'v-text' => 'record.behavior'}
 
-= will_paginater @records
+  %div{style: 'width: 100%;text-align: center;'}
+    %a{'@click' => 'getMoreBehaviorLogs', 'v-if' => 'pageIndex >= 0'}
+      %span.glyphicon.glyphicon-hourglass
+      加载更多数据
+    %span{'v-else' => '', style: 'color: gray;'}
+      %span.glyphicon.glyphicon-home
+      所有数据已加载
 
-:javascript
-  $(function() {
-    $(".operation-logs td a").each(function() {
-      $(this).attr("target", "_blank");
-      $(this).attr("href", "javascript:void(0);");
-    })
-  })
+= javascript_include_tag 'account/home/agent_behavior_logs.js'

@@ -15,7 +15,8 @@ new Vue({
       currentSideMenu: {},
       file_backups: [],
       file_backups_not_exist: [],
-      behavior_logs: [],
+      behaviorLogs: [],
+      pageIndex: 0,
       modal: {
         title: '标题',
         body: '加载中...',
@@ -30,7 +31,7 @@ new Vue({
       if(menuIndex < 0 || menuIndex >= this.sideMenus.length) { menuIndex = 0; }
       this.currentSideMenu = this.sideMenus[menuIndex]
       if(this.currentSideMenu.id == 'behavior_log') {
-        this.getAgentBehaviorLogs()
+        this.getBehaviorLogs()
       }
     })
   },
@@ -39,7 +40,7 @@ new Vue({
       this.currentSideMenu = menu
       window.localStorage.setItem('device.show.menu.id', menu.id)
       if(this.currentSideMenu.id == 'behavior_log') {
-        this.getAgentBehaviorLogs()
+        this.getBehaviorLogs()
       }
     },
     getRecord(callback) {
@@ -163,9 +164,9 @@ new Vue({
         window.Loading.hide();
       });
     },
-    getAgentBehaviorLogs() {
+    getBehaviorLogs() {
       let that = this,
-          url = `/api/v2/account/agent_behavior_log/list?device_uuid=${that.record.uuid}`;
+          url = `/api/v2/account/device_behavior_log/list?device_uuid=${that.record.uuid}&page=${that.pageIndex}`;
       
       window.Loading.show("获取数据中...");
       $.ajax({
@@ -175,13 +176,18 @@ new Vue({
       }).done(function(res, status, xhr) {
         console.log(res)
         that.$nextTick(() => {
-          that.behavior_logs = res.data
+          that.behaviorLogs = that.behaviorLogs.concat(res.data)
+          if(!res.data.length) { that.pageIndex = -1 }
         })
 
       }).fail(function(xhr, status, error) {
       }).always(function(res, status, xhr) {
         window.Loading.hide();
       });
+    },
+    getMoreBehaviorLogs() {
+      this.pageIndex = this.pageIndex + 1
+      this.getBehaviorLogs()
     },
     formatDate(timestamp) {
       try {

@@ -11,6 +11,7 @@
   .tableBackup th:nth-child(2), .tableBackup td:nth-child(2) { text-align:left;width:20%;word-break:keep-all;white-space:nowrap;}
   .tableBackup th:nth-child(3), .tableBackup td:nth-child(3) { text-align:left;width:10%;word-break:keep-all;white-space:nowrap;}
   .tableBackup th:nth-child(n+4), .tableBackup td:nth-child(n+4) { text-align: center; width: 5%; }
+  .tableBehaviorLog { margin-bottom: 2px;}
   .tableBehaviorLog th:nth-child(1), .tableBehaviorLog td:nth-child(1) { text-align:left;width:80%;word-break:keep-all;white-space:nowrap;}
   .tableBehaviorLog th:nth-child(2), .tableBehaviorLog td:nth-child(2) { text-align: center; width: 20%; }
   .list-group li:hover {cursor: pointer;}
@@ -183,15 +184,22 @@
               %span.glyphicon.glyphicon-download
 
     %div{'v-if' => 'currentSideMenu.id == "behavior_log"'}
-      %div 共计提交 {{ behavior_logs.length }} 条行为操作。
+      %div 当前页面共计 {{ behaviorLogs.length }} 条行为操作。
       %table.table.table-hover.table-condensed.table-strip.table-bordered.behavior-logs.tableBehaviorLog
         %thead
           %th 行为描述
           %th 提交时间
         %tbody
-          %tr{'v-for' => '(item, index) in behavior_logs', ':key' => 'item.id'}
+          %tr{'v-for' => '(item, index) in behaviorLogs', ':key' => 'item.id'}
             %td{'v-text' => 'item.behavior'}
             %td{'v-text' => 'item.created_at'}
+      %div{style: 'width: 100%;text-align: center;'}
+        %a{'@click' => 'getMoreBehaviorLogs', 'v-if' => 'pageIndex >= 0'}
+          %span.glyphicon.glyphicon-hourglass
+          加载更多数据
+        %span{'v-else' => '', style: 'color: gray;'}
+          %span.glyphicon.glyphicon-home
+          所有数据已加载
 
   .modal.fade#infoModal{"aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
     .modal-dialog{role: "document"}
