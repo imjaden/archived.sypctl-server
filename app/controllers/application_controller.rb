@@ -285,6 +285,7 @@ class ApplicationController < Sinatra::Base
   end
 
   def halt_with_format_json(data_hash = {}, code = 200)
+    data_hash[:code] ||= code if code
     data_hash[:code] = 401 unless data_hash.has_key?(:code)
     data_hash[:message] = 'default halt message' unless data_hash.has_key?(:message)
 

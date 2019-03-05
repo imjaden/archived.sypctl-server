@@ -13,18 +13,20 @@ class User < ActiveRecord::Base
       user_num: params[:user_num],
       password: ::Digest::MD5.hexdigest(params[:user_pass])
     }
-    response = HTTParty.post "http://shengyiplus.com/api/v1.1/user/authentication", body: options.to_json
-    if response.code == 200
-      res_hash = ::JSON.parse(response.body)['data']
-      if user = find_by(user_num: params[:user_num])
-        user.update_columns({user_name: res_hash['user_name'], user_pass: res_hash['user_pass']})
-      else
-        user = create({user_num: res_hash['user_num'], user_name: res_hash['user_name'], user_pass: res_hash['user_pass']})
-      end
-      [user, "登录成功"]
-    else
-      [nil, response.body]
-    end
+    user = find_by(user_num: params[:user_num])
+    [user, "登录成功"]
+    # response = HTTParty.post "http://shengyiplus.com/api/v1.1/user/authentication", body: options.to_json
+    # if response.code == 200
+    #   res_hash = ::JSON.parse(response.body)['data']
+    #   if user = find_by(user_num: params[:user_num])
+    #     user.update_columns({user_name: res_hash['user_name'], user_pass: res_hash['user_pass']})
+    #   else
+    #     user = create({user_num: res_hash['user_num'], user_name: res_hash['user_name'], user_pass: res_hash['user_pass']})
+    #   end
+    #   [user, "登录成功"]
+    # else
+    #   [nil, response.body]
+    # end
   end
   
   def to_hash

@@ -112,6 +112,9 @@ new Vue({
           console.log('unkonwn cmd, data:', event.data)
           break
       }
+    },
+    switchDevice(mode) {
+      $("body").css({"overflow-y": "auto"})
     }
   }
 })

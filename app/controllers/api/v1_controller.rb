@@ -245,6 +245,24 @@ module API
       respond_with_formt_json({data: record.id, message: "接收成功"}, 201)
     end
 
+    post '/agent/backup_mysql_meta' do
+      api_authen_params([:backup_mysql_meta])
+
+      params[:backup_mysql_meta][:uuid] ||= generate_uuid
+      record = BackupMysqlMeta.create(params[:backup_mysql_meta])
+
+      respond_with_formt_json({data: record.id, message: "接收成功"}, 201)
+    end
+
+    post '/agent/backup_mysql_day' do
+      api_authen_params([:backup_mysql_day])
+
+      params[:backup_mysql_day][:uuid] ||= generate_uuid
+      record = BackupMysqlDay.create(params[:backup_mysql_day])
+
+      respond_with_formt_json({data: record.id, message: "接收成功"}, 201)
+    end
+
     protected
 
     def authen_api_token(api_token)

@@ -198,17 +198,35 @@ module API
     end
 
     get '/account/device_behavior_log/list' do
-      params[:page] ||= 0
       records = AgentBehaviorLog.where(device_uuid: params[:device_uuid]).order(id: :desc).limit(30).offset(params[:page] * 30).map(&:to_hash)
 
       respond_with_formt_json({data: records, message: "成功获取#{records.length}条数据"}, 200)
     end
 
     get '/account/agent_behavior_log/list' do
-      params[:page] ||= 0
       records = AgentBehaviorLog.order(id: :desc).limit(30).offset(params[:page] * 30).map(&:to_hash)
 
       respond_with_formt_json({data: records, message: "成功获取#{records.length}条数据"}, 200)
+    end
+
+    get '/account/backup_mysql_meta/list' do
+      records = BackupMysqlMeta.where(device_uuid: params[:device_uuid]).limit(30).offset(params[:page] * 30).map(&:to_hash)
+
+      respond_with_formt_json({data: records, message: "成功获取#{records.length}条数据"}, 200)
+    end
+
+    get '/account/backup_mysql_day/list' do
+      records = BackupMysqlDay.where(device_uuid: params[:device_uuid], ymd: params[:ymd]).map(&:to_hash)
+
+      respond_with_formt_json({data: records, message: "成功获取#{records.length}条数据"}, 200)
+    end
+
+    get '/account/download/backup_mysql' do
+      backup_path = File.join(Setting.path.mysql_backup, params[:host], params[:ymd].gsub('/', ''), params[:backup_name])
+
+      halt_with_format_json({data: backup_path, message: "备份不存在"}, 200) unless File.exists?(backup_path) 
+      
+      send_file(backup_path, type: 'application/x-gzip ', filename: params[:backup_name], disposition: 'attachment')
     end
 
     protected

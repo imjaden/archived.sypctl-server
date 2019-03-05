@@ -9,6 +9,7 @@ new Vue({
         {label: '设备信息', id: 'device'},
         {label: '服务状态', id: 'service'},
         {label: '文档备份', id: 'file_backup'},
+        {label: 'MySQL备份', id: 'mysql_backup'},
         {label: '代理行为', id: 'behavior_log'},
         {label: 'SSH 信息', id: 'ssh'}
       ],
@@ -17,6 +18,9 @@ new Vue({
       file_backups_not_exist: [],
       behaviorLogs: [],
       pageIndex: 0,
+      loadMore: true,
+      backupMysqlMetas: [],
+      backupMysqlDays: [],
       modal: {
         title: '标题',
         body: '加载中...',
@@ -33,6 +37,9 @@ new Vue({
       if(this.currentSideMenu.id == 'behavior_log') {
         this.getBehaviorLogs()
       }
+      if(this.currentSideMenu.id == 'mysql_backup') {
+        this.getBackupMysqlMeta()
+      }
     })
   },
   methods: {
@@ -40,7 +47,14 @@ new Vue({
       this.currentSideMenu = menu
       window.localStorage.setItem('device.show.menu.id', menu.id)
       if(this.currentSideMenu.id == 'behavior_log') {
+        this.loadMore = true
+        this.pageIndex = 0
         this.getBehaviorLogs()
+      }
+      if(this.currentSideMenu.id == 'mysql_backup') {
+        this.loadMore = true
+        this.pageIndex = 0
+        this.getBackupMysqlMeta()
       }
     },
     getRecord(callback) {
@@ -58,13 +72,9 @@ new Vue({
           data = res.data
           window.App.addSuccessNotify(res.message)
 
-          // data.file_backup_config = data.file_backup_config
-          // data.file_backup_monitor = data.file_backup_monitor
-          // data.service_config = data.service_config
-
           try {
             array = []
-            file_backups = JSON.parse(data.file_backup_monitor)
+            file_backups = JSON.parse(data.file_backup_monitor || "{\"file_list\": []}")
             file_backups_keys = Object.keys(file_backups)
             file_backups_keys.forEach(function(key) {
               if(file_backups[key]['file_list']) {
@@ -78,9 +88,13 @@ new Vue({
               } 
             })
             that.file_backups = array.sort((a, b) => { return (b['file_mtime'] || 0) - (a['file_mtime'] || 0); })
-            that.file_backups_not_exist = JSON.parse(data.file_backup_config).filter(function(item) { return file_backups_keys.indexOf(item.uuid) < 0;})
+            that.file_backups_not_exist = JSON.parse(data.file_backup_config || "[]").filter(function(item) { return file_backups_keys.indexOf(item.uuid) < 0;})
 
-            service_monitor = JSON.parse(data.service_monitor)
+          } catch(e) {
+            console.log(e)
+          }
+          try {
+            service_monitor = JSON.parse(data.service_monitor || "{}")
             service_monitor.widths = ['30%', '20%', '10%', '10%', '30%'],
             data.service_monitor = service_monitor
           } catch(e) {
@@ -177,7 +191,51 @@ new Vue({
         console.log(res)
         that.$nextTick(() => {
           that.behaviorLogs = that.behaviorLogs.concat(res.data)
-          if(!res.data.length) { that.pageIndex = -1 }
+          if(!res.data.length || res.data.length < 30) { that.loadMore = false }
+        })
+
+      }).fail(function(xhr, status, error) {
+      }).always(function(res, status, xhr) {
+        window.Loading.hide();
+      });
+    },
+    getBackupMysqlMeta() {
+      let that = this,
+          url = `/api/v2/account/backup_mysql_meta/list?device_uuid=${that.record.uuid}&page=${that.pageIndex}`;
+      
+      window.Loading.show("获取数据中...");
+      $.ajax({
+        type: 'get',
+        url: url,
+        contentType: 'application/json'
+      }).done(function(res, status, xhr) {
+        console.log(res)
+        that.$nextTick(() => {
+          that.backupMysqlMetas = that.backupMysqlMetas.concat(res.data)
+          if(!res.data.length || res.data.length < 30) { that.loadMore = false }
+        })
+
+      }).fail(function(xhr, status, error) {
+      }).always(function(res, status, xhr) {
+        window.Loading.hide();
+      });
+    },
+    viewMysqlDay(item) {
+      let that = this,
+          url = `/api/v2/account/backup_mysql_day/list?device_uuid=${item.device_uuid}&ymd=${item.ymd}&page=${that.pageIndex}`;
+      
+      window.Loading.show("获取数据中...");
+      $.ajax({
+        type: 'get',
+        url: url,
+        contentType: 'application/json'
+      }).done(function(res, status, xhr) {
+        console.log(res)
+
+        that.modal.title = `${item.ymd}#${item.device_name}`
+        $("#mysqlModal").modal('show')
+        that.$nextTick(() => {
+          that.backupMysqlDays = res.data
         })
 
       }).fail(function(xhr, status, error) {
