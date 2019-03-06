@@ -6,113 +6,6 @@
   .jobs th:nth-child(4), .jobs td:nth-child(4) { text-align: center; width: 5%; }
   .jobs th:nth-last-child(1), .jobs td:nth-last-child(1) { text-align: center; width:15%; }
 
-  #iframe {
-      margin-top: 0
-  }
-  .icon-monitor,.icon-tablet,.icon-mobile-1,.icon-mobile-2,.icon-mobile-3 {
-      margin-right: 7px;
-      margin-top: 20px;
-      width: 17px;
-      height: 16px
-  }
-  .icon-monitor {
-      margin-left: 10px;
-      background-image: url(/images/mon-spr.png);
-      background-position: 0 0;
-      background-repeat: no-repeat
-  }
-  .icon-tablet {
-      background: url(/images/mon-spr.png) no-repeat -24px 0
-  }
-  .icon-mobile-1 {
-      background: url(/images/mon-spr.png) no-repeat -49px 0
-  }
-  .icon-monitor:hover,.icon-monitor.active {
-      background-position: 0 -16px
-  }
-  .icon-tablet:hover,.icon-tablet.active {
-      background-position: -24px -16px
-  }
-  .icon-mobile-1:hover,.icon-mobile-1.active {
-      background-position: -49px -16px
-  }
-  .icon-mobile-2 {
-      background: url(/images/mon-spr.png) no-repeat -71px 0
-  }
-  .icon-mobile-3 {
-      background: url(/images/mon-spr.png) no-repeat -94px 0
-  }
-  .icon-mobile-2:hover,.icon-mobile-2.active {
-      background-position: -71px -16px
-  }
-  .icon-mobile-3:hover,.icon-mobile-3.active {
-      background-position: -94px -16px
-  }
-  #iframe-wrap {
-      height: 100%;
-      overflow: visible;
-      position: relative;
-      z-index: 50
-  }
-  ul.device {
-    display: inline;
-    margin-right: 30px;
-    margin-to: -40px;
-  }
-  ul.device li {
-    display: inline;
-    position: relative;
-    float: right;
-  }
-  .tablet-width {
-      height: 960px!important;
-      margin: 0 auto;
-      padding: 96px 100px 115px 49px;
-      width: 785px;
-      margin-top: 40px;
-      background: url(/images/bgipad.png) no-repeat 0 0;
-      transition: all .5s ease 0s
-  }
-  .tablet-width iframe {
-      height: 960px!important
-  }
-  .mobile-width {
-      height: 703px!important;
-      margin: 0 auto;
-      padding: 41px 115px 100px 75px;
-      width: 1041px;
-      margin-top: 40px;
-      background: url(/images/bgipadw.png) no-repeat;
-      transition: all .5s ease 0s
-  }
-  .mobile-width iframe {
-      height: 704px!important
-  }
-  .mobile-width-2 {
-      height: 540px!important;
-      margin: 0 auto;
-      padding: 102px 25px 159px 23px;
-      width: 337px;
-      margin-top: 40px;
-      background: url(/images/bgiphone.png) no-repeat;
-      transition: all .5s ease 0s
-  }
-  .mobile-width-2 iframe {
-      height: 585px!important
-  }
-  .mobile-width-3 {
-      height: 273px!important;
-      margin: 0 auto;
-      padding: 43px 115px 69px 82px;
-      width: 605px;
-      margin-top: 40px;
-      background: url(/images/bgiphonew.png) no-repeat;
-      transition: all .5s ease 0s
-  }
-  .mobile-width-3 iframe {
-      height: 317px!important
-  }
-
 #appVue
   .col-sm-12
     %ol.breadcrumb
@@ -150,33 +43,16 @@
           %td{'v-text' => 'record.updated_at'}
 
   .modal.fade#iframeModal
-    .modal-dialog{style: 'width:100%;max-width:3170px;height:100%;max-height:3700px;margin:0px;'}
+    .modal-dialog{style: 'width:100%;max-width:1170px;height:100%;max-height:700px;margin:0 auto;'}
       .modal-content{style: 'height:100%;'}
         .modal-header
           %button.close{'type' => 'button', 'data-dismiss' => 'modal', 'aria-label' => 'Close'}
             %span{'aria-hidden' => 'true'} &times;
           %h4.modal-title
             %span{'v-text' => 'iframeTitle'}
-            %ul.device
-              %li.device-monitor
-                %a{'@click' => "switchDevice('device-monitor')"}
-                  .icon-monitor
-              %li.device-mobile
-                %a{'@click' => "switchDevice('device-mobile')"}
-                  .icon-tablet
-              %li.device-mobile
-                %a{'@click' => "switchDevice('device-mobile-1')"}
-                  .icon-mobile-1
-              %li.device-mobile-2
-                %a{'@click' => "switchDevice('device-mobile-2')"}
-                  .icon-mobile-2
-              %li.device-mobile-3
-                %a{'@click' => "switchDevice('device-mobile-3')"}
-                  .icon-mobile-3.active
 
         .modal-body{style: 'width:100%;height:90%;overflow:hidden'}
-          #iframe-wrap.tablet-width
-            %iframe.hidden#iframe{ref:"iframe", style: 'border:none;width:100%;height:100%;overflow:scroll', ':src' => 'iframeSrc'}
-            .loader{style: 'margin: 0 auto;'}
+          %iframe.hidden#iframe{ref:"iframe", style: 'border:none;width:100%;height:100%;overflow:scroll', ':src' => 'iframeSrc'}
+          .loader{style: 'margin: 0 auto;'}
 
 = javascript_include_tag 'account/jobs/index.js'

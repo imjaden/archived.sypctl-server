@@ -1,0 +1,18 @@
+
+%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.operation-logs
+  %tbody
+    - @records.each do |record|
+      %tr{id: "dom_#{record.id}"}
+        %td
+          %span{style: "color: darkgray;"}
+            = record.created_at.strftime("%y-%m-%d %H:%M:%S")
+            &nbsp;-&nbsp;
+          %span.glyphicon.glyphicon-grain
+          = record.description
+
+= will_paginater @records
+
+:javascript
+  $(function() {
+    setTimeout("$('nav, .navbar-header').remove()", 666)
+  })

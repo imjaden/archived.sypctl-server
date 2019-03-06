@@ -1,24 +1,140 @@
+
+:css
+  .operation-logs th:nth-child(1), .operation-logs td:nth-child(1) { width: 100%; }
+
+  #iframe {
+      margin-top: 0
+  }
+  .icon-monitor,.icon-tablet,.icon-mobile-1,.icon-mobile-2,.icon-mobile-3 {
+      margin-right: 7px;
+      margin-top: 20px;
+      width: 17px;
+      height: 16px
+  }
+  .icon-monitor {
+      margin-left: 10px;
+      background-image: url(/images/mon-spr.png);
+      background-position: 0 0;
+      background-repeat: no-repeat
+  }
+  .icon-tablet {
+      background: url(/images/mon-spr.png) no-repeat -24px 0
+  }
+  .icon-mobile-1 {
+      background: url(/images/mon-spr.png) no-repeat -49px 0
+  }
+  .icon-monitor:hover,.icon-monitor.active {
+      background-position: 0 -16px
+  }
+  .icon-tablet:hover,.icon-tablet.active {
+      background-position: -24px -16px
+  }
+  .icon-mobile-1:hover,.icon-mobile-1.active {
+      background-position: -49px -16px
+  }
+  .icon-mobile-2 {
+      background: url(/images/mon-spr.png) no-repeat -71px 0
+  }
+  .icon-mobile-3 {
+      background: url(/images/mon-spr.png) no-repeat -94px 0
+  }
+  .icon-mobile-2:hover,.icon-mobile-2.active {
+      background-position: -71px -16px
+  }
+  .icon-mobile-3:hover,.icon-mobile-3.active {
+      background-position: -94px -16px
+  }
+  #iframe-wrap {
+      height: 100%;
+      overflow: visible;
+      position: relative;
+      z-index: 50
+  }
+  ul.device {
+    display: inline;
+    margin-right: 30px;
+    margin-to: -40px;
+  }
+  ul.device li {
+    display: inline;
+    position: relative;
+    float: left;
+  }
+  .tablet-width {
+      height: auto;
+      width: 885px;
+      margin: 0 auto;
+      padding: 96px 100px 115px 49px;
+      margin-top: 0px;
+      background: url(/images/bgipad.png) no-repeat 0 0;
+      transition: all .5s ease 0s
+  }
+  .tablet-width iframe {
+      height: 960px!important
+  }
+  .mobile-width {
+      height: 785px;
+      width: 1211px;
+      margin: 0 auto;
+      padding: 41px 115px 100px 75px;;
+      margin-top: 0px;
+      background: url(/images/bgipadw.png) no-repeat;
+      transition: all .5s ease 0s
+  }
+  .mobile-width iframe {
+    height: 554px!important
+  }
+  .mobile-width-2 {
+      height: auto;
+      margin: 0 auto;
+      padding: 102px 25px 159px 23px;
+      width: 380px;
+      margin-top: 0px;
+      background: url(/images/bgiphone.png) no-repeat;
+      transition: all .5s ease 0s
+  }
+  .mobile-width-2 iframe {
+      height: 585px!important
+  }
+  .mobile-width-3 {
+      height: auto;
+      width: 780px;
+      margin: 0 auto;
+      padding: 43px 115px 69px 82px;
+      margin-top: 0px;
+      background: url(/images/bgiphonew.png) no-repeat;
+      transition: all .5s ease 0s
+  }
+  .mobile-width-3 iframe {
+      height: 317px!important
+  }
+
 %ol.breadcrumb
   %li 日志中心
   %li
     操作日志
     %a{"data-toggle" => "modal", "data-target" => "#templateModal"}
       %span.glyphicon.glyphicon-info-sign
+  %li
+    %ul.device
+      %li.device-monitor
+        %a{onclick: "Platform.switch('full-width', this)"}
+          .icon-monitor
+      %li.device-mobile
+        %a{onclick: "Platform.switch('tablet-width', this)"}
+          .icon-tablet.active
+      %li.device-mobile
+        %a{onclick: "Platform.switch('mobile-width', this)"}
+          .icon-mobile-1
+      %li.device-mobile-2
+        %a{onclick: "Platform.switch('mobile-width-2', this)"}
+          .icon-mobile-2
+      %li.device-mobile-3
+        %a{onclick: "Platform.switch('mobile-width-3', this)"}
+          .icon-mobile-3
 
-:css
-  .operation-logs th:nth-child(1), .operation-logs td:nth-child(1) { width: 100%; }
-%table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.operation-logs
-  %tbody
-    - @records.each do |record|
-      %tr{id: "dom_#{record.id}"}
-        %td
-          %span{style: "color: darkgray;"}
-            = record.created_at.strftime("%y-%m-%d %H:%M:%S")
-            &nbsp;-&nbsp;
-          %span.glyphicon.glyphicon-grain
-          = record.description
-
-= will_paginater @records
+#iframe-wrap.tablet-width
+  %iframe#iframe{ref:"iframe", style: 'border:none;width:100%;height:100%;min-height:300px;overflow:scroll', src: '/account/_operation_logs'}
 
 #templateModal.modal.fade{"aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
   .modal-dialog{:role => "document"}
@@ -30,7 +146,6 @@
       %pre.modal-body{style: "max-height:450px;overflow:scroll;"}
         loading...
 
-
 :javascript
   $(function() {
     $(".operation-logs td a").each(function() {
@@ -38,5 +153,14 @@
       $(this).attr("href", "javascript:void(0);");
     })
 
+    
+    setTimeout("$('#footer').remove()", 666)
     $("#templateModal .modal-body").html(JSON.stringify(window.OperationLogger.templates, null, 2))
   })
+  window.Platform = {
+    switch: function(platform, ctl) {
+      $(ctl).closest("ul").find("div").removeClass('active')
+      $(ctl).children("div").addClass('active')
+      $("#iframe-wrap").removeClass("full-width tablet-width mobile-width mobile-width-2 mobile-width-3").addClass(platform)
+    }
+  }
