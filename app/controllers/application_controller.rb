@@ -313,7 +313,7 @@ class ApplicationController < Sinatra::Base
   end
 
   def api_authen_params(keys)
-    halt_with_json({message: "参数不足：请提供 #{keys.join(' ,')}"}, 401) if keys.any? { |key| !params.has_key?(key) }
+    halt_with_json({message: "参数不足：请提供 #{keys.join(',')}"}, 401) if keys.any? { |key| !params.has_key?(key) }
   end
 
   private

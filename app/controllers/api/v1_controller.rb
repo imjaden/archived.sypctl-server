@@ -263,6 +263,13 @@ module API
       respond_with_formt_json({data: record.id, message: "接收成功"}, 201)
     end
 
+    post '/upload/mysql_backup' do
+      api_authen_params([:device_uuid, :host, :ymd, :backup_name, :backup_file])
+
+      message = upload_mysql_backup(params)
+      respond_with_formt_json({message: message, code: 201}, 201)
+    end
+
     protected
 
     def authen_api_token(api_token)
@@ -294,6 +301,19 @@ module API
         temp_file = hsh[:backup_file][:tempfile]
         File.open(file_path, "wb") { |file| file.write(temp_file.read) } if temp_file
       end
+      "上传成功"
+    rescue => e
+      puts e.backtrace.select { |line| line.include?(ENV['APP_ROOT_PATH']) }
+      "上传失败, #{__FILE__}@#{__LINE__} - #{e.message}"
+    end
+
+    def upload_mysql_backup(params)
+      ymd_folder = File.join(Setting.path.mysql_backup, params[:device_uuid], params[:host], params[:ymd])
+      FileUtils.mkdir_p(ymd_folder) unless File.exists?(ymd_folder)
+      backup_path = File.join(ymd_folder, params[:backup_name])
+
+      temp_file = params[:backup_file][:tempfile]
+      File.open(backup_path, "wb") { |file| file.write(temp_file.read) } if temp_file
       "上传成功"
     rescue => e
       puts e.backtrace.select { |line| line.include?(ENV['APP_ROOT_PATH']) }
