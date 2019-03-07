@@ -5,9 +5,13 @@
   #iframe {
       margin-top: 0
   }
+  .device-monitor, .device-mobile, .device-mobile, .device-mobile-2, .device-mobile-3 {
+    width: 30px;
+    margin-right: 0px;
+  }
   .icon-monitor,.icon-tablet,.icon-mobile-1,.icon-mobile-2,.icon-mobile-3 {
       margin-right: 7px;
-      margin-top: 20px;
+      margin-top: -20px;
       width: 17px;
       height: 16px
   }
@@ -50,15 +54,27 @@
       position: relative;
       z-index: 50
   }
-  ul.device {
+  ol.device {
     display: inline;
-    margin-right: 30px;
-    margin-to: -40px;
+    margin-right: 10px;
+    margin-top: 0px;
   }
-  ul.device li {
+  ol.device li {
     display: inline;
     position: relative;
     float: left;
+  }
+  .breadcrumb>li:nth-child(n+3):before {
+    content: ""
+  }
+  .breadcrumb>li:nth-child(3) {
+    width: 35px;
+  }
+  .breadcrumb>li:nth-child(n+4) {
+    width: 25px;
+  }
+  .breadcrumb>li:nth-child(n+3) a {
+    width: 100%;
   }
   .tablet-width {
       height: auto;
@@ -115,23 +131,21 @@
     操作日志
     %a{"data-toggle" => "modal", "data-target" => "#templateModal"}
       %span.glyphicon.glyphicon-info-sign
-  %li
-    %ul.device
-      %li.device-monitor
-        %a{onclick: "Platform.switch('full-width', this)"}
-          .icon-monitor
-      %li.device-mobile
-        %a{onclick: "Platform.switch('tablet-width', this)"}
-          .icon-tablet.active
-      %li.device-mobile
-        %a{onclick: "Platform.switch('mobile-width', this)"}
-          .icon-mobile-1
-      %li.device-mobile-2
-        %a{onclick: "Platform.switch('mobile-width-2', this)"}
-          .icon-mobile-2
-      %li.device-mobile-3
-        %a{onclick: "Platform.switch('mobile-width-3', this)"}
-          .icon-mobile-3
+  %li.device-monitor{onclick: "Platform.switch('full-width', this)"}
+    %a
+      .icon-monitor
+  %li.device-mobile{onclick: "Platform.switch('tablet-width', this)"}
+    %a
+      .icon-tablet.active
+  %li.device-mobile{onclick: "Platform.switch('mobile-width', this)"}
+    %a
+      .icon-mobile-1
+  %li.device-mobile-2{onclick: "Platform.switch('mobile-width-2', this)"}
+    %a
+      .icon-mobile-2
+  %li.device-mobile-3{onclick: "Platform.switch('mobile-width-3', this)"}
+    %a
+      .icon-mobile-3
 
 #iframe-wrap.tablet-width
   %iframe#iframe{ref:"iframe", style: 'border:none;width:100%;height:100%;min-height:300px;overflow:scroll', src: '/account/_operation_logs'}
@@ -159,7 +173,7 @@
   })
   window.Platform = {
     switch: function(platform, ctl) {
-      $(ctl).closest("ul").find("div").removeClass('active')
+      $(".breadcrumb").find("div").removeClass('active')
       $(ctl).children("div").addClass('active')
       $("#iframe-wrap").removeClass("full-width tablet-width mobile-width mobile-width-2 mobile-width-3").addClass(platform)
     }

@@ -254,7 +254,7 @@
             %tbody
               %tr{'v-for' => '(item, index) in backupMysqlDays', ':key' => 'item.id'}
                 %td
-                  %a{'v-text' => 'item.backup_name', 'target' => 'blank', ':href' => "'/api/v2/account/download/backup_mysql?host='+item.host+'-'+item.port+'&ymd='+item.ymd+'&backup_name='+item.backup_name"}
+                  %a{'v-text' => 'item.backup_name', 'target' => 'blank', ':href' => "'/api/v2/account/backup_mysql/download?device_uuid='+item.device_uuid+'&host='+item.host+'-'+item.port+'&ymd='+item.ymd+'&backup_name='+item.backup_name"}
                 %td{'v-text' => 'item.backup_md5'}
                 %td{'v-text' => 'item.backup_size'}
                 %td{'v-text' => 'item.backup_duration'}
