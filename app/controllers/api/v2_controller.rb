@@ -210,13 +210,13 @@ module API
     end
 
     get '/account/backup_mysql_meta/list' do
-      records = BackupMysqlMeta.where(device_uuid: params[:device_uuid]).limit(30).offset(params[:page] * 30).map(&:to_hash)
+      records = BackupMysqlMeta.where(device_uuid: params[:device_uuid]).order(updated_at: :desc).limit(30).offset(params[:page] * 30).map(&:to_hash)
 
       respond_with_formt_json({data: records, message: "成功获取#{records.length}条数据"}, 200)
     end
 
     get '/account/backup_mysql_day/list' do
-      records = BackupMysqlDay.where(device_uuid: params[:device_uuid], ymd: params[:ymd]).map(&:to_hash)
+      records = BackupMysqlDay.where(device_uuid: params[:device_uuid], ymd: params[:ymd]).order(backup_size: :desc).map(&:to_hash)
 
       respond_with_formt_json({data: records, message: "成功获取#{records.length}条数据"}, 200)
     end

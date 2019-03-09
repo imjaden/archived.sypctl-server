@@ -49,11 +49,15 @@ new Vue({
       if(this.currentSideMenu.id == 'behavior_log') {
         this.loadMore = true
         this.pageIndex = 0
+        this.file_backups = []
+        this.file_backups_not_exist = []
         this.getBehaviorLogs()
       }
       if(this.currentSideMenu.id == 'mysql_backup') {
         this.loadMore = true
         this.pageIndex = 0
+        this.backupMysqlMetas = []
+        this.backupMysqlDays = []
         this.getBackupMysqlMeta()
       }
     },
@@ -235,6 +239,7 @@ new Vue({
         that.modal.title = `${item.ymd}#${item.device_name}`
         $("#mysqlModal").modal('show')
         that.$nextTick(() => {
+          that.modal.title = `${item.ymd}#${item.device_name}(共${res.data.length}个备份)`
           that.backupMysqlDays = res.data
         })
 
