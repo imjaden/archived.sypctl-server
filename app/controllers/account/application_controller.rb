@@ -33,8 +33,6 @@ module Account
     end
 
     get '/operation_logs' do
-      @records = OperationLog.paginate(page: params[:page], per_page: 20).order(id: :desc)
-
       haml :operation_logs, layout: settings.layout
     end
 
@@ -48,6 +46,16 @@ module Account
       @records = AgentBehaviorLog.paginate(page: params[:page], per_page: 20).order(id: :desc)
 
       haml :agent_behavior_logs, layout: settings.layout
+    end
+
+    get '/sms_records' do
+      haml :sms_records, layout: settings.layout
+    end
+
+    get '/_sms_records' do
+      @records = SmsRecord.paginate(page: params[:page], per_page: 20).order(id: :desc)
+
+      haml :_sms_records, layout: settings.layout
     end
   end
 end

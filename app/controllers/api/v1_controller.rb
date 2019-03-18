@@ -214,6 +214,10 @@ module API
       `date +'%s'`.strip
     end
 
+    get '/ping' do
+      'pong'
+    end
+
     post '/service' do
       api_authen_params([:uuid])
 
@@ -268,6 +272,45 @@ module API
 
       message = upload_mysql_backup(params)
       respond_with_formt_json({message: message, code: 201}, 201)
+    end
+
+    post '/send_sms' do
+      api_authen_params([:mobiles, :project, :message])
+
+      sms_limit = 10 # 每个手机号每小时限量发送短信数量
+      redis_key = 'send_sms_count_cache'
+      result = params[:mobiles].split('.').uniq.map do |mobile|
+        redis_hkey = "#{mobile}/#{Time.now.strftime('%y%m%d%H')}"
+        cached_count = redis.hget(redis_key, redis_hkey).to_i
+        if cached_count < sms_limit
+          if mobile.length == 11
+            res = Aliyun::Sms.send(mobile, Setting.aliyun_sms.exception_template_id, {project: params[:project], message: params[:message]}.to_json)
+            redis.hincrby(redis_key, redis_hkey, 1)
+
+            res_hash = JSON.parse(res.body)
+            sms_record = SmsRecord.create({
+              uuid: generate_uuid,
+              mobile: mobile,
+              message: Setting.aliyun_sms.exception_template.sub('${project}', params[:project]).sub('${message}', params[:message]),
+              state: res_hash['Code'],
+              sms_total_time: res.total_time,
+              sms_code: res_hash['Code'],
+              sms_message: res_hash['Message'],
+              sms_request_id: res_hash['RequestId'],
+              sms_biz_id: res_hash['BizId'],
+              sms_biz_id: res_hash['BizId'],
+              creater_name: 'api#v1',
+              creater_uuid: request.ip
+            })
+            {mobile: mobile, sms_id: sms_record.id, sms_state: sms_record.state}
+          else
+            {mobile: mobile, sms_id: -1, sms_state: 'BadMobile'}
+          end
+        else
+          {mobile: mobile, sms_id: -1, sms_state: 'NoMarginThisHour'}
+        end
+      end
+      respond_with_formt_json({data:result, message: '发送完成', code: 200}, 200)
     end
 
     protected

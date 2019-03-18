@@ -31,7 +31,6 @@ require 'active_support/core_ext/numeric'
 require 'active_support/core_ext/date'
 require 'active_support/core_ext/numeric/time'
 require 'active_support/cache'
-require 'config/assets_handler'
 require 'lib/utils/boot.rb'
 require 'app/models/setting.rb'
 include Utils::Boot

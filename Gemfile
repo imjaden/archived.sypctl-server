@@ -51,3 +51,5 @@ gem 'net-scp', '~>1.2.1'
 
 gem 'whenever', '~>0.10.0'
 gem 'colorize'
+
+gem 'aliyun-sms', '1.1.1', git: 'https://github.com/VICTOR-LUO-F/aliyun-sms.git'

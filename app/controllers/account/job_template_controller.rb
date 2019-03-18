@@ -27,7 +27,7 @@ module Account
 
       if record.save(validate: true)
         flash[:success] = '创建成功'
-        redirect to('/')
+        redirect to("/?id=#{record.id}")
       else
         flash[:danger] = record.errors.messages.to_s
         redirect to('/new')
@@ -65,11 +65,10 @@ module Account
         
       if record.update_attributes(params[:job_template])
         flash[:success] = '更新成功'
-        redirect to("/#{record.id}")
       else
         flash[:danger] = record.errors.messages.to_s
-        redirect to("/?id=#{record.id}")
       end
+      redirect to("/?id=#{record.id}")
     end
 
     delete '/:id' do

@@ -1,6 +1,7 @@
 # encoding: utf-8
 require 'fileutils'
 require 'digest/md5'
+require 'aliyun/sms'
 require 'lib/utils/boot.rb'
 
 include Utils::Boot
@@ -31,6 +32,18 @@ class AssetsHandler < Sinatra::Base
     # set :erb, :layout_engine => :erb, :layout => :layout
     set :haml, layout_engine: :haml, layout: :'/app/views/layouts/layout'
     set :cssengine, 'css'
+
+    Aliyun::Sms.configure do |config|
+      config.access_key_secret = Setting.aliyun_sms.access_key_secret    
+      config.access_key_id = Setting.aliyun_sms.access_key_id            
+      config.action = 'SendSms'                       # default value
+      config.format = 'JSON'                          # http return format, value is 'JSON' or 'XML'
+      config.region_id = 'cn-hangzhou'                # default value      
+      config.sign_name = Setting.aliyun_sms.sign_name                
+      config.signature_method = 'HMAC-SHA1'           # default value
+      config.signature_version = '1.0'                # default value
+      config.version = '2017-05-25'                   # default value
+    end
   end
 
   require 'database.rb'
