@@ -298,9 +298,8 @@ module API
               sms_message: res_hash['Message'],
               sms_request_id: res_hash['RequestId'],
               sms_biz_id: res_hash['BizId'],
-              sms_biz_id: res_hash['BizId'],
-              creater_name: 'api#v1',
-              creater_uuid: request.ip
+              creater_name: params[:creater_name] || 'api#v1',
+              creater_uuid: params[:creater_uuid] || request.ip
             })
             {mobile: mobile, sms_id: sms_record.id, sms_state: sms_record.state}
           else

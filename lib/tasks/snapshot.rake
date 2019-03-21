@@ -39,31 +39,29 @@ namespace :mysql do
       output.push <<-EOF.strip_heredoc
         -- ------------------------------------------------
         -- database snapshot
-        -- auto generated: #{Time.now.strftime("%y-%m-%d %H:%M:%S")}
+        -- generated at: #{Time.now.strftime("%y-%m-%d %H:%M:%S")}
         --
         -- host: #{config[:host]}
         -- port: #{config[:port] || 3306}
         -- username: #{config[:username]}
         -- database: #{config[:database]}
         -- 
-        -- 把该脚本中 DATABASE_NAME 替换为要部署的数据库
         -- ------------------------------------------------
 
-        drop procedure if exists pro_snapshot_method_add_column_unless_exists;
+        drop procedure if exists syppro_add_column;
         delimiter ;;
-        create procedure pro_snapshot_method_add_column_unless_exists(
-            IN param_db_name tinytext,
-            IN param_table_name tinytext,
-            IN param_field_name tinytext,
-            IN param_field_def text
+        create procedure syppro_add_column(
+            in param_table_name tinytext,
+            in param_field_name tinytext,
+            in param_field_def text
         )
         begin
             if not exists (
                 select * from information_schema.columns
-                where column_name=param_field_name and table_name=param_table_name and table_schema=param_db_name
+                where column_name=param_field_name and table_name=param_table_name and table_schema=database()
             )
             then
-                set @ddl = concat('ALTER TABLE ', param_db_name, '.', param_table_name, ' ADD COLUMN ', param_field_name, ' ', param_field_def);
+                set @ddl = concat('alter table ', database(), '.', param_table_name, ' add column ', param_field_name, ' ', param_field_def);
                 prepare stmt from @ddl;
                 execute stmt;
                 select @ddl as '-- 字段调整';
@@ -72,19 +70,111 @@ namespace :mysql do
         ;;
         delimiter ;
 
-        drop procedure if exists pro_snapshot_method_create_table_unless_exists;
+        drop procedure if exists syppro_create_table;
         delimiter ;;
-        create procedure pro_snapshot_method_create_table_unless_exists(
-            IN param_db_name tinytext,
-            IN param_table_name tinytext
+        create procedure syppro_create_table(
+            in param_table_name tinytext
         )
         begin
             if not exists (
                 select * from information_schema.tables
-                where table_name=param_table_name and table_schema=param_db_name
+                where table_name=param_table_name and table_schema=database()
             )
             then
                 select param_table_name as '-- 创建数据表';
+            end if;
+        end
+        ;;
+        delimiter ;
+
+        /*
+         * 判断业务表中是否存在某索引，不存在则创建，存在则没有操作
+         *
+         * 参数:
+         * @param_table_name: 数据表名称
+         * @param_index_name: 索引名称
+         * @param_index_def: 索引列名，多个列名时使用逗号分隔
+         *
+         * 示例:
+         * call syppro_add_index('sys_devices', 'index_uuid', 'uuid');
+         * call syppro_add_index('sys_devices', 'index_code_and_num', 'code,num');
+         */
+        drop procedure if exists syppro_add_index;
+        delimiter ;;
+        create procedure syppro_add_index(
+            in param_table_name tinytext,
+            in param_index_name tinytext,
+            in param_index_def text)
+        begin
+            set @db_name = database();
+            if not exists (
+                select distinct index_name from information_schema.statistics 
+                where table_schema = @db_name and table_name = param_table_name and index_name = param_index_name
+            )
+            then
+                set @ddl = concat('alter table ', @db_name, '.', param_table_name, ' add index ', param_index_name, '(', param_index_def, ')');
+                prepare stmt from @ddl;
+                execute stmt;
+                deallocate prepare stmt; 
+                select @ddl as '-- 索引添加';
+            end if;
+        end
+        ;;
+        delimiter ;
+
+        drop procedure if exists syppro_add_unique_index;
+        delimiter ;;
+        create procedure syppro_add_unique_index(
+            in param_table_name tinytext,
+            in param_index_name tinytext,
+            in param_index_def text)
+        begin
+            set @db_name = database();
+            if not exists (
+                select distinct index_name from information_schema.statistics 
+                where table_schema = @db_name and table_name = param_table_name and index_name = param_index_name
+            )
+            then
+                set @ddl = concat('alter table ', @db_name, '.', param_table_name, ' add unique index ', param_index_name, '(', param_index_def, ')');
+                prepare stmt from @ddl;
+                execute stmt;
+                deallocate prepare stmt; 
+                select @ddl as '-- 索引添加';
+            end if;
+        end
+        ;;
+        delimiter ;
+
+        /*
+         * 判断业务表中是否存在某索引，存在则删除，不存在则没有操作
+         *
+         * 参数:
+         * @param_table_name: 数据表名称
+         * @param_index_name: 索引名称
+         * @param_index_def: 索引列名，多个列名时使用逗号分隔
+         *
+         * 示例:
+         * call syppro_del_index('sys_devices', 'index_uuid', 'uuid');
+         * call syppro_del_index('sys_devices', 'index_code_and_num', 'code,num');
+         */
+        drop procedure if exists syppro_del_index;
+        delimiter ;;
+        create procedure syppro_del_index(
+            in param_table_name tinytext,
+            in param_index_name tinytext,
+            in param_index_def text)
+        begin
+            set @db_name = database();
+            if exists (
+                select distinct index_name from information_schema.statistics 
+                where table_schema = @db_name and table_name = param_table_name and index_name = param_index_name
+            )
+            then
+                set @ddl = concat('alter table ', @db_name, '.', param_table_name, ' drop index ', param_index_name, '(', param_index_def, ')');
+                prepare stmt from @ddl;
+                execute stmt;
+                deallocate prepare stmt; 
+                select @ddl as '-- 索引删除';
             end if;
         end
         ;;
@@ -97,10 +187,10 @@ namespace :mysql do
         create_table_sql = conn.exec_query("show create table #{table_name}").to_a.flatten[0]["Create Table"]
         increment_zero = create_table_sql.scan(/(AUTO_INCREMENT=\d+)/).flatten[0]
         create_table_sql = create_table_sql.sub(increment_zero, "AUTO_INCREMENT=0") if increment_zero
-        create_table_sql =create_table_sql.sub("CREATE TABLE ", "CREATE TABLE IF NOT EXISTS `DATABASE_NAME`.") + ";"
+        create_table_sql =create_table_sql.sub("CREATE TABLE ", "CREATE TABLE IF NOT EXISTS ") + ";"
 
         output.push ""
-        output.push "call pro_snapshot_method_create_table_unless_exists('DATABASE_NAME', '#{table_name}');"
+        output.push "call syppro_create_table('#{table_name}');"
         output.push create_table_sql
 
         conn.exec_query("desc #{table_name}").to_a.flatten.map { |h| h['Field'] }.each do |field|
@@ -109,7 +199,7 @@ namespace :mysql do
           field_def = 'datetime NOT NULL DEFAULT CURRENT_TIMESTAMP' if field == 'created_at'
           field_def = 'datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP' if field == 'updated_at'
 
-          procedures_output.push "call pro_snapshot_method_add_column_unless_exists('DATABASE_NAME', '#{table_name}', '#{field}', '#{field_def}');"
+          procedures_output.push "call syppro_add_column('#{table_name}', '#{field}', '#{field_def}');"
         end
       end
       output.push "-- procedures"
@@ -162,25 +252,21 @@ namespace :mysql do
         - database: #{config[:database]}
 
         快照详情:
-        - 路径: #{snapshot_path.sub(ENV['APP_ROOT_PATH'], '.')}
+        - 路径: #{snapshot_path.gsub(ENV['APP_ROOT_PATH'], '.')}
         - 大小: #{File.size(snapshot_path).number_to_human_size}
         - 哈希: #{digest_file_md5(snapshot_path)}
         - 更新时间: #{File.mtime(snapshot_path)}
       EOF
 
-      snapshot_sql = File.read(snapshot_path).gsub("DATABASE_NAME", config[:database])
-      snapshot_tmp_path = File.join(ENV['APP_ROOT_PATH'], 'tmp', snapshot_name)
-      File.open(snapshot_tmp_path, "w:utf-8") { |file| file.puts(snapshot_sql) }
-
-      snapshot_output_path = snapshot_tmp_path + ".output"
-      command = utils_import_sql_file_command(snapshot_tmp_path, config, snapshot_output_path)
+      snapshot_output_path = File.join(ENV['APP_ROOT_PATH'], 'tmp', snapshot_name + '.output')
+      command = utils_import_sql_file_command(snapshot_path, config, snapshot_output_path)
       File.delete(snapshot_output_path) if File.exists?(snapshot_output_path)
 
       `#{command}`
 
       puts "\n加载快照结果:"
-      puts "- 执行命令: $ #{command}"
-      puts "- 输出日志: #{snapshot_output_path}"
+      puts "- 执行命令: $ #{command.gsub(ENV['APP_ROOT_PATH'], '.')}"
+      puts "- 输出日志: #{snapshot_output_path.gsub(ENV['APP_ROOT_PATH'], '.')}"
       if File.exists?(snapshot_output_path) 
         if File.readlines(snapshot_output_path).count > 1
           puts "- 日志明细:"

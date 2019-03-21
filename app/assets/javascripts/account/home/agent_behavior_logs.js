@@ -17,6 +17,17 @@ new Vue({
   },
   created() {
     this.getBehaviorLogs()
+    let that = this
+    window.onscroll = function(){
+  　　if(window.App.getScrollTop() + window.App.getWindowHeight() == window.App.getScrollHeight()){
+        console.log('scroll bottomed!')
+        console.log('this.pageIndex', that.pageIndex)
+        if(that.pageIndex >= 0) {
+          that.pageIndex = that.pageIndex + 1
+          that.getBehaviorLogs()
+        }
+  　　}
+    };
   },
   methods: {
     getBehaviorLogs() {

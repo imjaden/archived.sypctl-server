@@ -200,13 +200,13 @@ module API
     get '/account/device_behavior_log/list' do
       records = AgentBehaviorLog.where(device_uuid: params[:device_uuid]).order(id: :desc).limit(30).offset(params[:page] * 30).map(&:to_hash)
 
-      respond_with_formt_json({data: records, message: "成功获取#{records.length}条数据"}, 200)
+      respond_with_formt_json({data: records, message: "第#{params[:page]+1}页#{records.length}条数据"}, 200)
     end
 
     get '/account/agent_behavior_log/list' do
       records = AgentBehaviorLog.order(id: :desc).limit(30).offset(params[:page] * 30).map(&:to_hash)
 
-      respond_with_formt_json({data: records, message: "成功获取#{records.length}条数据"}, 200)
+      respond_with_formt_json({data: records, message: "第#{params[:page]+1}页#{records.length}条数据"}, 200)
     end
 
     get '/account/backup_mysql_meta/list' do

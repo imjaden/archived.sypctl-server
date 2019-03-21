@@ -168,9 +168,9 @@
     })
 
     
-    setTimeout("$('#footer').remove()", 666)
     $("#templateModal .modal-body").html(JSON.stringify(window.OperationLogger.templates, null, 2))
   })
+
   window.Platform = {
     switch: function(platform, ctl) {
       $(".breadcrumb").find("div").removeClass('active')

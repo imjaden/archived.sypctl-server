@@ -1,11 +1,11 @@
 upstream sypctl-server-unicorn {
-   server unix:/usr/local/src/sypctl-server/tmp/unicorn.sock fail_timeout=0;
+   server unix:/Users/junjieli/Work/syp-apps/sypctl-server/tmp/unicorn.sock fail_timeout=0;
 }
 
 server {
-    listen 80;
+    listen 81;
     listen 443 ssl;
-    server_name sypctl.com;
+    server_name 127.0.0.1 localhost;
 
     ssl on;
     ssl_certificate /etc/nginx/conf.d/sypctl_com_ssl/sypctl_com.crt;

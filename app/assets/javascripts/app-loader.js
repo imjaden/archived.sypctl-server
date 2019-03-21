@@ -32,5 +32,19 @@
          window.App.breadcrumbSearch(this);
        }  
     });
+
+    let params = window.Param.parse();
+    if(params['keyword'] && params['keyword'].length && params['keyword-klass'] && params['keyword-klass'].length) {
+        let klasses = params['keyword-klass'].split(','),
+            keyword = $.trim(params['keyword']),
+            len = klasses.length,
+            i;
+        for(i = 0; i < len; i ++) {
+            $(klasses[i]).html(function() {
+                console.log(keyword, $(this).text())
+                return $(this).text().replace(decodeURI(keyword), "<font style=\"background:rgb(255,253,84);color:black;\">"+decodeURI(keyword)+"</font>");
+            }); 
+        }
+    }
   });
 }).call(this);

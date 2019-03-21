@@ -3,10 +3,29 @@ window.App = {
     let html = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">' +
       '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' + 
       message +
-      '<br><small>' + new Date().toISOString().replace('T', ' ').split('.')[0] + '</small>' +
+    '<br><span class="alert-date" data-date="' +new Date().valueOf() + '"></span>' +
     '</div>';
 
     $(".system-notify").prepend(html)
+    let tmpDate, interval, text;
+    $(".system-notify .alert-date").each(function(ctl) {
+      tmpDate = $(this).data("date")
+      if(tmpDate) {
+        interval = (new Date().valueOf() - parseInt(tmpDate))/1000
+        if(interval < 5) {
+          text = '刚刚'
+        } else if(interval < 60 ) {
+          text = parseInt(interval) + '秒前'
+        } else if(interval < 60*60) {
+          interval = interval/60
+          text = parseInt(interval) + '分钟前'
+        } else if(interval < 24*60*60) {
+          interval = interval/24*60*60
+          text = parseInt(interval) + '天前'
+        }
+        $(this).html(text)
+      }
+    })
   },
   addSuccessNotify: function(message) {
     window.App.addNotify(message, 'success')
@@ -244,5 +263,36 @@ window.App = {
       $('.visit-menus').addClass('hidden')
       $('.system-notify').removeClass('hidden')
     }
+  },
+  getScrollTop: function(){
+  　　var scrollTop = 0, bodyScrollTop = 0, documentScrollTop = 0;
+  　　if(document.body){
+  　　　　bodyScrollTop = document.body.scrollTop;
+  　　}
+  　　if(document.documentElement){
+  　　　　documentScrollTop = document.documentElement.scrollTop;
+  　　}
+  　　scrollTop = (bodyScrollTop - documentScrollTop > 0) ? bodyScrollTop : documentScrollTop;
+  　　return scrollTop;
+  },
+  getScrollHeight: function(){
+  　　var scrollHeight = 0, bodyScrollHeight = 0, documentScrollHeight = 0;
+  　　if(document.body){
+  　　　　bodyScrollHeight = document.body.scrollHeight;
+  　　}
+  　　if(document.documentElement){
+  　　　　documentScrollHeight = document.documentElement.scrollHeight;
+  　　}
+  　　scrollHeight = (bodyScrollHeight - documentScrollHeight > 0) ? bodyScrollHeight : documentScrollHeight;
+  　　return scrollHeight;
+  },
+  getWindowHeight: function(){
+  　　var windowHeight = 0;
+  　　if(document.compatMode == "CSS1Compat"){
+  　　　　windowHeight = document.documentElement.clientHeight;
+  　　}else{
+  　　　　windowHeight = document.body.clientHeight;
+  　　}
+  　　return windowHeight;
   }
 };

@@ -8,23 +8,43 @@
 
 html, body {
   background: #f0f0f0;
+  width:100%;min-height:100%;position:relative;
 }
 .system-notify,
 .visit-menus {
   /*z-index: 9999;*/
   font-size: 14px;
   position: fixed;
+  filter: alpha(Opacity=85);
+  -moz-opacity: 0.85;
+  opacity: 0.85;
+
 }
 .visit-menus {
-  width: 200px;
-  min-height: 400px;
+  width: 250px;
+}
+.visit-menus ul {
+  height: 450px;
+  overflow: scroll;
 }
 .top-right {
   right: 0px;
   top: 50px;
 }
 .system-notify .alert { 
-  width: 200px;
+  width: 150px;
+  font-size: 14px;
+  padding: 10px 5px;
+  margin-bottom: 5px;
+}
+.system-notify .alert .alert-date { 
+  font-size: 12px;
+  color: gray;
+}
+.alert-dismissible .close {
+    position: relative;
+    top: -5px;
+    right: 0px;
 }
 .system-notify .alert small { 
   color: darkgray;
@@ -75,17 +95,15 @@ a:hover {
   text-decoration: none;
   background: transparent; 
 }
-
 #footer {
-  position: absolute;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-top: 5px;
   text-align: center;
   width: 100%;
   font-size: 14px;
   line-height: 20px;
   color: #808080;
-  font-family: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,serif;
-  bottom: 5px;
-  top: expression(document.body.clientHeight-this.style.pixelHeight+document.body.scrollTop); 
 }
 #footer a:hover {
   text-decoration: underline;
