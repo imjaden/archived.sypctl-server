@@ -338,7 +338,7 @@ class ApplicationController < Sinatra::Base
 
   def cookie_name
     @cookie_name ||= begin
-      version_major = ENV['APP_VERSION'].split('.').first(2).join('.')
+      version_major = ENV['APP_VERSION'] # .split('.').first(2).join('.')
       "authen-#{Setting.app_name}-#{ENV['RACK_ENV']}-#{version_major}"
     end
   end

@@ -13,8 +13,11 @@ class User < ActiveRecord::Base
       user_num: params[:user_num],
       password: ::Digest::MD5.hexdigest(params[:user_pass])
     }
-    user = find_by(user_num: params[:user_num])
-    [user, "登录成功"]
+    if user = find_by(user_num: params[:user_num], user_pass: ::Digest::MD5.hexdigest(params[:user_pass]))
+      [user, "登录成功"]
+    else
+      [nil, "用户不存在或密码错误"]
+    end
     # response = HTTParty.post "http://shengyiplus.com/api/v1.1/user/authentication", body: options.to_json
     # if response.code == 200
     #   res_hash = ::JSON.parse(response.body)['data']
