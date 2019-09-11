@@ -1,0 +1,4 @@
+{
+  "backup_root": "/data",
+  "backup_level": "AliyunECS"
+}
