@@ -178,6 +178,22 @@ module API
       send_file(version_file_path, type: 'application/java-archive', filename: File.basename(version_file_path), disposition: 'attachment')
     end
 
+    # snapshot#v2
+    post '/upload/backup_file' do
+      api_authen_params([:device_uuid, :backup_uuid, :file_object, :snapshot_filename])
+
+      message = upload_backup_file(params)
+      respond_with_formt_json({message: message, code: 201}, 201)
+    end
+
+    post '/upload/backup_snapshot' do
+      api_authen_params([:device_uuid, :backup_uuid, :backup_path])
+
+      message = upload_backup_snapshot(params)
+      respond_with_formt_json({message: message, code: 201}, 201)
+    end
+
+    # deprecated
     post '/upload/file_backup' do
       api_authen_params([:device_uuid, :file_uuid, :archive_file_name, :backup_file])
 
@@ -192,6 +208,21 @@ module API
       respond_with_formt_json({message: message, code: 201}, 201)
     end
     
+    post '/update/backup_snapshot' do
+      api_authen_params([:device_uuid, :file_backup_config, :file_backup_monitor])
+
+      record = Device.find_by(uuid: params[:device_uuid])
+      halt_with_format_json({message: "查询设备失败,#{params[:device_uuid]}"}, 200) unless record
+
+      record.update_attributes({
+        file_backup_config: params[:file_backup_config],
+        file_backup_monitor: params[:file_backup_monitor],
+        file_backup_updated_at: Time.now.strftime('%Y/%m/%d %H:%M:%S')
+      })
+      respond_with_formt_json({message: '更新成功', code: 201}, 201)
+    end
+
+    # deprecated
     post '/update/file_backup' do
       api_authen_params([:device_uuid, :file_backup_config, :file_backup_monitor])
 
@@ -318,6 +349,28 @@ module API
       Setting.api_keys.any? { |key| md5("#{key}#{request.path}#{key}") == api_token }
     end
 
+    def upload_backup_file(params)
+      snapshot_backup_path = File.join(Setting.path.file_backup, params[:device_uuid], 'snapshots')
+      FileUtils.mkdir_p(snapshot_backup_path) unless File.exists?(snapshot_backup_path)
+
+      backup_file_object = params[:file_object][:tempfile]
+      snapshot_filepath = File.join(snapshot_backup_path, params[:snapshot_filename])
+      File.open(snapshot_filepath, "wb") { |file| file.write(backup_file_object.read) } if backup_file_object
+      "上传成功"
+    rescue => e
+      puts e.backtrace.select { |line| line.include?(ENV['APP_ROOT_PATH']) }
+      "上传失败, #{__FILE__}@#{__LINE__} - #{e.message}"
+    end
+
+    def upload_backup_snapshot(params)
+      device_backup_path = File.join(Setting.path.file_backup, params[:device_uuid])
+      FileUtils.mkdir_p(device_backup_path) unless File.exists?(device_backup_path)
+
+      snapshot_instance_path = File.join(device_backup_path, "#{params[:backup_uuid]}-snapshot.json")
+      File.open(snapshot_instance_path, 'w:utf-8') { |file| file.puts(params.to_json) }
+    end
+
+    # deprecated
     def upload_file_backup(params)
       file_folder = File.join(Setting.path.file_backup, params[:device_uuid], params[:file_uuid])
       FileUtils.mkdir_p(file_folder) unless File.exists?(file_folder)

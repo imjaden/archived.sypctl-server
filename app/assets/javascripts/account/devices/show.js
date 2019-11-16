@@ -14,8 +14,8 @@ new Vue({
         {label: 'SSH 信息', id: 'ssh'}
       ],
       currentSideMenu: {},
-      file_backups: [],
-      file_backups_not_exist: [],
+      fileBackups: [],
+      fileBackup: {},
       behaviorLogs: [],
       pageIndex: 0,
       loadMore: true,
@@ -49,8 +49,7 @@ new Vue({
       if(this.currentSideMenu.id == 'behavior_log') {
         this.loadMore = true
         this.pageIndex = 0
-        this.file_backups = []
-        this.file_backups_not_exist = []
+        this.fileBackups = []
         this.getBehaviorLogs()
       }
       if(this.currentSideMenu.id == 'mysql_backup') {
@@ -64,7 +63,7 @@ new Vue({
     getRecord(callback) {
       let that = this,
           uuid = window.location.pathname.split('/').reverse()[0],
-          data, service_monitor, file_backups, file_backups_keys, array;
+          data, service_monitor, fileBackups, array;
       window.Loading.show("获取数据中...");
       $.ajax({
         type: 'get',
@@ -77,23 +76,9 @@ new Vue({
           window.App.addSuccessNotify(res.message)
 
           try {
-            array = []
-            file_backups = JSON.parse(data.file_backup_monitor || "{\"file_list\": []}")
-            file_backups_keys = Object.keys(file_backups)
-            file_backups_keys.forEach(function(key) {
-              if(file_backups[key]['file_list']) {
-                Object.keys(file_backups[key]['file_list']).forEach(function(k) {
-                  file_backups[key]['file_list'][k]['uuid'] = file_backups[key]['uuid']
-                  file_backups[key]['file_list'][k]['file_path'] = file_backups[key]['file_path'] + '/' + k
-                  array.push(file_backups[key]['file_list'][k])
-                })
-              } else {
-                 array.push(file_backups[key])
-              } 
-            })
-            that.file_backups = array.sort((a, b) => { return (b['file_mtime'] || 0) - (a['file_mtime'] || 0); })
-            that.file_backups_not_exist = JSON.parse(data.file_backup_config || "[]").filter(function(item) { return file_backups_keys.indexOf(item.uuid) < 0;})
-
+            fileBackups = JSON.parse(data.file_backup_monitor || "{\"file_list\": []}")
+            that.fileBackups = fileBackups
+            console.log('fileBackups', fileBackups)
           } catch(e) {
             console.log(e)
           }
@@ -159,10 +144,11 @@ new Vue({
         this.modal.body = JSON.stringify(JSON.parse(this.record.service_config), null, 4)
       }
     },
-    getBackupFile(type, device_uuid, file_uuid, archive_file_name, file_path) {
+
+    getBackupFile(type, file) {
       let that = this,
-          url = `/api/v2/account/file_backup/${type}?device_uuid=${device_uuid}&file_uuid=${file_uuid}&archive_file_name=${archive_file_name}`;
-      
+          url = `/api/v2/account/file_backup/${type}?device_uuid=${file.device_uuid}&snapshot_filename=${file.snapshot_filename}`
+
       if(type == 'download') {
         window.open(url, 'blank')
         return false
@@ -174,7 +160,7 @@ new Vue({
         contentType: 'application/json'
       }).done(function(res, status, xhr) {
         console.log(res)
-        that.modal.title = file_path
+        that.modal.title = file.file_path
         that.modal.body = res.code == 200 ? res.data : res.message
         $("#infoModal").modal('show')
       }).fail(function(xhr, status, error) {
@@ -182,6 +168,28 @@ new Vue({
         window.Loading.hide();
       });
     },
+    getBackupFileTree(item) {
+      this.modal.title = item.backup_path
+      this.modal.body = item.file_tree
+      $("#infoModal").modal('show')
+    },
+    getBackupFileList(item) {
+      item.file_list_array = Object.keys(item.file_list).map((file_path) => {
+        let file = item.file_list[file_path]
+        file['file_path'] = file_path
+        file['snapshot_filename'] = file.pmd5 + "-" + file.mtime + "-" + file_path.split('/').pop()
+        return file
+      })
+      
+      this.fileBackup = item
+      $(".file-list").removeClass("hidden")
+      $(".file-backups").addClass("hidden")
+    },
+    backFileBackups() {
+      $(".file-list").addClass("hidden")
+      $(".file-backups").removeClass("hidden")
+    },
+
     getBehaviorLogs() {
       let that = this,
           url = `/api/v2/account/device_behavior_log/list?device_uuid=${that.record.uuid}&page=${that.pageIndex}`;

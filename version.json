@@ -4,5 +4,5 @@
   "commit:description": "开发版本，每次 commit 时 +1",
   "major": 0,
   "minor": 1,
-  "commit": 107
+  "commit": 108
 }

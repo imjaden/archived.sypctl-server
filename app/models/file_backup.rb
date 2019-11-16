@@ -24,7 +24,7 @@ class FileBackup < ActiveRecord::Base
   end
 
   def self.refresh_file_backup_cache
-    records = FileBackup.all.order(id: :desc).map { |fb| { uuid: fb.uuid, file_path: fb.file_path, description: fb.description }}.to_json
+    records = FileBackup.all.order(id: :desc).map { |fb| { backup_uuid: fb.uuid, backup_path: fb.file_path, backup_description: fb.description }}.to_json
 
     cache_path = File.join(ENV['APP_ROOT_PATH'], 'tmp/file-backups')
     FileUtils.mkdir_p(cache_path) unless File.exists?(cache_path)
