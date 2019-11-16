@@ -140,21 +140,21 @@ module API
     end
 
     get '/account/file_backup/read' do
-      authen_api_token([:device_uuid, :file_uuid, :archive_file_name])
+      authen_api_token([:device_uuid, :snapshot_filename])
 
-      file_path = File.join(Setting.path.file_backup, params[:device_uuid], params[:file_uuid], params[:archive_file_name])
+      file_path = File.join(Setting.path.file_backup, params[:device_uuid], 'snapshots', params[:snapshot_filename])
       data = File.exists?(file_path) ? File.read(file_path) : "文件不存在 #{file_path}"
       
       respond_with_formt_json({data: data, message: "备份文件读取成功"}, 200)
     end
 
     get '/account/file_backup/download' do
-      authen_api_token([:device_uuid, :file_uuid, :archive_file_name])
+      authen_api_token([:device_uuid, :snapshot_filename])
 
-      file_path = File.join(Setting.path.file_backup, params[:device_uuid], params[:file_uuid], params[:archive_file_name])
-      halt_with_format_json({message: "文件不存在 #{params[:archive_file_name]}"}, 200) unless File.exists?(file_path) 
+      file_path = File.join(Setting.path.file_backup, params[:device_uuid], 'snapshots', params[:snapshot_filename])
+      halt_with_format_json({message: "文件不存在 #{params[:snapshot_filename]}"}, 200) unless File.exists?(file_path) 
       
-      send_file(file_path, type: 'text/plain', filename: params[:archive_file_name], disposition: 'attachment')
+      send_file(file_path, type: 'text/plain', filename: params[:snapshot_filename], disposition: 'attachment')
     end
 
     get '/account/file_backup/db_info' do
