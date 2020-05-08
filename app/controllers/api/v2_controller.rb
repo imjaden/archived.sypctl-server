@@ -1,13 +1,11 @@
 # encoding: utf-8
 require 'digest/md5'
 require 'securerandom'
-
 #
 # portal ui 使用
 #
 module API
   class V2Controller < API::ApplicationController
-
     before do
       if Setting.website.api_key
         halt_with_format_json({message: '接口验证失败：请提供 api_token'}, 401) unless params[:api_token]
@@ -231,10 +229,133 @@ module API
       send_file(backup_path, type: 'application/x-gzip ', filename: params[:backup_name], disposition: 'attachment')
     end
 
+    get '/account/document/list' do
+      documents = Document.all.order(order: :asc).map(&:to_hash)
+      document_groups = DocumentGroup.order(order: :asc).map(&:to_hash)
+
+      records = document_groups.map do |hsh|
+        hsh[:documents] = documents.select { |h| h[:group_uuid] == hsh[:uuid] }
+        hsh
+      end
+
+      respond_with_formt_json({data: records, message: "查询成功"}, 200)
+    end
+
+    post '/account/document/create' do
+      params[:document][:group_uuid] ||= ''
+      params[:document][:uuid] ||= generate_uuid
+      record = Document.create(params[:document])
+      record.create_history_snapshot
+
+      respond_with_formt_json({data: record.to_hash, message: "创建成功"}, 200)
+    end
+
+    get '/account/document/query' do
+      authen_api_token([:uuid])
+
+      record = Document.find_by(uuid: params[:uuid])
+
+      respond_with_formt_json({data: record.to_hash, message: "查询成功"}, 200)
+    end
+
+    put '/account/document/update' do
+      authen_api_token([:uuid])
+
+      record = Document.find_by(uuid: params[:uuid])
+      record.update_attributes(params[:document])
+      record.create_history_snapshot
+
+      respond_with_formt_json({data: record.to_hash, message: "查询成功"}, 200)
+    end
+
+    delete '/account/document/delete' do
+    end
+
+    post '/account/document_group/create' do
+      params[:document_group][:uuid] ||= generate_uuid
+      record = DocumentGroup.create(params[:document_group])
+
+      respond_with_formt_json({data: record.to_hash, message: "创建成功"}, 200)
+    end
+
+    get '/account/document_group/list' do
+      authen_api_token([:uuid])
+
+      records = DocumentGroup.all.map(&:to_hash)
+
+      respond_with_formt_json({data: records, message: "查询成功"}, 200)
+    end
+
+    get '/account/document_group/query' do
+      authen_api_token([:uuid])
+
+      record = DocumentGroup.find_by(uuid: params[:uuid])
+
+      respond_with_formt_json({data: record.to_hash, message: "查询成功"}, 200)
+    end
+
+    put '/account/document_group/update' do
+      authen_api_token([:uuid])
+
+      record = DocumentGroup.find_by(uuid: params[:uuid])
+      record.update_attributes(params[:document_group])
+
+      respond_with_formt_json({data: record.to_hash, message: "查询成功"}, 200)
+    end
+
+    get '/account/image/list' do
+      records = Image.order(id: :desc).map(&:to_hash)
+
+      respond_with_formt_json({data: records, message: "查询成功"}, 200)
+    end
+
+    post '/account/image/upload' do
+      halt_with_json({message: "上传失败"}, 201) unless res = upload_image(params)
+
+      image = Image.create({
+        uuid: generate_uuid,
+        creater_uuid: 'todo',
+        md5: res[:file_md5],
+        file_name: res[:file_name],
+        origin_file_name: res[:origin_file_name],
+        file_size: res[:file_size],
+        file_path: res[:file_path]
+      })
+      respond_with_json({message: "上传成功", data: image.to_hash}, 201)
+    end
+
     protected
 
     def authen_api_token(api_token)
       Setting.api_keys.any? { |key| md5("#{key}#{request.path}#{key}") == api_token }
+    end
+
+    def upload_image(params)
+      image_md5, image_path = nil, nil
+      image_folder = File.join(Setting.path.images)
+      FileUtils.mkdir_p(image_folder) unless File.exist?(image_folder)
+
+      form_data = params[:file]
+      if form_data && (temp_file = form_data[:tempfile])
+        extname = File.extname(form_data[:filename])
+        image_path = File.join(image_folder, "#{generate_uuid}#{extname}")
+        begin
+          FileUtils.rm_rf(image_path) if File.exists?(image_path)
+          File.open(image_path, "wb") { |file| file.write(temp_file.read) }
+          image_md5 = digest_file_md5(image_path)
+        rescue => e
+          puts "#{__FILE__}:#{__LINE__} #{e.message}"
+        end
+        
+        {
+          file_name: File.basename(image_path),
+          origin_file_name: form_data[:filename],
+          file_type: form_data[:type],
+          file_size: File.size(image_path),
+          file_path: image_path,
+          file_md5: image_md5
+        }
+      end
     end
   end
 end

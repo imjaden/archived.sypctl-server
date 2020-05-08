@@ -1,0 +1,67 @@
+= stylesheet_link_tag 'codemirror/lib/codemirror'
+= stylesheet_link_tag 'codemirror/theme/material'
+= stylesheet_link_tag 'codemirror/addon/dialog/dialog'
+= stylesheet_link_tag 'markdown-editor-style'
+= stylesheet_link_tag 'github-markdown'
+= stylesheet_link_tag 'prism'
+
+#appVue
+  .col-sm-6
+    - form_for @record = {}, '', method: "post", class: "form-horizontal", id: "recordForm" do |f|
+      - field_set_tag do
+        .form-group
+          = f.label '文档名称', class: "col-sm-2 control-label"
+          .col-sm-3
+            = f.text_field :title, class: "form-control", placeholder: "文档名称, 必填项", 'v-model' => 'title'
+          .col-sm-3
+            %select.form-control{'v-model' => 'groupUuid'}
+              %option{'v-for' => '(item, inx) in groups', ':key' => 'item.uuid', ':value' => 'item.uuid', 'v-text' => 'item.title'}
+          .col-sm-1{style: "padding-top:10px;"}
+            %a{'@click' => 'queryGroupAction'}
+              %span.glyphicon.glyphicon-refresh
+            %a{href: "/account/document_groups/new", target: "blank"}
+              %span.glyphicon.glyphicon-plus
+        .form-group
+          = f.label '文档属性', class: "col-sm-2 control-label"
+          .col-sm-8{style: 'padding-top: 7px;'}
+            %input{type: 'radio', id: '项目文档', value: '项目文档', 'v-model' => 'tags'}
+            %label{for: '项目文档'} 项目文档
+            &nbsp;
+            %input{type: 'radio', id: '测试报告', value: '测试报告', 'v-model' => 'tags'}
+            %label{for: '测试报告'} 测试报告
+            &nbsp;
+            %input{type: 'radio', id: '说明文档', value: '说明文档', 'v-model' => 'tags'}
+            %label{for: '说明文档'} 说明文档
+            &nbsp;
+            %input{type: 'radio', id: '测试用例', value: '测试用例', 'v-model' => 'tags'}
+            %label{for: '测试用例'} 测试用例
+
+        .form-group
+          = f.label '文档内容', class: "col-sm-2 control-label hidden"
+          .col-sm-7.editor-wrap
+            = f.text_area :content, class: "form-control", placeholder: "文档内容, 必填项", 'v-model' => 'content'
+            = f.text_area :html, class: "form-control", placeholder: "", 'v-model' => 'html', style: 'display: none;'
+        .form-group{style: 'margin-top: 5px;'}
+          .col-sm-6
+            = button_tag "提交", class: "btn btn-primary", '@click' => 'btnClickHandler'
+            = button_tag "取消", class: "btn btn-default", onclick: "window.history.go(-1);"
+
+  .col-sm-6
+    .preview-wrap
+      .markdown-body
+
+= javascript_include_tag 'marked.min'
+= javascript_include_tag 'codemirror/lib/codemirror.js'
+= javascript_include_tag 'codemirror/addon/edit/continuelist.js'
+= javascript_include_tag 'codemirror/addon/edit/matchbrackets.js'
+= javascript_include_tag 'codemirror/addon/edit/closebrackets.js'
+= javascript_include_tag 'codemirror/mode/markdown/markdown.js'
+= javascript_include_tag 'codemirror/keymap/sublime.js'
+= javascript_include_tag 'codemirror/addon/search/search.js'
+= javascript_include_tag 'codemirror/addon/search/searchcursor.js'
+= javascript_include_tag 'codemirror/addon/dialog/dialog.js'
+= javascript_include_tag 'codemirror/addon/comment/comment.js'
+= javascript_include_tag 'codemirror/addon/wrap/hardwrap.js'
+= javascript_include_tag 'prism.js'
+
+= javascript_include_tag 'account/documents/form'

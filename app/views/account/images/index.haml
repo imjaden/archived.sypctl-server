@@ -1,0 +1,107 @@
+= stylesheet_link_tag 'element-ui@2.4.11.css'
+= javascript_include_tag 'element-ui@2.4.11.js'
+= javascript_include_tag 'spark-md5.min.js'
+= javascript_include_tag 'vue-clipboard.min@0.3.1'
+
+%ol.breadcrumb
+  %li 应用中心
+  %li= link_to "应用管理", url_for("/")
+  %li 上传版本
+
+:css
+  .upload-demo,
+  .upload-demo .el-upload,
+  .upload-demo .el-upload .el-upload-dragger {
+    width: 100%;
+    min-height: 150px;
+  }
+  .upload-demo .el-upload .el-upload-dragger {
+    padding-top: 0px;
+  }
+  .upload-version-container .el-icon-upload {
+    font-size: 67px;
+    color: #c0c4cc;
+    margin: 40px 0 16px;
+    line-height: 50px;
+  }
+  .upload-demo .el-upload__input {
+    display: none;
+  }
+  .upload-demo .el-upload__tip {
+    text-align: center;
+  }
+  /*
+   * 图标管理、选择图标时样式
+   */
+  .bs-glyphicons {
+    margin: 0 -10px 20px;
+    overflow: hidden;
+  }
+  .bs-glyphicons-list {
+    padding-left: 0;
+    list-style: none;
+  }
+  .bs-glyphicons li {
+    float: left;
+    width: 25%;
+    height: 115px;
+    line-height: 1.4;
+    padding: 10px;
+    font-size: 10px;
+    text-align: center;
+    background-color: #f9f9f9;
+    border: 1px solid #fff;
+  }
+  .bs-glyphicons .glyphicon {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    font-size: 24px;
+  }
+  .bs-glyphicons .glyphicon img {
+    width: 55px;
+    min-height: 40px;
+    max-height: 55px;
+  }
+  .bs-glyphicons .glyphicon-class {
+    display:block;/* 内联对象需加 */  
+    /*width:31em; 何问起 hovertree.com   */
+    word-break:keep-all;/* 不换行 */  
+    white-space:nowrap;/* 不换行 */  
+    overflow:hidden;/* 内容超出宽度时隐藏超出部分的内容 */  
+    text-overflow:ellipsis;/* 当对象内文本溢出时显示省略标记 (...) ；需与 overflow:hidden; 一起使用。*/  
+  }
+  .bs-glyphicons li:hover {
+    color: black;
+    background-color: white;
+    cursor: pointer;
+  }
+  @media (min-width: 768px) {
+    .bs-glyphicons {
+      margin-right: 0;
+      margin-left: 0;
+    }
+    .bs-glyphicons li {
+      width: 12.5%;
+      font-size: 12px;
+    }
+  }
+#appVue
+  .row
+    .col-md-8.col-md-offset-2
+      %el-upload.upload-demo{':action' => 'action', ':data' => 'data', drag: true, multiple: false, ':accept' => '"." + support_types', 'auto-upload' => true, ':on-success' => 'uploadOnSuccess', ':on-error' => 'uploadOnError', ':on-change' => 'uploadOnChange'}
+        %i.el-icon-upload
+        .el-upload__text
+          将文件拖到此处，或
+          %em 点击上传
+          %br
+          （只能上传 {{support_types}} 文件，且不超过20MB）
+  .row
+    .col-sm-12
+      .bs-glyphicons
+        %ul.bs-glyphicons-list
+          %li{'v-for' => '(item, index) in images', ':key' => 'item.file_name', 'v-clipboard:copy' => 'copyImageUrl(item)', 'v-clipboard:success' => "copyOnSuccess", 'v-clipboard:error' => "copyOnError"}
+            %span.glyphicon
+              %img{':src' => '"/images/documents/" + item.file_name', class: 'img-lazy-load'}
+            %span.glyphicon-class{'v-text' => 'item.origin_file_name'}
+
+= javascript_include_tag 'account/images/index'

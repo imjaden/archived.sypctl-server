@@ -102,7 +102,7 @@ class ApplicationController < Sinatra::Base
   end
 
   get '/login' do
-    redirect to('/account/jobs') if cookies[cookie_name].present? && current_user
+    redirect to('/account/documents') if cookies[cookie_name].present? && current_user
     @user = User.new(user_num: cookies[cookie_name] || '')
 
     haml :index, layout: settings.layout

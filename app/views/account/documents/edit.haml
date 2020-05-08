@@ -1,0 +1,11 @@
+%ol.breadcrumb
+  %li 文档中心
+  %li= link_to "文档管理", url_for("/")
+  %li 
+    编辑文档
+    &nbsp;|&nbsp;
+    %a{href: "/account/images", target: "blank"}
+      上传图片
+      %span.glyphicon.glyphicon-plus
+
+= haml :_form

@@ -70,7 +70,6 @@ new Vue({
         url: `/api/v2/account/device/query?uuid=${uuid}`,
         contentType: 'application/json'
       }).done(function(res, status, xhr) {
-        console.log(res)
         if(res.code === 200) {
           data = res.data
           window.App.addSuccessNotify(res.message)
@@ -78,7 +77,6 @@ new Vue({
           try {
             fileBackups = JSON.parse(data.file_backup_monitor || "{\"file_list\": []}")
             that.fileBackups = fileBackups
-            console.log('fileBackups', fileBackups)
           } catch(e) {
             console.log(e)
           }
@@ -159,7 +157,6 @@ new Vue({
         url: url,
         contentType: 'application/json'
       }).done(function(res, status, xhr) {
-        console.log(res)
         that.modal.title = file.file_path
         that.modal.body = res.code == 200 ? res.data : res.message
         $("#infoModal").modal('show')
@@ -176,6 +173,7 @@ new Vue({
     getBackupFileList(item) {
       item.file_list_array = Object.keys(item.file_list).map((file_path) => {
         let file = item.file_list[file_path]
+        file['device_uuid'] = item.device_uuid
         file['file_path'] = file_path
         file['snapshot_filename'] = file.pmd5 + "-" + file.mtime + "-" + file_path.split('/').pop()
         return file
@@ -200,7 +198,6 @@ new Vue({
         url: url,
         contentType: 'application/json'
       }).done(function(res, status, xhr) {
-        console.log(res)
         that.$nextTick(() => {
           that.behaviorLogs = that.behaviorLogs.concat(res.data)
           if(!res.data.length || res.data.length < 30) { that.loadMore = false }
@@ -221,7 +218,6 @@ new Vue({
         url: url,
         contentType: 'application/json'
       }).done(function(res, status, xhr) {
-        console.log(res)
         that.$nextTick(() => {
           that.backupMysqlMetas = that.backupMysqlMetas.concat(res.data)
           if(!res.data.length || res.data.length < 30) { that.loadMore = false }
@@ -242,8 +238,6 @@ new Vue({
         url: url,
         contentType: 'application/json'
       }).done(function(res, status, xhr) {
-        console.log(res)
-
         that.modal.title = `${item.ymd}#${item.device_name}`
         $("#mysqlModal").modal('show')
         that.$nextTick(() => {
