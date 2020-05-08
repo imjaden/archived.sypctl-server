@@ -1,0 +1,44 @@
+= stylesheet_link_tag 'element-ui@2.4.11.css'
+= javascript_include_tag 'element-ui@2.4.11.js'
+= javascript_include_tag 'spark-md5.min.js'
+
+%ol.breadcrumb
+  %li 应用中心
+  %li= link_to "应用管理", url_for("/")
+  %li= @app.name
+  %li 上传版本
+
+:css
+  .upload-demo,
+  .upload-demo .el-upload,
+  .upload-demo .el-upload .el-upload-dragger {
+    width: 100%;
+    min-height: 300px;
+  }
+  .upload-demo .el-upload .el-upload-dragger {
+    padding-top: 50px;
+  }
+  .upload-version-container .el-icon-upload {
+    font-size: 67px;
+    color: #c0c4cc;
+    margin: 40px 0 16px;
+    line-height: 50px;
+  }
+  .upload-demo .el-upload__input {
+    display: none;
+  }
+  .upload-demo .el-upload__tip {
+    text-align: center;
+  }
+#appVersionUpload.row
+  .col-md-2
+  .col-md-8
+    %el-upload.upload-demo{':action' => 'action', ':data' => 'data', drag: true, multiple: false, ':accept' => '"." + app.file_type', 'auto-upload' => true, ':on-success' => 'uploadOnSuccess', ':on-error' => 'uploadOnError', ':on-change' => 'uploadOnChange', ':on-preview' => 'uploadOnPreview'}
+      %i.el-icon-upload
+      .el-upload__text
+        将文件拖到此处，或
+        %em 点击上传
+        %br
+        （只能上传 {{app.file_type}} 文件，且不超过100mb）
+
+= erb :'version/upload.js'

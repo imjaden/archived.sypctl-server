@@ -88,7 +88,7 @@ case "$1" in
         bash $0 config
 
         fun_print_table_header "start process" "process" "status"
-        bash $0 redis:start
+        # bash $0 redis:start
         bash $0 unicorn:start
         fun_print_table_footer
     ;;
@@ -97,7 +97,7 @@ case "$1" in
         bash $0 unicorn:stop
         fun_print_table_footer
     ;;
-    restart)
+    restart|reload)
         bash $0 stop
         sleep 2
         bash $0 start

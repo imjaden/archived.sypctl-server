@@ -20,7 +20,7 @@ gem 'unicorn-worker-killer', '~> 0.4.4'
 
 # orm
 gem 'mysql2', '~> 0.4.4'
-gem 'sinatra-activerecord', '2.0.13'
+gem 'sinatra-activerecord', '2.0.18', github: 'sinatra-activerecord/sinatra-activerecord'
 gem 'redis', '~> 3.2.2'
 gem 'redis-namespace', '~> 1.5.2'
 gem 'sidekiq', '~> 4.0.2'
@@ -40,8 +40,8 @@ gem 'haml', '~> 4.0.7'
 gem 'therubyracer', '~> 0.12.2'
 gem 'settingslogic', '~> 2.0.9'
 
-gem 'will_paginate', '~> 3.0.6'
-gem 'will_paginate-bootstrap', '~> 1.0.1'
+gem 'will_paginate', '~> 3.3.0'
+gem 'will_paginate-bootstrap', '~> 1.0.2'
 
 gem 'geetest3', '~> 0.1.0'
 gem 'httparty', '~> 0.13.7'

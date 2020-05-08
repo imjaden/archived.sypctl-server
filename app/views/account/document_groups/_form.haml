@@ -1,0 +1,18 @@
+#appVue
+  - form_for @record = {}, '', method: "post", class: "form-horizontal", id: "recordForm" do |f|
+    - field_set_tag do
+      .form-group
+        = f.label '文档夹', class: "col-sm-2 control-label"
+        .col-sm-7
+          = f.text_field :title, class: "form-control", placeholder: "文档名称, 必填项", 'v-model' => 'title'
+      .form-group
+        = f.label '描述', class: "col-sm-2 control-label"
+        .col-sm-7
+          = f.text_area :description, rows: 20, class: "form-control", placeholder: "文档内容, 必填项", 'v-model' => 'description'
+      .form-group
+        .col-sm-offset-2.col-sm-10
+          = button_tag "提交", class: "btn btn-primary", '@click' => 'btnClickHandler'
+          = button_tag "取消", class: "btn btn-default", onclick: "cancel()"
+
+= javascript_include_tag 'stackedit.1.0.7.min'
+= javascript_include_tag 'account/document_groups/form'

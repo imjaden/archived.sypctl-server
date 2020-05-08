@@ -21,11 +21,15 @@ use Unicorn::WorkerKiller::Oom, (256*(1024**2)), (1024*(1024**2))
   '/account/device_groups' => 'Account::DeviceGroupController',
   '/account/jobs' => 'Account::JobController',
   '/account/job_templates' => 'Account::JobTemplateController',
+  '/account/documents' => 'Account::DocumentController',
+  '/account/document_groups' => 'Account::DocumentGroupController',
+  '/account/images' => 'Account::ImageController',
   '/account/file_backups' => 'Account::FileBackupController',
   '/api' => 'API::ApplicationController',
   '/api/v1' => 'API::V1Controller',
   '/api/v2' => 'API::V2Controller',
-  '/api/v3' => 'API::V3Controller'
+  '/api/v3' => 'API::V3Controller',
+  '/api/v4' => 'API::V4Controller'
 }.each_pair do |path, mod|
  map(path) { run mod.constantize }
 end

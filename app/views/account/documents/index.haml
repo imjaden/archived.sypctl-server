@@ -1,0 +1,44 @@
+:css   
+  .documents th:nth-child(n+1), .documents td:nth-child(n+1) { text-align: center; width: 5%; }
+  .documents th:nth-child(1), .documents td:nth-child(1) { width: 3%; }
+  .documents th:nth-child(2), .documents td:nth-child(2) { text-align: left; width: 20%; }
+  .documents th:nth-child(3), .documents td:nth-child(3) { width: 10%; }
+  .documents th:nth-child(4), .documents td:nth-child(4) { width: 15%; }
+  .documents th:nth-child(5), .documents td:nth-child(5) { width: 5%; }
+#appVue
+  %ol.breadcrumb
+    %li 文档中心
+    %li= link_to "文档管理", url_for('/') + "?page=#{params[:page] || 1}"
+    %li
+      %a{href: "#{url_for('/new')}?page=#{params[:page] || 1}"}
+        新建文档
+        %span.glyphicon.glyphicon-plus
+
+  .col-sm-3{':style' => '"height:" + screenHeight + "px;overflow:scroll;"'}
+    %ol.list-group
+      %li.list-group-item.disabled 文件夹：
+      %li.list-group-item{'v-for' => '(sideMenu, index) in records', ':class' => '{active: sideMenu === menu}', ':key' => 'sideMenu.id', '@click' => 'clickSideMenu(sideMenu)'}
+        {{ sideMenu.title }}
+        %span.badge {{ sideMenu.documents.length }}
+
+  .col-sm-9{':style' => '"height:" + screenHeight + "px;overflow:scroll;"'}
+    %table.table.table-hover.table-condensed.table-strip.table-bordered.smart-table.documents
+      %thead
+        %th -
+        %th 文档标题
+        %th 文档属性
+        %th 更新时间
+        %th 编辑
+      %tbody
+        %tr{'v-for' => '(record, index) in documents', ':key' => 'record.id'}
+          %td{'v-text' => 'index+1'}
+          %td.name
+            %a{'v-text' => 'record.title', ':href' => '"/account/documents/preview/" + record.uuid', target: '_blank'}
+          %td
+            %label.label.label-info{'v-text' => 'record.tags'}
+          %td{'v-text' => 'record.updated_at'}
+          %td
+            %a{':href' => '"/account/documents/edit?uuid=" + record.uuid', class: 'btn btn-xs btn-link'}
+              %span.glyphicon.glyphicon-edit
+
+= javascript_include_tag 'account/documents/index.js'
