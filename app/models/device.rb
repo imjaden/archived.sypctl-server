@@ -1,7 +1,7 @@
 # encoding: utf-8
 require 'timeout'
 require 'lib/utils/device.rb'
-require 'sinatra/activerecord'
+# require 'sinatra/activerecord'
 
 # 设备表（服务器）
 class Device < ActiveRecord::Base

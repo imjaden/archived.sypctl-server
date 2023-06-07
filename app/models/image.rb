@@ -1,5 +1,5 @@
 # encoding: utf-8
-require 'sinatra/activerecord'
+# require 'sinatra/activerecord'
 
 # 图库表
 class Image < ActiveRecord::Base

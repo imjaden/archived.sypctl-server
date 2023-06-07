@@ -1,8 +1,12 @@
-## 代码分支
+## SypCtl Server
 
-- dev-0.0.1 开发环境
-- dev-0.1.1 测试环境
-- dev-0.2.1 正式环境
+```
+$ bash tool.sh bundle
+$ bash tool.sh config
+$ bash tool.sh upgrade
+
+$ bundle exec unicorn -p 8085
+```
 
 ## 依赖
 

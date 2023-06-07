@@ -1,5 +1,5 @@
 # encoding: utf-8
-require 'sinatra/activerecord'
+# require 'sinatra/activerecord'
 
 # 任务模板表
 class JobTemplate < ActiveRecord::Base

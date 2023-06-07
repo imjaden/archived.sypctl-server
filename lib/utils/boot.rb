@@ -1,5 +1,6 @@
 # encoding: utf-8
 # Boot Assitant Methods
+
 module Utils
   module Boot
     def traverser_settings_yaml_to_env
@@ -8,13 +9,14 @@ module Utils
       settings_hash = YAML.load(IO.read(settings_path))
       settings_mtime = File.mtime(settings_path).to_i
       settings_json_path = File.join(root_path, "config/setting-#{ENV['RACK_ENV']}-#{settings_mtime}.json")
-      unless File.exists?(settings_json_path)
+      unless File.exist?(settings_json_path)
         result_hash = {}
         _traverser_settings_yaml_to_env(result_hash, settings_hash[ENV['RACK_ENV']])
         File.open(settings_json_path, "w:utf-8") { |file| file.puts(result_hash.to_json) }
       end
       ENV['settings.json.path'] = settings_json_path
-      JSON.parse(IO.read(settings_json_path)).each_pair do |key, value|
+      json_obj = JSON.parse(File.read(settings_json_path))
+      json_obj.each_pair do |key, value|
         ENV[key] = value
       end
     end

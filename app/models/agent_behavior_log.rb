@@ -1,7 +1,7 @@
 # encoding: utf-8
-require 'json'
+# require 'json'
 require 'digest/md5'
-require 'sinatra/activerecord'
+# require 'sinatra/activerecord'
 
 # 代理端行为记录表
 class AgentBehaviorLog < ActiveRecord::Base

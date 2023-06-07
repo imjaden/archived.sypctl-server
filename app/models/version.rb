@@ -1,5 +1,5 @@
 # encoding: utf-8
-require 'sinatra/activerecord'
+# require 'sinatra/activerecord'
 
 # 应用版本表
 class Version < ActiveRecord::Base

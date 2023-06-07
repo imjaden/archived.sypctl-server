@@ -1,6 +1,6 @@
 # encoding: utf-8
 require 'securerandom'
-require 'sinatra/activerecord'
+# require 'sinatra/activerecord'
 
 # 文档表
 class Document < ActiveRecord::Base

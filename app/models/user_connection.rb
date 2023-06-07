@@ -1,5 +1,5 @@
 # encoding: utf-8
-require 'sinatra/activerecord'
+require "active_record"
 
 # 用户与分组的关联表
 class UserConnection < ActiveRecord::Base

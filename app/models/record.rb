@@ -1,5 +1,5 @@
 # encoding: utf-8
-require 'sinatra/activerecord'
+# require 'sinatra/activerecord'
 
 # 代理请求记录表
 class Record < ActiveRecord::Base

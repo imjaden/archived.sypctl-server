@@ -1,5 +1,5 @@
 # encoding: utf-8
-require 'sinatra/activerecord'
+# require 'sinatra/activerecord'
 
 # 用户分组表
 class UserGroup < ActiveRecord::Base

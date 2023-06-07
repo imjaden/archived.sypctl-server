@@ -5,6 +5,7 @@ require 'aliyun/sms'
 require 'lib/utils/boot.rb'
 
 include Utils::Boot
+
 class AssetsHandler < Sinatra::Base
   configure do
     enable :logging, :static, :sessions

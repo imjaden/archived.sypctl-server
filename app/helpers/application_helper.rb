@@ -1,5 +1,8 @@
 # encoding: utf-8
 require 'active_support/core_ext/numeric'
+require "will_paginate-bootstrap"
+require "will_paginate/collection"
+
 module ApplicationHelper
   
   def flash_message

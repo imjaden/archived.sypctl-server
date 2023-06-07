@@ -1,5 +1,5 @@
 # encoding: utf-8
-require 'sinatra/activerecord'
+# require 'sinatra/activerecord'
 
 # 每日备份 MySQL 数据库信息
 class BackupMysqlDay < ActiveRecord::Base

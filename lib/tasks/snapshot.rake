@@ -207,7 +207,7 @@ namespace :mysql do
 
 
       snapshots_path = File.join(ENV['APP_ROOT_PATH'], 'db/snapshots')
-      FileUtils.mkdir_p(snapshots_path) unless File.exists?(snapshots_path)
+      FileUtils.mkdir_p(snapshots_path) unless File.exist?(snapshots_path)
 
       snapshot_name = "snapshot-#{Time.now.strftime('%y%m%d%H%M%S')}.sql"
       snapshot_path = File.join(snapshots_path, snapshot_name)
@@ -238,12 +238,13 @@ namespace :mysql do
       snapshot_name = File.read(latest_index_path).strip
       snapshot_path = File.join(snapshots_path, snapshot_name)
 
-      unless File.exists?(snapshot_path)
+      unless File.exist?(snapshot_path)
         puts "快照异常:\n#{snapshot_path} 不存在\n退出操作!"
         exit
       end
 
-      config = ActiveRecord::Base.connection_config()
+      # config = ActiveRecord::Base.connection_config()
+      config = {adapter: "mysql2", database: "sypctl_pro", host: "127.0.0.1", port: 3306, username: "root", password: "Root@321"}
       puts <<-EOF.strip_heredoc
         项目数据库连接:
         - host: #{config[:host]}
@@ -258,16 +259,19 @@ namespace :mysql do
         - 更新时间: #{File.mtime(snapshot_path)}
       EOF
 
-      snapshot_output_path = File.join(ENV['APP_ROOT_PATH'], 'tmp', snapshot_name + '.output')
+      snapshot_tmp_path = File.join(ENV['APP_ROOT_PATH'], 'tmp')
+      snapshot_output_path = File.join(snapshot_tmp_path, snapshot_name + '.output')
+      Dir.mkdir(snapshot_tmp_path) unless File.exist?(snapshot_tmp_path)
+
       command = utils_import_sql_file_command(snapshot_path, config, snapshot_output_path)
-      File.delete(snapshot_output_path) if File.exists?(snapshot_output_path)
+      File.delete(snapshot_output_path) if File.exist?(snapshot_output_path)
 
       `#{command}`
 
       puts "\n加载快照结果:"
       puts "- 执行命令: $ #{command.gsub(ENV['APP_ROOT_PATH'], '.')}"
       puts "- 输出日志: #{snapshot_output_path.gsub(ENV['APP_ROOT_PATH'], '.')}"
-      if File.exists?(snapshot_output_path) 
+      if File.exist?(snapshot_output_path) 
         if File.readlines(snapshot_output_path).count > 1
           puts "- 日志明细:"
           puts File.readlines(snapshot_output_path)[1..-1].uniq.reject(&:empty?).map { |line| "\tmysql> #{line.strip}" }.join("\n")

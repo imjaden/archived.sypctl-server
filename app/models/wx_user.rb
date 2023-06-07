@@ -1,7 +1,7 @@
 # encoding: utf-8
-require 'json'
+# require 'json'
 require 'digest/md5'
-require 'sinatra/activerecord'
+# require 'sinatra/activerecord'
 
 # 微信用户表
 class WxUser < ActiveRecord::Base

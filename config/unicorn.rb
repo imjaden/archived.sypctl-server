@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "redis"
 require 'settingslogic'
+require 'fileutils'
 require File.expand_path('../../app/models/setting.rb', __FILE__) unless defined?(Setting)
 
 # config/unicorn.rb

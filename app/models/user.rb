@@ -1,7 +1,7 @@
 # encoding: utf-8
-require 'json'
+# require 'json'
 require 'digest/md5'
-require 'sinatra/activerecord'
+# require 'sinatra/activerecord'
 
 # 用户表，与生意+ 同源
 class User < ActiveRecord::Base

@@ -1,8 +1,8 @@
 # encoding: utf-8
-require 'json'
+# require 'json'
 require 'fileutils'
 require 'digest/md5'
-require 'sinatra/activerecord'
+# require 'sinatra/activerecord'
 
 # 文件备份
 class FileBackup < ActiveRecord::Base

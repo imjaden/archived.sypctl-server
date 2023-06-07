@@ -9,9 +9,9 @@ require 'lib/utils/rake_utils_instance_methods'
 
 task default: [:environment]
 
-desc 'bundle exec rake task_name RACK_ENV=development'
+desc 'bundle exec rake :task_name RACK_ENV=development'
 task environment: 'Gemfile.lock' do
-  ENV['RACK_ENV'] ||= 'production'
+  ENV['RACK_ENV'] ||= 'development'
   ENV['RAILS_ENV'] = ENV['RACK_ENV']
   require File.expand_path('../config/boot.rb', __FILE__)
 

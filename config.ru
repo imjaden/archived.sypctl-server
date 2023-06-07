@@ -31,5 +31,5 @@ use Unicorn::WorkerKiller::Oom, (256*(1024**2)), (1024*(1024**2))
   '/api/v3' => 'API::V3Controller',
   '/api/v4' => 'API::V4Controller'
 }.each_pair do |path, mod|
- map(path) { run mod.constantize }
+  map(path) { run mod.constantize }
 end

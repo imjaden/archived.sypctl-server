@@ -26,12 +26,12 @@ class ApplicationController < Sinatra::Base
     end
   }
 
-  register Sinatra::Reloader unless ENV['RACK_ENV'].eql?('production')
+  # register Sinatra::Reloader unless ENV['RACK_ENV'].eql?('production')
   register Sinatra::MultiRoute
   register Sinatra::Logger
-  register Sinatra::Flash
+  # register Sinatra::Flash
   register Sinatra::MarkupPlugin
-  register Sinatra::ActiveRecordExtension
+  # register Sinatra::ActiveRecordExtension
   register WillPaginate::Sinatra
   WillPaginate.per_page = 15
 
@@ -92,7 +92,7 @@ class ApplicationController < Sinatra::Base
     if request.path_info.start_with?('/images/')
       send_file(app_root_join('/app/assets/images/404-small.png'), type: 'image/png', filename: '404.png', disposition: 'inline')
     else
-      flash[:warning] = "路由不存在，#{request.request_method} #{request.url}"
+      # flash[:warning] = "路由不存在，#{request.request_method} #{request.url}"
       redirect to('/')
     end
   end
@@ -115,15 +115,17 @@ class ApplicationController < Sinatra::Base
 
   post '/login' do
     user, message = User.authen_with_api(params[:user])
+    puts message
+    puts user.inspect
 
     if user
-      flash[:success] = message
+      # flash[:success] = message
       set_login_cookie(params[:user][:user_num])
 
       redirect to("/account/jobs?#{append_params_when_login(user)}")
     end
     
-    flash[:waning] = message
+    # flash[:waning] = message
     redirect to('/login')
   end
 
@@ -176,7 +178,7 @@ class ApplicationController < Sinatra::Base
     url = "/login?#{append_params_when_logout}"
     set_login_cookie(nil)
 
-    flash[:success] = '登出成功'
+    # flash[:success] = '登出成功'
     redirect to(url)
   end
 
@@ -184,7 +186,7 @@ class ApplicationController < Sinatra::Base
     return if cookies[cookie_name].present? && current_user
 
     cookies['path_before_login']= request.url
-    flash[:danger] = '继续操作前请登录.'
+    # flash[:danger] = '继续操作前请登录.'
     redirect '/login', 302
   end
 
@@ -328,12 +330,12 @@ class ApplicationController < Sinatra::Base
 
   def append_params_when_login(user)
     bsession = ((0..100).to_a + ('a'..'z').to_a).sample(128).join
-    "bsession=#{bsession}&user_num=#{user.user_num}&user_name=#{URI.encode(user.user_name)}&login_authen_to_redirect=true"
+    "bsession=#{bsession}&user_num=#{user.user_num}&user_name=#{user.user_name}&login_authen_to_redirect=true"
   end
 
   def append_params_when_logout
     bsession = ((0..100).to_a + ('a'..'z').to_a).sample(128).join
-    "bsession=#{bsession}&user_num=#{current_user.user_num}&user_name=#{URI.encode(current_user.user_name)}&logout_authen_to_redirect=true"
+    "bsession=#{bsession}&user_num=#{current_user.user_num}&user_name=#{current_user.user_name}&logout_authen_to_redirect=true"
   end
 
   def cookie_name

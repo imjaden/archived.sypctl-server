@@ -1,5 +1,5 @@
 # encoding: utf-8
-require 'sinatra/activerecord'
+# require 'sinatra/activerecord'
 
 # 文档修改历史表
 class DocumentHistory < ActiveRecord::Base

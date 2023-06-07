@@ -1,6 +1,7 @@
 # encoding: utf-8
 require 'yaml'
 require 'json'
+
 namespace :boom do
   def check_setting_has_key?(keystr, delimit = '.')
     parts = keystr.split(delimit)
@@ -62,6 +63,21 @@ namespace :boom do
     end
 
     puts "sidekiq: 配置正确"
+  end
+
+  task :test do
+    json_content = File.read("version.json")
+    puts json_content.to_s
+    json_content = {host: "localhost", username: "root", password: "Root@321"}.to_json
+    puts json_content.to_s
+    version = JSON.parse(json_content)
+
+    require 'mysql2'
+    client = Mysql2::Client.new(host: "localhost", username: "root", password: "Root@321")
+    results = client.query("show databases;")
+    results.each do |item|
+      puts item.inspect
+    end
   end
 
   desc 'check config/setting.yaml necessary keys'

@@ -1,6 +1,6 @@
 # encoding: utf-8
 require 'cgi'
-require 'json'
+# require 'json'
 require 'fileutils'
 require 'digest/md5'
 require 'securerandom'
