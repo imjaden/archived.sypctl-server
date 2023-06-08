@@ -124,7 +124,7 @@ module Mail
       options[:attachment_path] ||= []
       options[:attachment_path] = [options[:attachment_path]] unless options[:attachment_path].is_a?(Array)
       options[:attachment_path].uniq.each do |attachment_path|
-        next unless File.exists?(attachment_path)
+        next unless File.exist?(attachment_path)
 
         mail_body += "\n"
         attachment_content = <<-EOF.strip_mail_heredoc

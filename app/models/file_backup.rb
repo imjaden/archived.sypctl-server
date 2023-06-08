@@ -27,7 +27,7 @@ class FileBackup < ActiveRecord::Base
     records = FileBackup.all.order(id: :desc).map { |fb| { backup_uuid: fb.uuid, backup_path: fb.file_path, backup_description: fb.description }}.to_json
 
     cache_path = File.join(ENV['APP_ROOT_PATH'], 'tmp/file-backups')
-    FileUtils.mkdir_p(cache_path) unless File.exists?(cache_path)
+    FileUtils.mkdir_p(cache_path) unless File.exist?(cache_path)
 
     hash_path = File.join(cache_path, 'db.hash')
     json_path = File.join(cache_path, 'db.json')
@@ -39,7 +39,7 @@ class FileBackup < ActiveRecord::Base
   def self.db_hash
     cache_path = File.join(ENV['APP_ROOT_PATH'], 'tmp/file-backups')
     hash_path = File.join(cache_path, 'db.hash')
-    refresh_file_backup_cache unless File.exists?(hash_path)
+    refresh_file_backup_cache unless File.exist?(hash_path)
 
     File.read(hash_path).strip
   end
@@ -47,7 +47,7 @@ class FileBackup < ActiveRecord::Base
   def self.db_mtime
     cache_path = File.join(ENV['APP_ROOT_PATH'], 'tmp/file-backups')
     hash_path = File.join(cache_path, 'db.json')
-    refresh_file_backup_cache unless File.exists?(hash_path)
+    refresh_file_backup_cache unless File.exist?(hash_path)
 
     File.mtime(hash_path).strftime('%Y/%m/%d %H:%M:%S')
   end
@@ -55,7 +55,7 @@ class FileBackup < ActiveRecord::Base
   def self.db_json
     cache_path = File.join(ENV['APP_ROOT_PATH'], 'tmp/file-backups')
     json_path = File.join(cache_path, 'db.json')
-    refresh_file_backup_cache unless File.exists?(json_path)
+    refresh_file_backup_cache unless File.exist?(json_path)
 
     JSON.parse(File.read(json_path))
   end

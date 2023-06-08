@@ -15,7 +15,7 @@ namespace :boom do
   end
 
   def check_dirpath_writable(dirpath, prompt)
-    unless File.exists?(dirpath)
+    unless File.exist?(dirpath)
       puts "ERROR: #{prompt}: #{dirpath} 路径不存在"
       return false
     end

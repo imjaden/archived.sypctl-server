@@ -169,7 +169,7 @@ module Account
         extname = File.extname(form_data[:filename])
         version_path = File.join(version_folder, "#{generate_uuid}#{extname}")
         begin
-          FileUtils.rm_rf(version_path) if File.exists?(version_path)
+          FileUtils.rm_rf(version_path) if File.exist?(version_path)
           File.open(version_path, "wb") { |file| file.write(temp_file.read) }
           version_md5 = digest_file_md5(version_path)
         rescue => e

@@ -15,7 +15,7 @@
 require 'json'
 require 'digest/md5'
 
-unless File.exists?('sypctl-backup.json')
+unless File.exist?('sypctl-backup.json')
   puts "请配置 sypctl-backup.json"
   exit(1)
 end

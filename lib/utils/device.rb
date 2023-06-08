@@ -213,7 +213,7 @@ module Utils
       def uuid
         uuid_tmp_path = File.join(ENV["RAKE_ROOT_PATH"] || Dir.pwd, "device-uuid")
 
-        if File.exists?(uuid_tmp_path)
+        if File.exist?(uuid_tmp_path)
           device_uuid = File.read(uuid_tmp_path).strip
           
           if device_uuid.empty?

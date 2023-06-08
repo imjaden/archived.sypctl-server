@@ -5,7 +5,7 @@ namespace :redis do
   task load: :environment do
     register Sinatra::Redis
 
-    if !ENV['data_path'] || !File.exists?(ENV['data_path'])
+    if !ENV['data_path'] || !File.exist?(ENV['data_path'])
       puts "Error: 数据文件不存在 #{ENV['data_path']}"
       exit 1
     end

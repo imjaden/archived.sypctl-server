@@ -69,7 +69,8 @@ module API
       jobs, file_backups = [], []
       record = Record.create(params[:device])
       if device = Device.find_by(uuid: params[:device][:uuid])
-        device.update_attributes({record_count: device.record_count + 1})
+        device.attributes[:record_count] = device.record_count + 1
+        device.save
         jobs = Job.where(device_uuid: device.uuid, state: 'waiting').map(&:to_hash)
       end
 
@@ -173,7 +174,7 @@ module API
       api_authen_params([:app_uuid, :version_file_name])
 
       version_file_path = File.join(Setting.path.version, params[:app_uuid], params[:version_file_name])
-      halt_with_format_json({data: {}, message: '版本文件不存在', code: 403}, 403) unless File.exists?(version_file_path)
+      halt_with_format_json({data: {}, message: '版本文件不存在', code: 403}, 403) unless File.exist?(version_file_path)
 
       send_file(version_file_path, type: 'application/java-archive', filename: File.basename(version_file_path), disposition: 'attachment')
     end
@@ -351,7 +352,7 @@ module API
 
     def upload_backup_file(params)
       snapshot_backup_path = File.join(Setting.path.file_backup, params[:device_uuid], 'snapshots')
-      FileUtils.mkdir_p(snapshot_backup_path) unless File.exists?(snapshot_backup_path)
+      FileUtils.mkdir_p(snapshot_backup_path) unless File.exist?(snapshot_backup_path)
 
       backup_file_object = params[:file_object][:tempfile]
       snapshot_filepath = File.join(snapshot_backup_path, params[:snapshot_filename])
@@ -364,7 +365,7 @@ module API
 
     def upload_backup_snapshot(params)
       device_backup_path = File.join(Setting.path.file_backup, params[:device_uuid])
-      FileUtils.mkdir_p(device_backup_path) unless File.exists?(device_backup_path)
+      FileUtils.mkdir_p(device_backup_path) unless File.exist?(device_backup_path)
 
       snapshot_instance_path = File.join(device_backup_path, "#{params[:backup_uuid]}-snapshot.json")
       File.open(snapshot_instance_path, 'w:utf-8') { |file| file.puts(params.to_json) }
@@ -373,7 +374,7 @@ module API
     # deprecated
     def upload_file_backup(params)
       file_folder = File.join(Setting.path.file_backup, params[:device_uuid], params[:file_uuid])
-      FileUtils.mkdir_p(file_folder) unless File.exists?(file_folder)
+      FileUtils.mkdir_p(file_folder) unless File.exist?(file_folder)
       file_path = File.join(file_folder, params[:archive_file_name])
 
       temp_file = params[:backup_file][:tempfile]
@@ -386,7 +387,7 @@ module API
 
     def upload_files_backup(params)
       file_folder = File.join(Setting.path.file_backup, params[:device_uuid], params[:file_uuid])
-      FileUtils.mkdir_p(file_folder) unless File.exists?(file_folder)
+      FileUtils.mkdir_p(file_folder) unless File.exist?(file_folder)
 
       params[:file_list].keys.each do |key|
         hsh = params[:file_list][key]
@@ -404,7 +405,7 @@ module API
 
     def upload_mysql_backup(params)
       ymd_folder = File.join(Setting.path.mysql_backup, params[:device_uuid], params[:host], params[:ymd])
-      FileUtils.mkdir_p(ymd_folder) unless File.exists?(ymd_folder)
+      FileUtils.mkdir_p(ymd_folder) unless File.exist?(ymd_folder)
       backup_path = File.join(ymd_folder, params[:backup_name])
 
       temp_file = params[:backup_file][:tempfile]

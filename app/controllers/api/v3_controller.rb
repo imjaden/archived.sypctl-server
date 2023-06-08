@@ -166,12 +166,12 @@ module API
 
     def get_weixin_acode(scene)
       image_folder = app_root_join('public/images/wxacode')
-      FileUtils.mkdir_p(image_folder) unless File.exists?(image_folder)
+      FileUtils.mkdir_p(image_folder) unless File.exist?(image_folder)
 
       image_name = scene.gsub('=', '-').gsub('&', '_') + '.png'
       image_path = File.join(image_folder, image_name)
 
-      unless File.exists?(image_path)
+      unless File.exist?(image_path)
         access_token = get_wxmp_access_token
         options = {
           page: 'pages/group-list/main',

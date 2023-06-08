@@ -86,7 +86,7 @@ def utils_procedure_generate_error_report(config)
   end.compact
 
   error_report_path = File.join(procedures_path, "procedures-state-exception-#{datasource_id}.html")
-  File.delete(error_report_path) if File.exists?(error_report_path)
+  File.delete(error_report_path) if File.exist?(error_report_path)
 
   puts error_report_path
   File.open(error_report_path, "a+:utf-8") do |file|
@@ -172,7 +172,7 @@ def utils_sqls_generate_error_report
   end.compact
 
   error_report_path = File.join(saas_sqls_path, "sqls-state-exception-report.html")
-  File.delete(error_report_path) if File.exists?(error_report_path)
+  File.delete(error_report_path) if File.exist?(error_report_path)
 
   puts error_report_path
   File.open(error_report_path, "a+:utf-8") do |file|
